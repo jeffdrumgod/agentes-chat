@@ -6,5 +6,12 @@
       "native/web": "web",
       "native/licenses/npm": "licenses/npm"
     }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://127.0.0.1:9/updates-disabled-team-build"
+      ]
+    }
   }
 }
