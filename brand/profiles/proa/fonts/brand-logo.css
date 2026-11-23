@@ -1,0 +1,13 @@
+/* Proa: the wordmark is Nunito ExtraBold (fonts.css), not a light display face. */
+.ac-logo {
+  font-weight: 800;
+}
+
+.proa-art {
+  display: block;
+}
+
+/* Over the empty state's glow, which is absolutely placed (the upstream sticker gets the same rule). */
+.ac-empty__agent .proa-art {
+  position: relative;
+}

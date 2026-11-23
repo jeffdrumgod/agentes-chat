@@ -1,0 +1,9 @@
+{
+  "name": "Example",
+  "scheme": "example",
+  "distribution": {
+    "updater": "off",
+    "downloadUrl": "https://example.com/download",
+    "defaultServer": "https://chat.example.com"
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "name": "Proa",
+  "scheme": "proa",
+  "distribution": {
+    "updater": "off",
+    "downloadUrl": "https://github.com/${BRAND_REPO}/releases",
+    "defaultServer": null
+  },
+  "assets": {
+    "_mark": "assets/mark.svg",
+    "apps/web/public/og.png": "assets/og.png",
+    "apps/web/public/push-badge.png": "assets/push-badge.png",
+    "apps/web/public/email/logo-ink.png": "assets/logo-ink.png",
+    "apps/web/public/email/logo-ink-tile.png": "assets/logo-ink-tile.png",
+    "apps/web/public/email/logo-bone.png": "assets/logo-bone.png",
+    "apps/web/public/email/mark.png": "assets/mark.png",
+    "apps/mobile/assets/images/splash-icon.png": "assets/splash-icon.png",
+    "apps/mobile/assets/images/notification-icon.png": "assets/notification-icon.png",
+    "apps/web/src/fonts/nunito-800-latin.woff2": "fonts/nunito-800-latin.woff2",
+    "apps/web/src/fonts/nunito-800-latin-ext.woff2": "fonts/nunito-800-latin-ext.woff2",
+    "apps/web/src/fonts/OFL-nunito.txt": "fonts/OFL-nunito.txt",
+    "apps/desktop/src/fonts/nunito-800-latin.woff2": "fonts/nunito-800-latin.woff2",
+    "apps/desktop/src/fonts/nunito-800-latin-ext.woff2": "fonts/nunito-800-latin-ext.woff2",
+    "apps/desktop/src/fonts/OFL-nunito.txt": "fonts/OFL-nunito.txt",
+    "apps/web/public/brand/3d/dupla.webp": "assets/3d/dupla.webp",
+    "apps/web/public/brand/3d/timo-acenando.webp": "assets/3d/timo-acenando.webp",
+    "apps/web/public/brand/3d/timo-luneta.webp": "assets/3d/timo-luneta.webp",
+    "apps/web/public/brand/3d/facho-parado.webp": "assets/3d/facho-parado.webp",
+    "apps/web/public/brand/3d/timo-headset.webp": "assets/3d/timo-headset.webp",
+    "apps/web/src/components/ProaArt.tsx": "components/ProaArt.tsx",
+    "packages/ui/src/components/ProaArt.tsx": "components/ProaArt.tsx",
+    "apps/desktop/public/brand/3d/dupla.webp": "assets/3d/dupla.webp",
+    "apps/desktop/public/brand/3d/timo-acenando.webp": "assets/3d/timo-acenando.webp",
+    "apps/desktop/public/brand/3d/timo-luneta.webp": "assets/3d/timo-luneta.webp",
+    "apps/desktop/public/brand/3d/facho-parado.webp": "assets/3d/facho-parado.webp",
+    "apps/desktop/public/brand/3d/timo-headset.webp": "assets/3d/timo-headset.webp"
+  },
+  "theme": "theme.json",
+  "overrides": {
+    "packages/ui/src/agent/engine.js": {
+      "file": "override/packages/ui/src/agent/engine.js",
+      "upstreamSha256": "23a83fbe403c65b67df16167d24a5f5d7c7b481f5ab9ba08ff1078e92d924709"
+    },
+    "packages/ui/test/agent-engine.test.ts": {
+      "file": "override/packages/ui/test/agent-engine.test.ts",
+      "upstreamSha256": "cbdc8019999ddc9f1467c2020d118141c9202e5b865bcd6283e14c7026fcee3c"
+    },
+    "apps/mobile/test/recorder.test.ts": {
+      "file": "override/apps/mobile/test/recorder.test.ts",
+      "upstreamSha256": "00f5535e96080963490d9284ce71dfc9968829a0041b1f33269388707c810797"
+    },
+    "packages/ui/scripts/app-icons/scenes.mjs": {
+      "file": "override/packages/ui/scripts/app-icons/scenes.mjs",
+      "upstreamSha256": "c5693b8a8e3ae3aef7bec692e09d2c6a7766841b2771c01cccf0c32bf6653b89"
+    },
+    "packages/ui/scripts/app-icons/scenes.d.mts": {
+      "file": "override/packages/ui/scripts/app-icons/scenes.d.mts",
+      "upstreamSha256": "1adc4fb479378a57322147814b563619050d261f246a9e75ee9827618dfa0a28"
+    },
+    "packages/engine/scripts/email-art.ts": {
+      "file": "override/packages/engine/scripts/email-art.ts",
+      "upstreamSha256": "acfe6c0f9ead6dabb866c229bdddaa821714ea777a9cc4c10b3caccb72eed755"
+    },
+    "apps/desktop/scripts/icons.ts": {
+      "file": "override/apps/desktop/scripts/icons.ts",
+      "upstreamSha256": "a768ac06eb04cdf26d8971fbdc190e7b1051be16763c81fbac18f2e2194930e8"
+    },
+    "packages/setup/src/term.ts": {
+      "file": "override/packages/setup/src/term.ts",
+      "upstreamSha256": "ff2a095822b4c8d0671b917a682d4e96a25bba3cd9848ef302fcd59da291d58a"
+    },
+    "packages/ui/scripts/favicon.mjs": {
+      "file": "override/packages/ui/scripts/favicon.mjs",
+      "upstreamSha256": "3e3fa1bb087531469430973ab8fffaf1c528949a406f24a436411a4c11104348"
+    },
+    "packages/ui/test/sky.test.tsx": {
+      "file": "override/packages/ui/test/sky.test.tsx",
+      "upstreamSha256": "38974b7919512d6524c2db5cbef753d2c43ba45fa2bad1623e76c98df7e53575"
+    },
+    "packages/ui/test/components.test.tsx": {
+      "file": "override/packages/ui/test/components.test.tsx",
+      "upstreamSha256": "5631a33de33c945dd2deb3f70242ebc72ba37bad17875e80f46c5b906feac8f9"
+    },
+    "packages/ui/test/app-icons.test.ts": {
+      "file": "override/packages/ui/test/app-icons.test.ts",
+      "upstreamSha256": "dbdcc767cdf37c3d8741384cbeae04639616f05efa83f485f221e76b5daab031"
+    },
+    "packages/ui/test/media.test.tsx": {
+      "file": "override/packages/ui/test/media.test.tsx",
+      "upstreamSha256": "f8ab4c9f5aa4711c6a139e63f9c57c8ad836e0b21a4790ad37c3e45163565b6d"
+    },
+    "packages/ui/test/dither.test.tsx": {
+      "file": "override/packages/ui/test/dither.test.tsx",
+      "upstreamSha256": "0614650eb99324caec3d8a194fcd4c5f14e2180f95cb0faf39b2642f45c2c60d"
+    },
+    "packages/ui/test/brain-portrait.test.tsx": {
+      "file": "override/packages/ui/test/brain-portrait.test.tsx",
+      "upstreamSha256": "09f338e50d5e1e43c5368b35b1c41bb8314cbd9ad96ce824d5f97f5a0cf1df54"
+    },
+    "packages/ui/src/sky/math.ts": {
+      "file": "override/packages/ui/src/sky/math.ts",
+      "upstreamSha256": "b925eeceb67484c005a5ed1050a331d1707b68bb864299889a51b26a9184393f"
+    },
+    "apps/desktop/scripts/pixel-art.ts": {
+      "file": "override/apps/desktop/scripts/pixel-art.ts",
+      "upstreamSha256": "8cb401b163bce3d4395c103a1e9b27ad3e93a98ca8336695febfb1c19e693dcc"
+    },
+    "apps/mobile/test/features/settings.test.ts": {
+      "file": "override/apps/mobile/test/features/settings.test.ts",
+      "upstreamSha256": "4226175fc3e2ec59ce8c864b6736a8d77b19f2a608eb9565b1ea91d03a27af61"
+    },
+    "packages/ui/src/sky/wallpaper.ts": {
+      "file": "override/packages/ui/src/sky/wallpaper.ts",
+      "upstreamSha256": "fb7571bca93f89cd587bf0c07d0f5362783b97d84130c087e8d0205d08790c86"
+    },
+    "packages/ui/src/sky/engine.ts": {
+      "file": "override/packages/ui/src/sky/engine.ts",
+      "upstreamSha256": "55b5959a08acf2448e7f3f2464d18d15744ed587aa0f779900027c1ba870d90f"
+    },
+    "packages/ui/src/sky/burst.ts": {
+      "file": "override/packages/ui/src/sky/burst.ts",
+      "upstreamSha256": "9673b393545953d5196dde639cc931540b98ae74cf55c9f12881f41e3831075d"
+    },
+    "apps/desktop/scripts/dmg-art.ts": {
+      "file": "override/apps/desktop/scripts/dmg-art.ts",
+      "upstreamSha256": "f782869972f053f781c9d7acce735e035d4a35723a7e3ae23516e1b94365dcdd"
+    },
+    "apps/mobile/src/sky/ComputerSky.tsx": {
+      "file": "override/apps/mobile/src/sky/ComputerSky.tsx",
+      "upstreamSha256": "1b78c1cf2c18a9340fa19d77c585d6f95187c904affca34704dbe2cba431e120"
+    },
+    "apps/web/src/components/AuthLayout.tsx": {
+      "file": "override/apps/web/src/components/AuthLayout.tsx",
+      "upstreamSha256": "2f93ba385c873bb299a2cad0d51d0f0cdd40ff87b99bd7e66c116eef7fa86f99"
+    },
+    "apps/web/src/pages/OnboardingPage.tsx": {
+      "file": "override/apps/web/src/pages/OnboardingPage.tsx",
+      "upstreamSha256": "6779ab8df951c6b03f62509b2a2c051c7aaed2ff66b2d99b2aeb3497a4ba7642"
+    },
+    "packages/ui/src/components/Surfaces.tsx": {
+      "file": "override/packages/ui/src/components/Surfaces.tsx",
+      "upstreamSha256": "660d0f969161125dcf9ad0f26409ef1923495bb0ac400a4c157cf61822d9a9fd"
+    },
+    "apps/web/src/routes/__root.tsx": {
+      "file": "override/apps/web/src/routes/__root.tsx",
+      "upstreamSha256": "34d06b992fda588ff9cdcdffc4c2234cf103cd9175524aa8b7750e37ccf3b7bf"
+    }
+  },
+  "ids": {
+    "desktop": "${BRAND_DESKTOP_ID}",
+    "mobile": "${BRAND_APP_ID}"
+  },
+  "mobile": {
+    "slug": "proa"
+  },
+  "generate": {
+    "all": [
+      "node packages/ui/scripts/favicon.mjs",
+      "node packages/ui/scripts/app-icons.mjs",
+      "bun packages/engine/scripts/email-art.ts",
+      "bun run docs:env"
+    ],
+    "desktop": [
+      "bun apps/desktop/scripts/icons.ts",
+      "bun apps/desktop/scripts/dmg-art.ts",
+      "bun apps/desktop/scripts/installer-art.ts"
+    ]
+  },
+  "afterGenerate": {
+    "apps/web/public/email/mark.png": "assets/mark.png",
+    "apps/web/public/apple-touch-icon.png": "assets/3d/apple-touch-icon.png",
+    "apps/web/public/icon-512.png": "assets/3d/icon-512.png",
+    "apps/web/public/app-icons/night.png": "assets/3d/preview.png",
+    "apps/desktop/app-icon.png": "assets/3d/icon.png",
+    "apps/desktop/app-icon-tile.png": "assets/3d/icon.png",
+    "apps/desktop/src-tauri/icons/app/night.png": "assets/3d/icon-512.png",
+    "apps/desktop/src-tauri/icons/app/night-tile.png": "assets/3d/icon-512.png",
+    "apps/mobile/assets/app-icons/peekNight/ios.png": "assets/3d/icon.png",
+    "apps/mobile/assets/app-icons/peekNight/ios-dark.png": "assets/3d/ios-dark.png",
+    "apps/mobile/assets/app-icons/peekNight/ios-tinted.png": "assets/3d/ios-tinted.png",
+    "apps/mobile/assets/app-icons/peekNight/android-foreground.png": "assets/3d/android-foreground.png",
+    "apps/mobile/assets/app-icons/peekNight/android-background.png": "assets/3d/android-background.png",
+    "apps/mobile/assets/app-icons/peekNight/android-monochrome.png": "assets/3d/android-monochrome.png",
+    "apps/mobile/assets/app-icons/peekNight/preview.png": "assets/3d/preview.png",
+    "apps/mobile/assets/app-icons/peekNight/preview-dark.png": "assets/3d/preview-dark.png"
+  },
+  "rightHand": {
+    "name": "Timo",
+    "handle": "timo"
+  },
+  "css": {
+    "apps/web/src/fonts.css": "fonts/brand-font.css",
+    "apps/desktop/src/fonts.css": "fonts/brand-font.css",
+    "packages/ui/src/styles/components.css": "fonts/brand-logo.css",
+    "apps/web/src/styles.css": "fonts/brand-root.css",
+    "apps/desktop/src/styles.css": "fonts/brand-root.css"
+  },
+  "serverDefaults": {
+    "SOURCE_URL": "https://github.com/${BRAND_REPO}",
+    "PUSH_SENDER": "direct",
+    "APNS_APP_IDS": "${BRAND_APP_ID}",
+    "DESKTOP_RELEASES_REPO": "${BRAND_REPO}",
+    "FEEDBACK_RELAY": false,
+    "TELEMETRY": "off",
+    "PROBLEM_REPORT_URL": "off"
+  },
+  "patches": [
+    {
+      "why": "first run: joining an existing workspace is the first place (no hosted cloud of our own)",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "onCloud(makeFirst ? \"/onboarding\" : \"/login\");",
+      "replace": "onConnect();"
+    },
+    {
+      "why": "first run: the first place's title",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "{p === \"cloud\" && makeFirst ? t(\"desktop.first.addCloud\") : t(`desktop.place.${p}`)}",
+      "replace": "{p === \"cloud\" ? t(\"desktop.connect.title\") : t(`desktop.place.${p}`)}"
+    },
+    {
+      "why": "first run: the first place's line",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "<span className=\"ac-optrow__desc\">{t(`desktop.place.${p}Text`)}</span>",
+      "replace": "<span className=\"ac-optrow__desc\">{p === \"cloud\" ? t(\"desktop.connect.lead\") : t(`desktop.place.${p}Text`)}</span>"
+    },
+    {
+      "why": "first run: the first place's drawing is the team's server",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "<PlaceScene place={shown} computer={host.platform} shape=\"tall\" />",
+      "replace": "<PlaceScene place={shown === \"cloud\" ? \"box\" : shown} computer={host.platform} shape=\"tall\" />"
+    },
+    {
+      "why": "first run: no hosted-cloud sign-up line",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "{adding && !makeFirst && (",
+      "replace": "{false && adding && !makeFirst && ("
+    },
+    {
+      "why": "first run: the join line is now the first place",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "        <span className=\"dk-help dk-choose__more\">\n          {t(\"desktop.place.haveOne\")}{\" \"}\n          <button type=\"button\" className=\"ac-link dk-link\" onClick={onConnect}>\n            {t(\"desktop.place.haveOneLink\")}\n          </button>\n        </span>\n",
+      "replace": ""
+    },
+    {
+      "why": "server address examples use the product's name",
+      "files": [
+        "apps/desktop/src/i18n/keys.*.ts",
+        "apps/desktop/src/i18n/locales/*.json",
+        "apps/mobile/src/i18n/keys.*.ts",
+        "apps/mobile/src/i18n/locales/*.json"
+      ],
+      "pattern": "agentes\\.([A-Za-z0-9-]+)\\.ts\\.net",
+      "replace": "proa.$1.ts.net"
+    }
+  ]
+}
