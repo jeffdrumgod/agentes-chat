@@ -24,7 +24,15 @@ import {
   readPushData,
   systemToken,
 } from "../src/lib/push-payload";
-import { connectPlan, currentServer, savedServer } from "../src/lib/server-choice";
+import {
+  buildServer,
+  connectPlan,
+  currentServer,
+  NO_SERVER,
+  needsServer,
+  placeFor,
+  savedServer,
+} from "../src/lib/server-choice";
 import { createSocketFactory } from "../src/lib/socket";
 import { ICON_NAMES } from "../src/ui/icons.data";
 
@@ -323,6 +331,23 @@ describe("choosing a server", () => {
     expect(currentServer("not a server", cloud)).toBe(cloud);
     expect(savedServer(box, cloud)).toBe(box);
     expect(savedServer(cloud, cloud)).toBeNull();
+  });
+
+  test("the build's server: its address, the Cloud when unset, none when empty", () => {
+    expect(buildServer(undefined, cloud)).toBe(cloud);
+    expect(buildServer(`${box}/`, cloud)).toBe(box);
+    expect(buildServer("", cloud)).toBe(NO_SERVER);
+    expect(buildServer("  ", cloud)).toBe(NO_SERVER);
+  });
+
+  test("a build without a server asks for one until the person chooses", () => {
+    expect(needsServer(currentServer(null, NO_SERVER))).toBe(true);
+    expect(needsServer(currentServer(box, NO_SERVER))).toBe(false);
+    expect(needsServer(placeFor(box, "a1"))).toBe(false);
+    // The chosen one is remembered; "none" never is.
+    expect(savedServer(box, NO_SERVER)).toBe(box);
+    expect(savedServer(NO_SERVER, NO_SERVER)).toBeNull();
+    expect(needsServer(cloud)).toBe(false);
   });
 
   test("another server: the app moves there and nothing signs out (ADR 0154)", () => {
