@@ -1,0 +1,326 @@
+# Proa desktop for Windows and Linux, built from a proa/X.Y.Z tag and attached to that tag's release.
+# The macOS build is signed and notarized outside CI and uploaded to the same release.
+#
+# The brand is applied once (brand/build.sh, Linux) and the branded tree goes to each platform's job. Repository
+# variables BRAND_APP_ID and BRAND_DESKTOP_ID hold the app ids (brand/profiles/proa/brand.env.example); BRAND_REPO is
+# this repository.
+name: Proa desktop
+
+on:
+  push:
+    tags: ["proa/*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build (proa/X.Y.Z)"
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: proa-desktop-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - name: Version from the tag
+        id: v
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          VERSION="${TAG#proa/}"
+          [[ "$TAG" == proa/* && "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::$TAG is not proa/X.Y.Z"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: refs/tags/${{ steps.v.outputs.tag }}
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Apply the brand and build the desktop front
+        shell: bash
+        env:
+          BRAND_VERSION: ${{ steps.v.outputs.version }}
+          BRAND_APP_ID: ${{ vars.BRAND_APP_ID }}
+          BRAND_DESKTOP_ID: ${{ vars.BRAND_DESKTOP_ID }}
+        run: brand/build.sh --profile brand/profiles/proa --out "$RUNNER_TEMP/proa" --target desktop
+
+      # The server the app runs on this computer, among the app's resources (tauri.native.conf.json).
+      - name: Build the server's files
+        shell: bash
+        working-directory: ${{ runner.temp }}/proa
+        run: |
+          bun scripts/native-package.ts folders --out "$RUNNER_TEMP/native"
+          src="$(dirname "$(ls -d "$RUNNER_TEMP"/native/*/server "$RUNNER_TEMP"/native/*/*/server 2>/dev/null | head -1)")"
+          rm -rf apps/desktop/src-tauri/native && mkdir -p apps/desktop/src-tauri/native
+          mv "$src"/* apps/desktop/src-tauri/native/
+          test -s apps/desktop/src-tauri/native/server/native.js
+          test -s apps/desktop/src-tauri/native/web/index.html
+
+      - name: Pack the branded tree
+        shell: bash
+        run: tar --exclude=node_modules --exclude=.git -czf "$RUNNER_TEMP/proa-src.tgz" -C "$RUNNER_TEMP" proa
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: proa-src
+          path: ${{ runner.temp }}/proa-src.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  windows:
+    needs: brand
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            triple: x86_64-pc-windows-msvc
+            bun: bun-windows-x64-baseline
+            browser: win32-x64
+          - arch: arm64
+            triple: aarch64-pc-windows-msvc
+            bun: bun-windows-arm64
+            browser: win32-x64
+    runs-on: ${{ matrix.arch == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: bash
+        working-directory: proa
+    env:
+      BIN_DIR: apps/desktop/src-tauri/binaries
+      VERSION: ${{ needs.brand.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: proa-src
+
+      - name: Unpack the branded tree
+        working-directory: .
+        run: tar -xzf proa-src.tgz && rm proa-src.tgz
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: proa/package.json
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+
+      - uses: swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: proa/apps/desktop/src-tauri -> target
+
+      - run: bun install --frozen-lockfile
+
+      - name: Compile the runner
+        run: |
+          mkdir -p "$BIN_DIR"
+          bun build --compile --target=${{ matrix.bun }} apps/server/runner/main.ts \
+            --outfile "$BIN_DIR/agentes-runner-${{ matrix.triple }}.exe"
+          "$BIN_DIR/agentes-runner-${{ matrix.triple }}.exe" --version
+
+      - name: Fetch agent-browser
+        run: |
+          read -r AB_VERSION ASSET SHA < <(bun -e '
+            import { AGENT_BROWSER_SHA256, AGENT_BROWSER_VERSION, agentBrowserAsset } from "./packages/adapters/src/machine-protocol.ts";
+            console.log([AGENT_BROWSER_VERSION, agentBrowserAsset("${{ matrix.browser }}"), AGENT_BROWSER_SHA256["${{ matrix.browser }}"]].join(" "));
+          ')
+          OUT="$BIN_DIR/agent-browser-${{ matrix.triple }}.exe"
+          curl -fsSL --retry 3 -o "$OUT" "https://github.com/vercel-labs/agent-browser/releases/download/v$AB_VERSION/$ASSET"
+          echo "$SHA  $OUT" | sha256sum -c -
+          "$OUT" --version
+
+      - name: Run the server here once
+        run: bun apps/desktop/scripts/server-smoke.ts "$BIN_DIR/agentes-runner-${{ matrix.triple }}.exe" apps/desktop/src-tauri/native
+
+      # The icons and the installer's pictures came from the brand job; only the sizes are made here.
+      - name: Icon sizes
+        working-directory: proa/apps/desktop
+        run: bun run tauri icon app-icon-tile.png
+
+      # Unsigned: SmartScreen asks once ("More info › Run anyway"). No updater files: the app does not update itself.
+      - name: Build the app (NSIS)
+        working-directory: proa/apps/desktop
+        run: |
+          rm -rf src-tauri/target/release/bundle
+          echo '{ "bundle": { "createUpdaterArtifacts": false } }' > "$RUNNER_TEMP/proa.conf.json"
+          bun run tauri build --bundles nsis --config src-tauri/tauri.native.conf.json --config "$RUNNER_TEMP/proa.conf.json"
+
+      - name: Check the app's files
+        run: |
+          RELEASE=apps/desktop/src-tauri/target/release
+          for f in agentes-runner.exe agent-browser.exe server/native.js web/index.html licenses/bun/LICENSE.md licenses/agent-browser/LICENSE; do
+            test -s "$RELEASE/$f" || { echo "::error::$f is missing"; exit 1; }
+          done
+
+      - name: Name the installer and its checksum
+        run: |
+          SRC=$(ls apps/desktop/src-tauri/target/release/bundle/nsis/*-setup.exe | head -1)
+          [ -s "$SRC" ] || { echo "::error::no installer"; exit 1; }
+          NAME="Proa-Windows-${{ matrix.arch }}-setup.exe"
+          mkdir -p ../out && cp "$SRC" "../out/$NAME"
+          (cd ../out && sha256sum "$NAME" > "$NAME.sha256" && ls -l)
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: proa-windows-${{ matrix.arch }}
+          path: out/*
+          if-no-files-found: error
+          retention-days: 3
+
+  linux:
+    needs: brand
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            triple: x86_64-unknown-linux-gnu
+            bun: bun-linux-x64-baseline
+            browser: linux-x64
+            pkg: amd64
+          - arch: arm64
+            triple: aarch64-unknown-linux-gnu
+            bun: bun-linux-arm64
+            browser: linux-arm64
+            pkg: arm64
+    # 22.04: an older glibc, so the app runs on more distributions.
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-22.04-arm' || 'ubuntu-22.04' }}
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: bash
+        working-directory: proa
+    env:
+      BIN_DIR: apps/desktop/src-tauri/binaries
+      VERSION: ${{ needs.brand.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: proa-src
+
+      - name: Unpack the branded tree
+        working-directory: .
+        run: tar -xzf proa-src.tgz && rm proa-src.tgz
+
+      - name: System libraries
+        working-directory: .
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
+            libxdo-dev libssl-dev patchelf file libfuse2
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: proa/package.json
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+
+      - uses: swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: proa/apps/desktop/src-tauri -> target
+
+      - run: bun install --frozen-lockfile
+
+      - name: Compile the runner
+        run: |
+          mkdir -p "$BIN_DIR"
+          bun build --compile --target=${{ matrix.bun }} apps/server/runner/main.ts \
+            --outfile "$BIN_DIR/agentes-runner-${{ matrix.triple }}"
+          chmod +x "$BIN_DIR/agentes-runner-${{ matrix.triple }}"
+
+      - name: Fetch agent-browser
+        run: |
+          read -r AB_VERSION ASSET SHA < <(bun -e '
+            import { AGENT_BROWSER_SHA256, AGENT_BROWSER_VERSION, agentBrowserAsset } from "./packages/adapters/src/machine-protocol.ts";
+            console.log([AGENT_BROWSER_VERSION, agentBrowserAsset("${{ matrix.browser }}"), AGENT_BROWSER_SHA256["${{ matrix.browser }}"]].join(" "));
+          ')
+          OUT="$BIN_DIR/agent-browser-${{ matrix.triple }}"
+          curl -fsSL --retry 3 -o "$OUT" "https://github.com/vercel-labs/agent-browser/releases/download/v$AB_VERSION/$ASSET"
+          echo "$SHA  $OUT" | sha256sum -c -
+          chmod +x "$OUT"
+
+      - name: Run the server here once
+        run: bun apps/desktop/scripts/server-smoke.ts "$BIN_DIR/agentes-runner-${{ matrix.triple }}" apps/desktop/src-tauri/native
+
+      - name: Icon sizes
+        working-directory: proa/apps/desktop
+        run: bun run tauri icon app-icon-tile.png
+
+      - name: Build the app (AppImage, deb)
+        working-directory: proa/apps/desktop
+        env:
+          # linuxdeploy's patchelf, except on the two sidecars: they keep their bytes in the AppImage too.
+          PATCHELF: ${{ github.workspace }}/proa/apps/desktop/scripts/patchelf-keep-sidecars.sh
+        run: |
+          rm -rf src-tauri/target/release/bundle
+          echo '{ "bundle": { "createUpdaterArtifacts": false } }' > "$RUNNER_TEMP/proa.conf.json"
+          bun run tauri build --bundles appimage,deb --config src-tauri/tauri.native.conf.json --config "$RUNNER_TEMP/proa.conf.json" --verbose
+
+      - name: Name the packages and their checksums
+        run: |
+          BUNDLE=apps/desktop/src-tauri/target/release/bundle
+          DEB=$(ls "$BUNDLE"/deb/*.deb | head -1)
+          APPIMAGE=$(ls "$BUNDLE"/appimage/*.AppImage | head -1)
+          [ -s "$DEB" ] && [ -s "$APPIMAGE" ] || { echo "::error::no deb or AppImage in $BUNDLE"; exit 1; }
+          mkdir -p ../out
+          cp "$DEB" "../out/Proa-Linux-${{ matrix.pkg }}.deb"
+          cp "$APPIMAGE" "../out/Proa-Linux-${{ matrix.arch }}.AppImage"
+          (cd ../out && for f in *; do sha256sum "$f" > "$f.sha256"; done && ls -l)
+
+      - name: Check the packages' files
+        run: |
+          dpkg-deb -c "../out/Proa-Linux-${{ matrix.pkg }}.deb" > "$RUNNER_TEMP/deb.txt"
+          for f in /agentes-runner /agent-browser /server/native.js /web/index.html /licenses/bun/LICENSE.md /licenses/agent-browser/LICENSE; do
+            grep -q -- "$f\$" "$RUNNER_TEMP/deb.txt" || { echo "::error::$f is not in the deb"; exit 1; }
+          done
+          dir=$(mktemp -d)
+          (cd "$dir" && "$GITHUB_WORKSPACE/out/Proa-Linux-${{ matrix.arch }}.AppImage" --appimage-extract > /dev/null)
+          for name in agentes-runner agent-browser; do
+            cmp "$BIN_DIR/$name-${{ matrix.triple }}" "$dir/squashfs-root/usr/bin/$name" \
+              || { echo "::error::the AppImage's $name isn't the one built"; exit 1; }
+          done
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: proa-linux-${{ matrix.arch }}
+          path: out/*
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    needs: [brand, windows, linux]
+    if: ${{ !cancelled() && needs.brand.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: proa-{windows,linux}-*
+          path: out
+          merge-multiple: true
+
+      # The release may already exist (the macOS upload): only the files are added or replaced.
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.brand.outputs.tag }}
+          VERSION: ${{ needs.brand.outputs.version }}
+        run: |
+          ls -l out
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1 \
+            || gh release create "$TAG" -R "$GITHUB_REPOSITORY" --verify-tag --title "Proa $VERSION" --notes "Proa $VERSION"
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber out/*

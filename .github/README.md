@@ -41,7 +41,8 @@ O Timo é o agente que acompanha você. O Facho, o farol, avisa o que precisa de
 | macOS (Apple Silicon e Intel) | [Proa-macOS.dmg](../../../releases/latest/download/Proa-macOS.dmg) | Assinado e notarizado pela Apple |
 | iPhone e iPad | TestFlight: em breve | Beta pelo app TestFlight |
 | Android | Teste no Google Play: em breve | Beta pelo Google Play |
-| Windows e Linux | Em breve | |
+| Windows (x64 e ARM) | [x64](../../../releases/latest/download/Proa-Windows-x64-setup.exe) · [ARM](../../../releases/latest/download/Proa-Windows-arm64-setup.exe) | Sem assinatura de código: o SmartScreen pergunta uma vez ("Mais informações › Executar assim mesmo") |
+| Linux (x64 e ARM) | AppImage [x64](../../../releases/latest/download/Proa-Linux-x64.AppImage) · [ARM](../../../releases/latest/download/Proa-Linux-arm64.AppImage), deb [amd64](../../../releases/latest/download/Proa-Linux-amd64.deb) · [arm64](../../../releases/latest/download/Proa-Linux-arm64.deb) | |
 
 - Todas as versões ficam em [Releases](../../../releases), cada uma com o `.sha256` e o código-fonte da tag.
 - O desktop não se atualiza sozinho: uma versão nova é baixada daqui.
@@ -69,7 +70,7 @@ O Timo é o agente que acompanha você. O Facho, o farol, avisa o que precisa de
 | Conector Postgres | Beta | Agentes consultam o seu banco com SQL, só leitura: um comando conferido, numa transação só de leitura, com limite de tempo e de linhas. |
 | Caixas de e-mail dos agentes | Beta | Agentes leem, rascunham e enviam de caixas que o workspace conecta: Gmail e Outlook pelo Composio, qualquer outra por IMAP/SMTP. O envio pede aprovação por padrão. |
 | App de celular | Beta | iPhone e Android: leia o QR code de "Abrir no celular" na web, que já faz o login, ou troque o servidor na tela de entrada. |
-| App desktop | Beta | macOS (Windows e Linux em breve). Conecta no seu servidor (pelo endereço, pelo que o app encontra ou pelo link do setup) ou roda o servidor no próprio computador, sem Docker. Os agentes também podem trabalhar nesse computador, depois que o app pede. |
+| App desktop | Beta | macOS, Windows e Linux. Conecta no seu servidor (pelo endereço, pelo que o app encontra ou pelo link do setup) ou roda o servidor no próprio computador, sem Docker. Os agentes também podem trabalhar nesse computador, depois que o app pede. |
 | Importar de outros apps | Beta | No onboarding ou nos Ajustes, traga agentes com skills, canais, rotinas e memória de outros apps de agentes ou de outro workspace. Uma prévia vem antes: skills chegam ligadas, rotinas ativas e chaves nunca. Um workspace exporta como um arquivo. |
 | 14 idiomas | Pronto | O app inteiro em português do Brasil, inglês, espanhol, francês, alemão, italiano, holandês, polonês, russo, turco, japonês, coreano, chinês simplificado e indonésio. |
 | Self-host (Docker) | Pronto | Um compose com o app e o Postgres com pgvector, migrações no boot e HTTPS privado na sua rede Tailscale, ou um domínio público com Caddy. |
