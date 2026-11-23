@@ -1104,6 +1104,31 @@ for (const p of brand.patches ?? []) {
   }
 }
 
+// The apps' own version (BRAND_VERSION, set by whoever builds a release): desktop and phone. The server keeps
+// upstream's version, which its health check and the apps' compatibility checks read. X.Y.Z with X and Y up to 255
+// and Z up to 65535, the limits of a Windows installer's version.
+const version = process.env.BRAND_VERSION;
+if (version) {
+  const parts = /^(\d+)\.(\d+)\.(\d+)$/.exec(version)?.slice(1).map(Number);
+  if (!parts || parts[0] > 255 || parts[1] > 255 || parts[2] > 65535)
+    fail(`version: BRAND_VERSION ${version} is not X.Y.Z (X and Y up to 255, Z up to 65535)`);
+  else {
+    for (const f of ["apps/desktop/package.json", "apps/desktop/src-tauri/tauri.conf.json"]) {
+      const before = read(f);
+      const after = before.replace(/^(  "version": )"[^"]*"/m, `$1"${version}"`);
+      if (after === before) fail(`version: no "version" in ${f}`);
+      else write(f, after), count("version: desktop", f, 1);
+    }
+    const cargo = "apps/desktop/src-tauri/Cargo.toml";
+    const toml = read(cargo).replace(/^version = "[^"]*"/m, `version = "${version}"`);
+    if (toml === read(cargo)) fail(`version: no version in ${cargo}`);
+    else write(cargo, toml), count("version: desktop", cargo, 1);
+    const phone = "apps/mobile/versions.json";
+    write(phone, `${JSON.stringify({ ...JSON.parse(read(phone)), ios: version, android: version }, null, 2)}\n`);
+    count("version: phone", phone, 1);
+  }
+}
+
 // Overrides: whole files the profile replaces (a drawing engine, a generator script). Each one records the SHA-256 of
 // the upstream file it was written against; when upstream changes that file the apply fails, so the override is
 // reviewed against the new version instead of silently dropping upstream's change.

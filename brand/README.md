@@ -18,6 +18,8 @@ brand/build.sh --profile brand/profiles/<name> --out ../<name>-build --target no
 - `--env <file>` sets the values `brand.json` reads as `${NAME}` (default: the profile's `brand.env`, ignored by git;
   start from its `brand.env.example`). A missing value fails the apply. In GitHub Actions `BRAND_REPO` defaults to
   the repository running the workflow.
+- `BRAND_VERSION=X.Y.Z` (optional) sets the desktop and phone apps' version. The server keeps upstream's version,
+  which compatibility checks read.
 - There is no build without a profile: building the plain tree ships the upstream brand.
 - `apply.ts` refuses to run on the repository itself.
 
