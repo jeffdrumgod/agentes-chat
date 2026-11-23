@@ -437,13 +437,14 @@ if (brand.scheme) {
         find: 'const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "https://app.agentes.chat";',
         replace: d.defaultServer
           ? `const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? ${JSON.stringify(d.defaultServer)};`
-          : 'const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? (() => { throw new Error("EXPO_PUBLIC_API_URL is required for this build (the app server)"); })();',
+          : // No default server: the app asks for one on its first screen (local/mobile-ask-server), unless the build sets one.
+            'const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "";',
       },
       {
         rule: "mobile: default server (EAS)",
         file: "apps/mobile/eas.json",
         find: /"env": \{\s*"EXPO_PUBLIC_API_URL": "https:\/\/app\.agentes\.chat"\s*\}/,
-        replace: d.defaultServer ? `"env": { "EXPO_PUBLIC_API_URL": ${JSON.stringify(d.defaultServer)} }` : '"env": {}',
+        replace: `"env": { "EXPO_PUBLIC_API_URL": ${JSON.stringify(d.defaultServer ?? "")} }`,
       },
     );
     if (d.updater === "off")

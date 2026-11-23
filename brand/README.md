@@ -31,7 +31,7 @@ brand/build.sh --profile brand/profiles/<name> --out ../<name>-build --target no
 |---|---|
 | `name` | Product name in every UI text, email, notification, server message and agent prompt, with each language's grammar fixed (articles, elision, particles) |
 | `scheme` | App link scheme (`<scheme>://`) for the desktop and phone apps and the server. Requires `distribution` |
-| `distribution` | `updater: "off"`; `downloadUrl` for the desktop downloads; `defaultServer` for the phone app (`null` = each build sets `EXPO_PUBLIC_API_URL`) |
+| `distribution` | `updater: "off"`; `downloadUrl` for the desktop downloads; `defaultServer` for the phone app (`null` = no default: the app asks for the server on its first screen, with `local/mobile-ask-server`; a build may still set `EXPO_PUBLIC_API_URL`) |
 | `ids` | `desktop` and `mobile` bundle identifiers. They must be your own: app stores tie an id to one account |
 | `mobile.slug` | EAS slug |
 | `assets` | Repo path → file in the profile, copied as is (favicon, icons, email logos, splash) |
