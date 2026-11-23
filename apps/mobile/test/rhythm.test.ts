@@ -58,7 +58,8 @@ test("the kit's screens, grouped rows and toolbar controls read those numbers in
   const grouped = source("Grouped.tsx");
   expect(grouped).not.toMatch(/minHeight: 50|paddingHorizontal: 14|\b14 \+ LEAD/);
   expect(grouped).toContain("minHeight: GROUPED_ROW.minHeight");
-  expect(source("Segmented.tsx")).toContain("minHeight: TOOL_H - 2 * PAD");
+  // The segmented control is a touch-first capsule now (40, a screen's views 44): its own segment heights.
+  expect(source("Segmented.tsx")).toContain("const SEGMENT_H = 34;");
   expect(source("Filters.tsx")).toContain("minHeight: TOOL_H");
   expect(source("Filters.tsx")).toContain("gap: 8");
   expect(source("LargeTitleHead.tsx")).toContain("paddingHorizontal: SCREEN_X");
@@ -66,9 +67,13 @@ test("the kit's screens, grouped rows and toolbar controls read those numbers in
   expect(source("Row.tsx")).toContain("paddingHorizontal: CARD_PAD");
 });
 
-test("a small button and a card's footer button are the web's 32, their targets grown to 44 above and below only", () => {
+test("a small button and a card's footer button are a 34 capsule, their targets grown to 44 above and below only", () => {
   const button = source("Button.tsx");
-  expect(button).toContain("const SMALL = { height: TOOL_H, radius: 10, padding: 12");
+  expect(button).toContain("const SMALL = { height: 34, radius: RADIUS.full, padding: 14");
+  // Touch first: every button a capsule, the wide one 50; primary the ink, solid; secondary the tonal fill.
+  expect(button).toContain('md: { height: 50, radius: RADIUS.full, padding: 22, text: "headline", icon: 18 },');
+  expect(button).toContain("{ backgroundColor: colors.tonal }");
+  expect(button).not.toContain("LinearGradient");
   expect(button).toMatch(/card: SMALL,\s*sm: SMALL,/);
   expect(button).toContain("const grow = (TOUCH - height) / 2;");
   expect(button).toContain("return grow > 0 ? { top: grow, bottom: grow } : undefined;");

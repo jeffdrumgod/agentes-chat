@@ -161,7 +161,8 @@ describe("the rows follow the same choice as the web", () => {
     expect(await read("chat/QuoteLine.tsx")).toContain(
       "look.faces ? WORDS_START[look.style] : rowBodyInset(look).left",
     );
-    expect(await read("chat/ConsultGroup.tsx")).toContain("const inset = rowBodyInset(useRowLook());");
+    // The agents' talk quoted on its own sits on the words' column, as a quote above a reply does.
+    expect(await read("chat/MessageRow.tsx")).toContain("paddingLeft: aboveInset(look), marginTop: rhythm.turn");
     expect(chatScreenSource()).toContain("const quiet = quietInset(rowLook);");
     for (const file of [
       "chat/EventLine.tsx",
