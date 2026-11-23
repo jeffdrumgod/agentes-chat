@@ -186,7 +186,12 @@
   },
   "rightHand": {
     "name": "Timo",
-    "handle": "timo"
+    "handle": "timo",
+    "nameStory": {
+      "en": "The name comes from timoneiro, Portuguese for helmsman: the one at the helm who keeps the boat on course.",
+      "pt-BR": "O nome vem de timoneiro, quem fica no leme e mantém o barco no rumo.",
+      "es": "El nombre viene de timoneiro, timonel en portugués: quien lleva el timón y mantiene el rumbo del barco."
+    }
   },
   "css": {
     "apps/web/src/fonts.css": "fonts/brand-font.css",

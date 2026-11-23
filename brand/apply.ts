@@ -10,7 +10,7 @@
  * Exit codes: 0 on success; 1 if a check fails (changed attribution or technical identifier, unmatched fixed rule,
  * or leftover old scheme).
  */
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { Glob } from "bun";
 
@@ -41,7 +41,8 @@ type Profile = {
   assets?: Record<string, string>;
   // The built-in agent every member talks to (ADR 0137, "Lodi" upstream): its default name and handle in new
   // workspaces, and every text that names it. Existing workspaces keep the name stored on their agent.
-  rightHand?: { name: string; handle: string };
+  // `nameStory`: where its name comes from, by language ("en" required; others fall back to it).
+  rightHand?: { name: string; handle: string; nameStory?: { en: string } & Record<string, string> };
   // Server env defaults (packages/config/src/schema.ts): variable -> new default, written as the schema's own
   // `.default(...)` value. Each server can still set the variable; this only changes what an unset one means.
   serverDefaults?: Record<string, string | boolean>;
@@ -469,6 +470,43 @@ if (brand.rightHand)
       replace: `name: ${JSON.stringify(brand.rightHand.name)},`,
     },
   );
+// Where the right hand's name comes from: the upstream one tells lodestar's story, which a renamed one must not.
+// With `nameStory` the profile tells its own (English for the languages it doesn't list); without it, none is told.
+if (brand.rightHand) {
+  const story = brand.rightHand.nameStory;
+  if (!story)
+    fixed.push({
+      rule: "right hand: no upstream name story",
+      file: "packages/client/src/lib/right-hand.ts",
+      find: "isRightHand(agent) && agent?.name === RIGHT_HAND_DEFAULT.name;",
+      replace: "false && isRightHand(agent) && agent?.name === RIGHT_HAND_DEFAULT.name;",
+    });
+  else {
+    fixed.push(
+      {
+        rule: "right hand: name story (en)",
+        file: "packages/i18n/src/en.ts",
+        find: /nameStory: "The name comes from lodestar[^"\n]*",/,
+        replace: `nameStory: ${JSON.stringify(story.en)},`,
+      },
+      {
+        rule: "right hand: name story (pt-BR)",
+        file: "packages/i18n/src/pt-BR.ts",
+        find: /nameStory: "O nome vem de lodestar[^"\n]*",/,
+        replace: `nameStory: ${JSON.stringify(story["pt-BR"] ?? story.en)},`,
+      },
+    );
+    for (const file of readdirSync(join(SRC, "packages/i18n/src/locales")).filter(
+      (f) => f.endsWith(".json") && !f.endsWith(".source.json"),
+    ))
+      fixed.push({
+        rule: `right hand: name story (${file})`,
+        file: `packages/i18n/src/locales/${file}`,
+        find: /"nameStory": "(?:[^"\\\n]|\\.)*"/,
+        replace: `"nameStory": ${JSON.stringify(story[file.replace(/\.json$/, "")] ?? story.en)}`,
+      });
+  }
+}
 if (brand.ids?.desktop) {
   fixed.push(
     {
