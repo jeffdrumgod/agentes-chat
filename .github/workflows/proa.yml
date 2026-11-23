@@ -73,12 +73,18 @@ jobs:
 
       - name: Pack the branded tree
         shell: bash
-        run: tar --exclude=node_modules --exclude=.git -czf "$RUNNER_TEMP/proa-src.tgz" -C "$RUNNER_TEMP" proa
+        # The embedded server keeps its own node_modules (its database driver); the rest is installed again per job.
+        run: |
+          tar --exclude=node_modules --exclude=.git --exclude=proa/apps/desktop/src-tauri/native \
+            -czf "$RUNNER_TEMP/proa-src.tgz" -C "$RUNNER_TEMP" proa
+          tar -czf "$RUNNER_TEMP/proa-native.tgz" -C "$RUNNER_TEMP" proa/apps/desktop/src-tauri/native
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: proa-src
-          path: ${{ runner.temp }}/proa-src.tgz
+          path: |
+            ${{ runner.temp }}/proa-src.tgz
+            ${{ runner.temp }}/proa-native.tgz
           if-no-files-found: error
           retention-days: 1
 
@@ -112,7 +118,7 @@ jobs:
 
       - name: Unpack the branded tree
         working-directory: .
-        run: tar -xzf proa-src.tgz && rm proa-src.tgz
+        run: tar -xzf proa-src.tgz && tar -xzf proa-native.tgz && rm proa-src.tgz proa-native.tgz
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
@@ -215,7 +221,7 @@ jobs:
 
       - name: Unpack the branded tree
         working-directory: .
-        run: tar -xzf proa-src.tgz && rm proa-src.tgz
+        run: tar -xzf proa-src.tgz && tar -xzf proa-native.tgz && rm proa-src.tgz proa-native.tgz
 
       - name: System libraries
         working-directory: .
@@ -321,7 +327,7 @@ jobs:
           TAG: ${{ needs.brand.outputs.tag }}
           VERSION: ${{ needs.brand.outputs.version }}
         run: |
-          ls -l out
+          ls -l out || { echo "::error::no Windows or Linux build to attach"; exit 1; }
           gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1 \
             || gh release create "$TAG" -R "$GITHUB_REPOSITORY" --verify-tag --title "Proa $VERSION" --notes "Proa $VERSION"
           gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber out/*
