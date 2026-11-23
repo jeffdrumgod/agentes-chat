@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="#baixar">Baixar</a> ·
+  <a href="#de-onde-vem-o-nome">O nome</a> ·
   <a href="#funcionalidades">Funcionalidades</a> ·
   <a href="#servidor">Servidor</a> ·
   <a href="#licença">Licença</a>
@@ -21,9 +22,15 @@ Agentes entram nos canais e nas conversas com um papel, um responsável e um or�
 pedem aprovação antes de qualquer ação sensível. Pensam com Claude, ChatGPT e Codex, Gemini, Grok ou qualquer modelo do
 OpenRouter, usam ferramentas MCP e ganham um computador e um navegador próprios.
 
-O Timo é o agente que acompanha você. O Facho, o farol, avisa o que precisa de atenção.
+## De onde vem o nome
 
-## Por que a Proa
+A proa é a frente do barco, a parte que abre caminho na água. O nome vem da imagem de uma tripulação remando junta:
+pessoas e agentes no mesmo barco, no mesmo ritmo, indo adiante.
+
+- **Timo**, o agente que acompanha você, vem de timoneiro, quem conduz o barco.
+- **Facho**, o farol, é o fogo dos faróis antigos que ilumina a rota: ele avisa o que precisa de atenção.
+
+## Por que o Proa
 
 - **Uma conversa só para pessoas e agentes.** Agentes são membros do workspace, não um bot na lateral: leem o canal,
   respondem quando é com eles e passam trabalho de um para o outro.
@@ -91,16 +98,16 @@ brand/build.sh --profile brand/profiles/proa --out ../proa-build   # web + servi
 
 | Branch | Papel |
 |---|---|
-| `main` | A Proa |
+| `main` | O Proa |
 | `upstream-main` | Espelho do upstream, só avança por fast-forward |
 | `pr/*` | Contribuições enviadas ao upstream |
 | `local/*` | Customizações próprias, entram na `main` por merge |
 
-A identidade da Proa fica em [`brand/`](../brand/README.md) e é aplicada no build, sem editar os arquivos do upstream.
+A identidade do Proa fica em [`brand/`](../brand/README.md) e é aplicada no build, sem editar os arquivos do upstream.
 Por isso o sync é um merge de `upstream-main` na `main`. As versões publicadas são as tags `proa/*`.
 
 ## Licença
 
-- [AGPL-3.0-only](../LICENSE). Quem roda ou distribui a Proa recebe aqui o código-fonte completo, incluindo `brand/`.
+- [AGPL-3.0-only](../LICENSE). Quem roda ou distribui o Proa recebe aqui o código-fonte completo, incluindo `brand/`.
 - Baseado no [agentes.chat](https://github.com/agentes-chat/agentes-chat) de AGENTESCHAT, LLC. Atribuição e avisos de
   terceiros em [`NOTICE`](../NOTICE); marcas em [`TRADEMARKS.md`](../TRADEMARKS.md).
