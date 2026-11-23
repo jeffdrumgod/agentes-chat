@@ -231,6 +231,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     // Android release builds signed with the upload key from the environment (the Android build workflow).
     "./plugins/with-android-release-signing",
+    // Portrait screen and Wi-Fi optional: Play would otherwise require both (ML Kit's scanners, expo-network).
+    "./plugins/with-optional-hardware",
     // The app icons a person may pick (ADR 0179): iOS's alternate icons and Android's launcher aliases.
     "./plugins/with-app-icons",
     [
