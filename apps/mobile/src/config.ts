@@ -1,5 +1,6 @@
 import { CLOUD_SERVER } from "@agenteschat/client/lib/server";
 import Constants from "expo-constants";
+import { buildServer, NO_SERVER } from "./lib/server-choice";
 
 /** Removes trailing slashes: "https://app.agentes.chat/" → "https://app.agentes.chat". */
 export const trimBase = (url: string) => url.replace(/\/+$/, "");
@@ -8,9 +9,13 @@ const extra = (Constants.expoConfig?.extra ?? {}) as { apiUrl?: string; variant?
 
 /**
  * The build's server: `extra.apiUrl` from app.config.ts (env `EXPO_PUBLIC_API_URL` at build time). The person
- * can choose another one ("Seu servidor"); read the current one with `serverUrl()` (src/lib/server.ts).
+ * can choose another one ("Seu servidor"); read the current one with `serverUrl()` (src/lib/server.ts). Built with an
+ * empty address, the app has none of its own (`NO_SERVER`) and asks for one first (`buildServer`).
  */
-export const API_URL = trimBase(extra.apiUrl ?? process.env.EXPO_PUBLIC_API_URL ?? CLOUD_SERVER);
+export const API_URL = buildServer(extra.apiUrl ?? process.env.EXPO_PUBLIC_API_URL, CLOUD_SERVER);
+
+/** The build has no server of its own: the person always names one (their address, or a QR code). */
+export const ASKS_SERVER = API_URL === NO_SERVER;
 
 /** "development" | "preview" | "production". */
 export const APP_VARIANT = extra.variant ?? "production";

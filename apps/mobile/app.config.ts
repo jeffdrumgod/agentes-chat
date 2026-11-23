@@ -29,8 +29,9 @@ const version = platform === "android" ? versions.android : versions.ios;
 const suffix = variant === "production" ? "" : `.${variant}`;
 const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "https://app.agentes.chat";
 // Links to this host open the app (universal links / App Links); the server publishes the matching /.well-known
-// files (apps/server/src/app-links.ts).
-const linkHost = new URL(apiUrl).host;
+// files (apps/server/src/app-links.ts). An empty address builds an app with no server of its own (it asks for one
+// first, src/config.ts `ASKS_SERVER`), and so with no host whose links it opens.
+const linkHost = apiUrl.trim() ? new URL(apiUrl).host : null;
 
 /**
  * The website's pages that open the app on Android (its intent filters; `*` is any text), the same list the server
@@ -132,7 +133,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     supportsTablet: false,
     usesAppleSignIn: true,
-    associatedDomains: [`applinks:${linkHost}`],
+    associatedDomains: linkHost ? [`applinks:${linkHost}`] : [],
     config: { usesNonExemptEncryption: false },
   },
   android: {
@@ -160,18 +161,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
       "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
     ],
-    intentFilters: [
-      {
-        action: "VIEW",
-        autoVerify: true,
-        data: APP_LINK_PATTERNS.map((pattern) => ({
-          scheme: "https",
-          host: linkHost,
-          pathPattern: pattern.replace(/\*/g, ".*"),
-        })),
-        category: ["BROWSABLE", "DEFAULT"],
-      },
-    ],
+    intentFilters: linkHost
+      ? [
+          {
+            action: "VIEW",
+            autoVerify: true,
+            data: APP_LINK_PATTERNS.map((pattern) => ({
+              scheme: "https",
+              host: linkHost,
+              pathPattern: pattern.replace(/\*/g, ".*"),
+            })),
+            category: ["BROWSABLE", "DEFAULT"],
+          },
+        ]
+      : [],
   },
   // Native permission texts (the OS shows them before the app's i18n runs). Only ready languages
   // (@agenteschat/i18n/locale), here and in `supportedLocales`: the stores list these as the app's languages.

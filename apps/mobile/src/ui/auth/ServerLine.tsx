@@ -3,6 +3,7 @@ import { CLOUD_SERVER, serverHost } from "@agenteschat/client/lib/server";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
+import { ASKS_SERVER } from "@/config";
 import { accountLabel, setServer, useServer, useServerToReturn } from "@/lib/server";
 import { router } from "@/ui/navigation";
 import { useTheme } from "@/ui/theme";
@@ -20,7 +21,8 @@ export function useOnCloud(): boolean {
 /**
  * The quiet line under the sign-in: where it goes, "Entrando no agentes.chat Cloud · Trocar" (the server says whether
  * it is the Cloud) or "Entrando em <host> · Trocar", as on the web. Trocar opens "Onde fica o seu workspace?", in front
- * of the address and QR screens. The language follows the phone's (and its per-app setting in iOS Settings); signed in,
+ * of the address and QR screens; on a build without a server of its own (`ASKS_SERVER`) straight to them, the Cloud
+ * being no choice there. The language follows the phone's (and its per-app setting in iOS Settings); signed in,
  * it changes in Você (ADR 0122). Signed in on another server (this one added from Workspaces): "Voltar para …" goes
  * back to it, still signed in there.
  */
@@ -36,7 +38,7 @@ export function AuthFootLine() {
   return (
     <View style={styles.foot}>
       <Pressable
-        onPress={() => router.push("/where")}
+        onPress={() => router.push(ASKS_SERVER ? "/server" : "/where")}
         accessibilityRole="button"
         accessibilityLabel={`${where}. ${t("mobile.auth.server.footSwitch")}`}
         // An 18-point line: 12 of slop above and below reaches the 44-point target.
