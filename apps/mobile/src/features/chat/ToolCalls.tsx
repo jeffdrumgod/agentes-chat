@@ -65,7 +65,7 @@ import { MONO, tapHaptic } from "../shared/parts";
 import { AccountSwitchLine } from "./AccountRef";
 import { CodeCard } from "./CodeCard";
 import { keepOpen, keptOpen } from "./kept-sizes";
-import { useMessageCardCorners } from "./look";
+import { useMessageCardFrame } from "./look";
 import { MessageText } from "./MessageText";
 import { outputTail } from "./turn";
 
@@ -289,7 +289,7 @@ export function ToolBlock({
   keep?: string | undefined;
 }) {
   const c = useColors();
-  const cardCorners = useMessageCardCorners();
+  const card = useMessageCardFrame();
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(() => defaultOpen || keptOpen(keep));
   const flashing = useFlash(flash, reduced ? FLASH_MS : FLASH_HOLD_MS);
@@ -317,7 +317,7 @@ export function ToolBlock({
         only.line.detail
       );
     return (
-      <View style={[styles.block, { backgroundColor: c.raised, borderColor: c.line2 }, cardCorners]}>
+      <View style={[styles.block, card.style]}>
         {plate}
         <View style={styles.one}>
           <Line line={{ ...only.line, detail }} color={color} onToggle={onToggle} keep={keep} />
@@ -326,7 +326,7 @@ export function ToolBlock({
     );
   }
   return (
-    <View style={[styles.block, { backgroundColor: c.raised, borderColor: c.line2 }, cardCorners]}>
+    <View style={[styles.block, card.style]}>
       {plate}
       <Pressable
         onPress={() => {
@@ -348,7 +348,7 @@ export function ToolBlock({
               <Animated.View
                 key={l.key}
                 entering={moving ? LOGO_IN : undefined}
-                style={[styles.stacked, i > 0 && styles.overlap, { borderColor: c.raised }]}
+                style={[styles.stacked, i > 0 && styles.overlap, { borderColor: card.fill }]}
               >
                 {l.node}
               </Animated.View>
@@ -359,7 +359,7 @@ export function ToolBlock({
         <View style={[styles.grow, styles.clip]}>
           <Animated.View key={head.textKey ?? head.text} entering={moving ? HEAD_IN : undefined}>
             <Breathing on={head.state === "run"}>
-              <Text variant="footnote" tone="ink2" numberOfLines={1} style={styles.medium}>
+              <Text variant="label" tone="ink2" numberOfLines={1}>
                 {head.text}
               </Text>
             </Breathing>
@@ -903,7 +903,7 @@ export function RunSteps({
 }
 
 /** A call's row: its side padding, the logo's column (and its first line's height) and the gap to the phrase. */
-const ROW_PAD = 8;
+const ROW_PAD = 10;
 const LOGO = 20;
 const ROW_GAP = 10;
 /** Where a call's phrase starts in the block: why it failed and what it said between calls line up there. */
@@ -920,7 +920,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   // The block opens from here, 44 tall (a finger's target); its logos and words in the rows' columns (the lines'
-  // 4 of padding and a row's own 8).
+  // 4 of padding and a row's own 10: the message cards' 14).
   head: {
     flexDirection: "row",
     alignItems: "center",

@@ -91,7 +91,7 @@
     "chats": "聊天",
     "threads": "话题",
     "agents": "智能体",
-    "activity": "动态",
+    "activity": "收件箱",
     "search": "搜索",
     "withCount": "{{label}}，{{count}}"
   },
@@ -845,7 +845,7 @@
     }
   },
   "activity": {
-    "title": "动态",
+    "title": "收件箱",
     "chooseModel": "选择其他模型",
     "filter": {
       "all": "全部",
@@ -1261,6 +1261,7 @@
     "criteriaOf": "{{done}}/{{total}}",
     "linkMessage": "#{{channel}} 中的消息",
     "linkMessagePlain": "原始消息",
+    "removeFileText": "文件仍保留在 Drive 中。",
     "subIssues": "子任务",
     "talk": "聊天",
     "finish": "标为完成",

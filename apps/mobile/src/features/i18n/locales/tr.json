@@ -96,7 +96,7 @@
     "chats": "Sohbetler",
     "threads": "İleti dizileri",
     "agents": "Ajanlar",
-    "activity": "Etkinlik",
+    "activity": "Gelen kutusu",
     "search": "Ara",
     "withCount": "{{label}}, {{count}}"
   },
@@ -870,7 +870,7 @@
     }
   },
   "activity": {
-    "title": "Etkinlik",
+    "title": "Gelen kutusu",
     "chooseModel": "Başka bir model seç",
     "filter": {
       "all": "Tümü",
@@ -1341,6 +1341,7 @@
     "criteriaOf": "{{done}} / {{total}}",
     "linkMessage": "#{{channel}} kanalındaki mesaj",
     "linkMessagePlain": "Kaynak mesaj",
+    "removeFileText": "Dosya Drive'da kalır.",
     "subIssues": "Alt görevler",
     "talk": "Sohbet et",
     "finish": "Tamamlandı olarak işaretle",

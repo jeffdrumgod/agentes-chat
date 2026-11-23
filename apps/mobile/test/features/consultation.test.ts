@@ -43,8 +43,8 @@ test("the agents' talk quoted in a reply: its head on one line, the subject in u
   expect(quoted).toContain('name: { fontWeight: "600", flexShrink: 1 },');
   expect(quoted).toContain("how: { flexShrink: 0 },");
   expect(quoted).toContain("{`· $" + "{how}`}");
-  // The question's subject in up to two lines under it.
-  expect(quoted).toContain('<Text variant="small" tone="muted" numberOfLines={2}>');
+  // The question's subject in up to two lines under it: what supports a card's title (13 under the names' 15).
+  expect(quoted).toContain('<Text variant="footnote" tone="muted" numberOfLines={2}>');
 });
 
 test("two agents' conversation is a sheet over the one that asked, as the web's dialog", () => {

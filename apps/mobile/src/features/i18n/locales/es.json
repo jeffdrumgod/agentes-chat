@@ -101,7 +101,7 @@
     "chats": "Chats",
     "threads": "Hilos",
     "agents": "Agentes",
-    "activity": "Actividad",
+    "activity": "Bandeja",
     "search": "Buscar",
     "withCount": "{{label}}, {{count}}"
   },
@@ -895,7 +895,7 @@
     }
   },
   "activity": {
-    "title": "Actividad",
+    "title": "Bandeja de entrada",
     "chooseModel": "Elegir otro modelo",
     "filter": {
       "all": "Todo",
@@ -1418,6 +1418,7 @@
     "criteriaOf": "{{done}} de {{total}}",
     "linkMessage": "Mensaje en #{{channel}}",
     "linkMessagePlain": "El mensaje original",
+    "removeFileText": "El archivo sigue en el Drive.",
     "subIssues": "Subtareas",
     "talk": "Chatear",
     "finish": "Marcar como lista",

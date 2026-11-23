@@ -18,7 +18,18 @@ import { createContext, type ReactNode, useCallback, useContext } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Pressable, type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
 import { useOrg } from "@/providers/org";
-import { Button, haptics, Icon, IconButton, LineIcon, PixelOrbit, Text, textLineOf, useToast } from "@/ui";
+import {
+  Button,
+  haptics,
+  Icon,
+  IconButton,
+  LineIcon,
+  MESSAGE_CARD_X,
+  PixelOrbit,
+  Text,
+  textLineOf,
+  useToast,
+} from "@/ui";
 import { router } from "@/ui/navigation";
 import { useFontScale } from "@/ui/text-scale";
 import { chatHref, consultationHref } from "../links/logic";
@@ -27,7 +38,7 @@ import { AgentFace } from "../shared/Face";
 import { useColors, useNow, useOrgId } from "../shared/hooks";
 import { ownsIn } from "../shared/owner";
 import { tapHaptic, useSurface } from "../shared/parts";
-import { RowPartContext, useCardTop, useMessageCardCorners } from "./look";
+import { RowPartContext, useCardTop, useMessageCardFrame } from "./look";
 import { useRowDirectory, useRowMeId } from "./row-data";
 
 /** The conversation's list scrolls to one of its messages (false: it doesn't show it). */
@@ -107,7 +118,7 @@ function Line({
   const surface = useSurface();
   const part = useBubblePart();
   const cardTop = useCardTop();
-  const cardCorners = useMessageCardCorners();
+  const card = useMessageCardFrame();
   const fontScale = useFontScale();
   const inBody = useContext(RowPartContext) !== null;
   const line = useLine(work, inUpdatesThread);
@@ -179,7 +190,7 @@ function Line({
     ) : (
       view.text
     );
-  const markOf = (variant: "small" | "caption", size: number) =>
+  const markOf = (variant: "small" | "footnote" | "caption", size: number) =>
     view.tone === "working" ? (
       <LineIcon variant={variant} size={size} mark>
         <PixelOrbit color="sky" size={size - 2} />
@@ -206,9 +217,7 @@ function Line({
               ? c.danger
               : c.muted;
     const state = [upFirst(h.state), ...h.facts, go?.label].filter(Boolean).join(" · ");
-    const frame = part
-      ? [styles.handed, { backgroundColor: part.fill }, cardCorners, part.edge]
-      : [styles.handed, styles.handedCard, { backgroundColor: c.raised, borderColor: c.line2 }, cardCorners];
+    const frame = [styles.handed, card.style];
     return (
       <View style={cardTop}>
         <Pressable
@@ -225,12 +234,12 @@ function Line({
             mode={h.tone === "working" ? "think" : "idle"}
           />
           <View style={styles.handedWords}>
-            <Text variant="body" tone="ink" numberOfLines={1} style={styles.bold}>
+            <Text variant="cardTitle" numberOfLines={1}>
               {t("mobile.chat.handedTo", { name: g.name, context: g.context })}
             </Text>
             <View style={styles.handedState}>
-              {markOf("caption", HANDED_MARK)}
-              <Text variant="caption" numberOfLines={1} style={[styles.bold, styles.shrink, { color: tone }]}>
+              {markOf("footnote", HANDED_MARK)}
+              <Text variant="footnote" numberOfLines={1} style={[styles.bold, styles.shrink, { color: tone }]}>
                 {state}
               </Text>
             </View>
@@ -435,7 +444,7 @@ export function IssueWorkLine({ issue, style }: { issue: Issue; style?: StylePro
           below={
             progress ? (
               <View style={styles.plan}>
-                <Text variant="caption" tone="faint" style={styles.bold}>
+                <Text variant="cardKind">
                   {t("work.plan")} · {t("work.planProgress", progress)}
                 </Text>
                 {work.plan.map((p) => (
@@ -475,10 +484,8 @@ function HandedWork({ work, style }: { work: WorkView; style?: StyleProp<ViewSty
     const when = relativeTime(t, i18n.language, work.finishedAt ?? work.startedAt);
     return (
       <View style={[style, styles.done, surface]}>
-        <Text variant="small" tone="ink" style={styles.bold}>
-          {t("issues.work.finishedTitle", { name })}
-        </Text>
-        <Text variant="caption" tone="muted">
+        <Text variant="cardTitle">{t("issues.work.finishedTitle", { name })}</Text>
+        <Text variant="footnote" tone="muted">
           {by ? t("issues.work.finishedMeta", { when, name: by }) : when}
         </Text>
         {work.result ? (
@@ -575,9 +582,10 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     minWidth: 240,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: MESSAGE_CARD_X,
+    // Outside a bubble group, the cards' hairline (the frame takes it off in one).
+    borderWidth: StyleSheet.hairlineWidth,
   },
-  handedCard: { borderWidth: StyleSheet.hairlineWidth },
   // As wide as its words (the bubble grows with them up to the column), shrinking only when the column runs out: with
   // no width of its own (`flex: 1`) the bubble stayed at its least and cut the words that had room.
   handedWords: { flexShrink: 1, minWidth: 0, gap: 1 },

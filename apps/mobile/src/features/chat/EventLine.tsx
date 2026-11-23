@@ -11,7 +11,7 @@ import { useOrgId, useWhen } from "../shared/hooks";
 import { ConsultQuote } from "./ConsultGroup";
 import { keepOpen, keptOpen } from "./kept-sizes";
 import { eventLineOf } from "./logic";
-import { useQuietInset } from "./look";
+import { plateInset, useQuietInset, useRowLook } from "./look";
 import { MessageText } from "./MessageText";
 import { useRowDirectory } from "./row-data";
 import { StoppedLine } from "./StoppedLine";
@@ -42,6 +42,7 @@ export const EventLine = memo(function EventLine({
   const keep = `event:${message.id}`;
   const [open, setOpen] = useState(() => keptOpen(keep));
   const inset = useQuietInset();
+  const look = useRowLook();
   // A person stopped one of the agent's tasks (ADR 0128): its own line, with the reason, or a way to give one.
   const stopped = stoppedNoticeOf(message.meta);
   if (stopped) return <StoppedLine message={message} notice={stopped} gap={gap} />;
@@ -50,7 +51,7 @@ export const EventLine = memo(function EventLine({
   // here to sit in), opening their conversation.
   if (fold?.fold === "line")
     return (
-      <View style={[styles.quote, { paddingLeft: inset, marginTop: gap }]}>
+      <View style={[plateInset(look, inset), { marginTop: gap }]}>
         <ConsultQuote
           askerId={fold.consultation.agentId}
           channelId={message.channelId}
@@ -68,7 +69,7 @@ export const EventLine = memo(function EventLine({
   });
   if (consulted)
     return (
-      <View style={[styles.quote, { paddingLeft: inset, marginTop: gap }]}>
+      <View style={[plateInset(look, inset), { marginTop: gap }]}>
         <ConsultQuote
           askerId={consulted.askerId}
           channelId={message.channelId}
@@ -144,6 +145,4 @@ function AnswerGitHub({ messageId }: { messageId: string }) {
 const styles = StyleSheet.create({
   // Aligned with the messages' words, like `IssueTakenLine`; left aligned, never centered. The list sets its top.
   line: { paddingRight: 16 },
-  // The agents' talk quoted on its own: on the words' column, as wide as a bubble's.
-  quote: { paddingRight: 48 },
 });

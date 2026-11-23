@@ -91,7 +91,7 @@
     "chats": "Obrolan",
     "threads": "Utas",
     "agents": "Agen",
-    "activity": "Aktivitas",
+    "activity": "Kotak masuk",
     "search": "Cari",
     "withCount": "{{label}}, {{count}}"
   },
@@ -845,7 +845,7 @@
     }
   },
   "activity": {
-    "title": "Aktivitas",
+    "title": "Kotak masuk",
     "chooseModel": "Pilih model lain",
     "filter": {
       "all": "Semua",
@@ -1261,6 +1261,7 @@
     "criteriaOf": "{{done}} dari {{total}}",
     "linkMessage": "Pesan di #{{channel}}",
     "linkMessagePlain": "Pesan aslinya",
+    "removeFileText": "File tetap ada di Drive.",
     "subIssues": "Subtugas",
     "talk": "Obrolan",
     "finish": "Tandai selesai",

@@ -2439,7 +2439,8 @@ export const en = {
     searchWorkspace: "Search the workspace",
     summary_one: "{{people}} member · {{agents}} agents",
     summary_other: "{{people}} members · {{agents}} agents",
-    waiting: "Waiting on you",
+    /** The sidebar's one entry for everything that involves me: what waits on me, what is new, what I decided. */
+    waiting: "Inbox",
     approvals: "Approvals",
     proposals: "Improvement proposals",
     issues: "Tasks",
@@ -5716,7 +5717,7 @@ export const en = {
     firstRun: "Pick up where you left off · {{done}} of {{total}}",
   },
   notifications: {
-    title: "Notifications",
+    title: "Inbox",
     /** "Tirar de volta" on `plan_lent`: the person's plan leaves the agent someone else gave it to, or all of them. */
     planLent: {
       takeBack: "Take it back",
@@ -5753,7 +5754,7 @@ export const en = {
         computer: "Switch computer",
       },
     },
-    docTitleUnread: "({{count}}) Notifications",
+    docTitleUnread: "({{count}}) Inbox",
     summaryWaiting_one: "{{count}} thing waiting on you",
     summaryWaiting_other: "{{count}} things waiting on you",
     summaryUnread_one: "{{count}} unread",
@@ -5770,6 +5771,8 @@ export const en = {
       waiting: "Waiting on you",
       unread: "Unread",
       reactions: "Reactions",
+      /** The requests already decided: approved, refused, expired. */
+      requests: "Decided requests",
       done: "Done",
     },
     keys: {
@@ -6011,6 +6014,9 @@ export const en = {
     noneUnread: "All read.",
     noneHere: "Nothing here for now.",
     noneDone: "Nothing marked done in the last 30 days.",
+    noneRequests: "No request decided yet.",
+    /** A proposal's row in the inbox, after the agent's name. */
+    proposes: "proposes an improvement",
     more: "Show more",
   },
   approvals: {
@@ -13760,15 +13766,51 @@ export const en = {
     added: "{{repo}} joins the list when you save.",
   },
   connectors: {
+    /** The connectors as a store: featured services, a line per service with one button, and each one's page. */
+    store: {
+      featured: "Featured",
+      suggested: "Suggested",
+      seeAll: "See all",
+      more: "See more",
+      moreName: "See more about {{name}}",
+      connected: "Connected",
+      browse: "Browse connectors",
+      notListed: "Is a service missing from the store?",
+      howLabel: "How it connects",
+      whoAll: "Every agent",
+      whoChoose: "You choose later",
+      asksLabel: "Approval",
+      asksSensitive: "Sensitive actions ask you",
+      afterTitle: "After connecting",
+      agents_one: "{{count}} agent",
+      agents_other: "{{count}} agents",
+      whoEvery_one: "Your agent uses it.",
+      whoEvery_other: "All {{count}} agents use it.",
+      whoSome_one: "{{names}}. The other agent doesn't use it.",
+      whoSome_other: "{{names}}. The other {{count}} agents don't use it.",
+      change: "Change",
+      see: "View",
+      account: "Account",
+      toolsText: "What agents can do with it, and what asks you.",
+      addressesText: "Who agents can talk to through this mailbox.",
+      bandTitle_one: "{{count}} service to connect",
+      bandTitle_other: "{{count}} services to connect",
+      bandText: "{{names}} and more.",
+      appMissing: "This server's app isn't created yet",
+      appEvents: "The app is missing events",
+      appLine: "This server's app",
+      eventsLine: "Events",
+    },
+    howShort: {
+      oneClick: "One click",
+      oauthOrKey: "One click or an API key",
+      key: "API key",
+      appPassword: "App password",
+      addressPassword: "Address and password",
+      composio: "Through Composio",
+    },
     title: "Connectors",
     add: "Add connector",
-    /** Settings › Connectors and MCPs: the second card, every MCP server connected by its address. */
-    mcp: {
-      title: "MCPs",
-      add: "Add MCP",
-      list: "Connected MCP servers",
-      none: "MCP servers you connect by their address show up here.",
-    },
     /** Connections split as the Vault splits its items: the team's and each person's (ADR 0099 addendum). */
     personal: {
       note: "Only you open these connections. Your agents use them only when you ask.",
@@ -13806,9 +13848,6 @@ export const en = {
         "Everyone in the workspace sees it. People who manage agents choose which agents use it, and an agent's owner can turn it off on theirs. An agent that uses every connected app gets it right away.",
       moved: "{{name}} now belongs to the team.",
     },
-    addTitle: "Add connector",
-    catalogText: "Connect once for {{org}}. Then choose what each agent can use.",
-    catalog: "Available connectors",
     categories: "Categories",
     category: {
       all: "All",
@@ -13829,8 +13868,6 @@ export const en = {
     connectName: "Connect {{name}}",
     reconnectName: "Reconnect {{name}}",
     addAccountName: "Add another {{name}} account",
-    other: "Can't find it?",
-    otherText: "Connect any service by its address.",
     search: "Search connectors",
     searchPlaceholder: "Search by name or what it does",
     empty: "No connector matches “{{q}}”",
@@ -13844,8 +13881,6 @@ export const en = {
     more: "More services",
     tileConnected: "{{name}}, connected",
     tileSoon: "{{name}}, soon",
-    otherTitle: "Another service",
-    otherDetail: "Any service that offers a connection for agents, by its address (it starts with https://).",
     otherSteps: {
       "1": "You paste the address and authorize on the service's page",
       "2": "We sort out what each of its tools does",
@@ -13853,7 +13888,6 @@ export const en = {
     },
     otherConnect: "Connect by address",
     detail: {
-      close: "Close details",
       can: "What agents will be able to do",
       afterText: "No agent uses it until you choose.",
       allText: "Once connected, every agent can use it. You can adjust that later.",
@@ -13861,8 +13895,6 @@ export const en = {
       accountsText: "Each account has its own agents and levels.",
       reconnect: "Reconnect",
       replaceText: "Replaces the current sign-in. Who uses it stays the same.",
-      connected: "Already connected",
-      how: "How it works",
     },
     how: {
       oneClick: "One click: you authorize on the service's page",
@@ -13965,6 +13997,7 @@ export const en = {
         "2": "Create and adjust campaigns",
         ask: "Turning ads on and changing budgets always ask for your approval",
       },
+      tiktok_ads: { "1": "See campaigns, ad groups and results", "2": "Create and adjust campaigns and ads" },
       google_docs: { "1": "Search and read documents", "2": "Create and edit documents" },
       google_sheets: { "1": "Read spreadsheets", "2": "Add rows and update cells" },
       google_calendar: {
@@ -14055,7 +14088,6 @@ export const en = {
         ask: "Each upload always asks for your approval",
       },
     },
-    connectedList: "Connected",
     connected: "Connected",
     connectedAs: "Connected as {{account}}",
     /** A sign-in that lacks scopes the connector asks for now; `what` lists what reconnecting adds (`adds.*`). */
@@ -14187,6 +14219,7 @@ export const en = {
       amplitude: "Charts, dashboards and experiments.",
       himetrica: "Visitors, funnels, revenue and search traffic.",
       meta_ads: "Facebook and Instagram ad campaigns and results.",
+      tiktok_ads: "TikTok ad campaigns, ad groups, ads and their results.",
       klaviyo: "Campaigns, flows, lists and profiles.",
       millionsend: "Email campaigns, lists and contacts.",
       semrush: "Keyword, domain and backlink data.",
@@ -15854,6 +15887,10 @@ export const en = {
       pageOf: "{{page}} of {{count}}",
       pdfFailed: "This PDF can't be shown here. Download it to open it.",
       loadFailed: "This image can't be shown here.",
+      /** On the file's bar with its comments open: whether a press marks the file. */
+      mark: "Mark",
+      markOff: "Stop marking: a click moves the file again",
+      markOn: "Mark: a click comments on a point or an area",
       hint: {
         image: "Click to mark a point or drag to mark an area",
         video: "Click the video to comment at this moment, or drag to mark an area",

@@ -131,6 +131,8 @@ test("a group's header can carry an ⓘ for the whole group, its text under the 
 test("a row's ⓘ sits right after its label, and a short fact about its value goes on the value's line", () => {
   const grouped = source("Grouped.tsx");
   expect(grouped).toContain("<Row {...props} said={hint.text} labelAfter={info.button} />");
+  // A labeled field's ⓘ never shares the label's column (a two-word label broke in two lines): after the value.
+  expect(grouped).toMatch(/\{children\}\n\s+<\/View>\n\s+\{info\.button\}/);
   expect(grouped).toMatch(/<View style=\{styles\.labelLine\}>\s*<Text variant="body"/);
   expect(grouped).toMatch(
     /\{valueNote \? \(\s*<Text variant="footnote" numberOfLines=\{1\} style=\{\{ color: c\.label2 \}\}>/,

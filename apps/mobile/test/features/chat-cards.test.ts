@@ -85,6 +85,11 @@ describe("agents it asked first: quoted at the top of the reply, as a reply quot
     expect(row).toContain("<ConsultQuote askerId={m.author.id} channelId={m.channelId} items={paired} alone />");
   });
 
+  test("a face inside a line of words stands in its sky tile, in its middle", () => {
+    const face = readFileSync(join(import.meta.dir, "../../src/features/shared/Face.tsx"), "utf8");
+    expect(face).toContain("<AgentFace agentId={agentId} size={size} live={false} framed />");
+  });
+
   test("live: the working line carries the pair, the one asking and the one asked, while the turn works", () => {
     const live = source("LiveRows.tsx");
     expect(live).not.toContain("useRunConsults");
@@ -92,8 +97,9 @@ describe("agents it asked first: quoted at the top of the reply, as a reply quot
       ascending(
         at(live, [
           "if (asking && e.consult === asking)",
-          '<AgentFace agentId={e.id} size={18} mode="idle" />',
-          '<AgentFace agentId={asking.to} size={18} mode={asking.yours || asking.wait ? "idle" : "think"} />',
+          '<AgentFace agentId={e.id} size={18} framed mode="idle" />',
+          "agentId={asking.to}",
+          'mode={asking.yours || asking.wait ? "idle" : "think"}',
         ]),
       ),
     ).toBe(true);
@@ -106,7 +112,7 @@ describe("agents it asked first: quoted at the top of the reply, as a reply quot
     expect(pair).not.toContain("ConsultPairRow");
     // No colored bar at its left edge: a plate a step off the bubble, the agent's name in its color.
     expect(pair).not.toContain("quote.bar");
-    expect(pair).toContain('<Text variant="small" tone="muted" numberOfLines={2}>');
+    expect(pair).toContain('<Text variant="footnote" tone="muted" numberOfLines={2}>');
     // Standing alone, it says who asked: the asker's name and the arrows.
     expect(pair).toContain('<Icon name="swap" size={12}');
   });
@@ -265,11 +271,12 @@ describe("what an agent changed wraps whole, on a card as wide as its words", ()
     expect(checks).not.toContain("styles.one, ACT_LINE.row");
   });
 
-  test("they wear the tool block's card (the face a step up, a hairline), never the sunken gray of a pressed row", () => {
+  test("they wear the message card's frame (as the tool block), never the sunken gray of a pressed row", () => {
     for (const file of ["Receipts.tsx", "TeamChecks.tsx"]) {
       const text = source(file);
       expect(text).not.toContain("sunken");
-      expect(text).toMatch(/backgroundColor: (c|colors)\.raised, borderColor: (c|colors)\.line2/);
+      // The one frame of a message card (`useMessageCardFrame`): raised with a hairline, a bubble in bubbles.
+      expect(text).toContain("card.style");
     }
   });
 });

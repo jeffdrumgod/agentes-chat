@@ -164,7 +164,7 @@ import {
   rowFrame,
   workStepsOf,
 } from "./logic";
-import { liftedEdge, lookRows, RowPartContext, useRhythm, useRowLook } from "./look";
+import { liftedEdge, lookRows, plateInset, RowPartContext, useRhythm, useRowLook } from "./look";
 import { MessageText } from "./MessageText";
 import { aboveInset, QuoteAbove, QuotePlate } from "./QuoteLine";
 import { ReachLines } from "./ReachLines";
@@ -824,14 +824,14 @@ function RowBody({
           hitSlop={NAME_LINE_SLOP}
           style={({ pressed }) => [styles.shrink, pressed && styles.pressedDim]}
         >
-          <Text variant="caption" tone="muted" numberOfLines={1} style={styles.medium}>
+          <Text variant="label" tone="muted" numberOfLines={1}>
             {reportOpen ? t("channel.routineReportHide") : t("channel.routineReport")}
           </Text>
         </Pressable>
       ) : null}
       {talker ? (
         <Text
-          variant="caption"
+          variant="footnote"
           tone="faint"
           numberOfLines={1}
           style={styles.shrink}
@@ -844,7 +844,7 @@ function RowBody({
       {/* The agent's role tells agents apart where several speak; in a DM (`look.names` off) the bar under its name
           already says it, and it isn't said again on every turn. */}
       {!reminder && !routine && !talker && !helping && agent?.role && look.names && !bubbled && !compact ? (
-        <Text variant="caption" tone="faint" numberOfLines={1} style={styles.shrink}>
+        <Text variant="footnote" tone="faint" numberOfLines={1} style={styles.shrink}>
           {agent.role}
         </Text>
       ) : null}
@@ -965,7 +965,7 @@ function RowBody({
   return (
     <>
       {quoteAlone && m.author.id ? (
-        <View style={[styles.consultAlone, { paddingLeft: aboveInset(look), marginTop: rhythm.turn }]}>
+        <View style={[plateInset(look, aboveInset(look)), { marginTop: rhythm.turn }]}>
           <ConsultQuote askerId={m.author.id} channelId={m.channelId} items={paired} alone />
         </View>
       ) : null}
@@ -1452,12 +1452,10 @@ function HelpingTag({ consultation: c, channelId }: { consultation: RunConsultat
   const from = agentGrammar(dir.agentById.get(c.agentId)?.name ?? t("mobile.chat.someone"));
   return (
     <>
-      <Text variant="caption" tone="faint" numberOfLines={1} style={styles.shrink}>
-        {withAgentFaces(
-          t("chat.consultPanel.helping", { name: from.name, context: from.context }),
-          [{ name: from.name, agentId: c.agentId }],
-          12,
-        )}
+      <Text variant="footnote" tone="faint" numberOfLines={1} style={styles.shrink}>
+        {withAgentFaces(t("chat.consultPanel.helping", { name: from.name, context: from.context }), [
+          { name: from.name, agentId: c.agentId },
+        ])}
       </Text>
       <Pressable
         onPress={() => router.push(consultationHref(c.id, channelId))}
@@ -1465,7 +1463,7 @@ function HelpingTag({ consultation: c, channelId }: { consultation: RunConsultat
         hitSlop={NAME_LINE_SLOP}
         style={({ pressed }) => [styles.shrink, pressed && styles.pressedDim]}
       >
-        <Text variant="caption" tone="muted" numberOfLines={1} style={styles.medium}>
+        <Text variant="label" tone="muted" numberOfLines={1}>
           {t("chat.consultPanel.see")}
         </Text>
       </Pressable>
@@ -1658,7 +1656,6 @@ const styles = StyleSheet.create({
   ownBox: { overflow: "hidden" },
   aboutAbove: { paddingRight: 16 },
   // A quote of the agents' talk with no words to sit in: on the words' column, as wide as a bubble's.
-  consultAlone: { paddingRight: 48 },
   avslot: { width: MSG_AVATAR, alignItems: "center", paddingTop: 2 },
   body: { flex: 1, minWidth: 0 },
   // A long pick wraps: the check stays on its first line.

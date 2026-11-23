@@ -234,7 +234,7 @@
     "value": "Agents"
   },
   "tabs.activity": {
-    "value": "Activity"
+    "value": "Inbox"
   },
   "tabs.search": {
     "value": "Search"
@@ -2076,7 +2076,7 @@
     "female": "{{name}} asks again before this kind of work."
   },
   "activity.title": {
-    "value": "Activity"
+    "value": "Inbox"
   },
   "activity.chooseModel": {
     "value": "Choose another model"
@@ -3327,6 +3327,9 @@
   },
   "issues.linkMessagePlain": {
     "value": "The original message"
+  },
+  "issues.removeFileText": {
+    "value": "The file stays in the Drive."
   },
   "issues.subIssues": {
     "value": "Subtasks"

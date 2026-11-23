@@ -34,7 +34,7 @@ import { roleIdsOf } from "../shared/owner";
 import { tapHaptic } from "../shared/parts";
 import { boldRuns } from "./actions";
 import { ConsultQuote, useConsultById } from "./ConsultGroup";
-import { useCardTop, useMessageCardCorners } from "./look";
+import { useCardTop, useMessageCardFrame } from "./look";
 import { useRowDirectory, useRowMeId, useRowRoles } from "./row-data";
 
 const LIST_GAP = 8;
@@ -62,7 +62,7 @@ export function ReachLines({ message: m }: { message: Message }) {
 function Row({ entry: e, channelId, authorId }: { entry: ReachEntry; channelId: string; authorId: string }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const cardCorners = useMessageCardCorners();
+  const card = useMessageCardFrame();
   const orgId = useOrgId();
   const api = useApi();
   const dir = useRowDirectory();
@@ -86,7 +86,7 @@ function Row({ entry: e, channelId, authorId }: { entry: ReachEntry; channelId: 
   // conversation. Under another such quote they stack with the list's own gap.
   if (talk) return <ConsultQuote askerId={authorId} channelId={channelId} items={[talk]} alone />;
   return (
-    <View style={[styles.one, { backgroundColor: colors.raised, borderColor: colors.line2 }, cardCorners]}>
+    <View style={[styles.one, card.style]}>
       <View style={styles.head}>
         <LineIcon name={handed ? "chat" : "info"} size={15} color={colors.muted} variant="small" />
         <View style={styles.words}>
@@ -102,7 +102,7 @@ function Row({ entry: e, channelId, authorId }: { entry: ReachEntry; channelId: 
             )}
           </Text>
           {detail ? (
-            <Text variant="caption" tone="faint" numberOfLines={1} style={styles.detail}>
+            <Text variant="footnote" tone="faint" numberOfLines={1} style={styles.detail}>
               {detail}
             </Text>
           ) : null}

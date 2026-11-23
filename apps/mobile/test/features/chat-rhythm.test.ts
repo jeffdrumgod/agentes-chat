@@ -116,11 +116,10 @@ describe("one rhythm, the web's numbers (chat-rhythm-css.test.ts holds them to t
 
   test("the agents' talk is quoted in the reply, or on its own at the turn's gap; on a reach line, the list's", async () => {
     const row = await read("chat/MessageRow.tsx");
-    expect(row).toContain(
-      "<View style={[styles.consultAlone, { paddingLeft: aboveInset(look), marginTop: rhythm.turn }]}>",
-    );
+    // On its own it stands on the bubbles' column in a conversation of bubbles, as wide as one (`plateInset`).
+    expect(row).toContain("<View style={[plateInset(look, aboveInset(look)), { marginTop: rhythm.turn }]}>");
     const event = await read("chat/EventLine.tsx");
-    expect(event).toContain("<View style={[styles.quote, { paddingLeft: inset, marginTop: gap }]}>");
+    expect(event).toContain("<View style={[plateInset(look, inset), { marginTop: gap }]}>");
     // Two on a reach line stack at the list's gap, as its other rows.
     const reach = await read("chat/ReachLines.tsx");
     expect(reach).toContain("list: { gap: LIST_GAP }");

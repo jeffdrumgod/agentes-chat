@@ -106,7 +106,7 @@
     "chats": "Чаты",
     "threads": "Ветки",
     "agents": "Агенты",
-    "activity": "Активность",
+    "activity": "Входящие",
     "search": "Поиск",
     "withCount": "{{label}}, {{count}}"
   },
@@ -920,7 +920,7 @@
     }
   },
   "activity": {
-    "title": "Активность",
+    "title": "Входящие",
     "chooseModel": "Выбрать другую модель",
     "filter": {
       "all": "Все",
@@ -1501,6 +1501,7 @@
     "criteriaOf": "{{done}} из {{total}}",
     "linkMessage": "Сообщение в #{{channel}}",
     "linkMessagePlain": "Исходное сообщение",
+    "removeFileText": "Файл останется в Drive.",
     "subIssues": "Подзадачи",
     "talk": "Чат",
     "finish": "Отметить выполненной",

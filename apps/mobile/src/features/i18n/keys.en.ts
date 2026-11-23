@@ -102,7 +102,7 @@ export const featureKeysEn = {
     chats: "Chats",
     threads: "Threads",
     agents: "Agents",
-    activity: "Activity",
+    activity: "Inbox",
     search: "Search",
     withCount: "{{label}}, {{count}}",
   },
@@ -942,7 +942,7 @@ export const featureKeysEn = {
     },
   },
   activity: {
-    title: "Activity",
+    title: "Inbox",
     /** Under `plan_model_dropped`: opens the agent's model. */
     chooseModel: "Choose another model",
     /** The pills over Atividade: short, no counts (the section and the tab's badge count). */
@@ -1455,6 +1455,8 @@ export const featureKeysEn = {
     criteriaOf: "{{done}} of {{total}}",
     linkMessage: "Message in #{{channel}}",
     linkMessagePlain: "The original message",
+    /** The text of the confirm before a file comes off a task (its title: "Remove {{name}} from the task"). */
+    removeFileText: "The file stays in the Drive.",
     subIssues: "Subtasks",
     talk: "Chat",
     finish: "Mark done",

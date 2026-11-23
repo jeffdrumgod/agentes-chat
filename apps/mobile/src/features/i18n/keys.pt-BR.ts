@@ -107,7 +107,7 @@ export const featureKeysPtBR = {
     chats: "Conversas",
     threads: "Threads",
     agents: "Agentes",
-    activity: "Atividade",
+    activity: "Caixa",
     search: "Buscar",
     withCount: "{{label}}, {{count}}",
   },
@@ -912,7 +912,7 @@ export const featureKeysPtBR = {
     },
   },
   activity: {
-    title: "Atividade",
+    title: "Caixa de entrada",
     /** Under `plan_model_dropped`: opens the agent's model. */
     chooseModel: "Escolher outro modelo",
     /** The pills over Atividade: short, no counts (the section and the tab's badge count). */
@@ -1399,6 +1399,7 @@ export const featureKeysPtBR = {
     criteriaOf: "{{done}} de {{total}}",
     linkMessage: "Mensagem no #{{channel}}",
     linkMessagePlain: "A mensagem de origem",
+    removeFileText: "O arquivo continua no Drive.",
     subIssues: "Subtarefas",
     talk: "Conversar",
     finish: "Concluir",

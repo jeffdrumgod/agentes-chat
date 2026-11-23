@@ -101,7 +101,7 @@
     "chats": "Discussions",
     "threads": "Fils",
     "agents": "Agents",
-    "activity": "Activité",
+    "activity": "Réception",
     "search": "Recherche",
     "withCount": "{{label}}, {{count}}"
   },
@@ -895,7 +895,7 @@
     }
   },
   "activity": {
-    "title": "Activité",
+    "title": "Boîte de réception",
     "chooseModel": "Choisir un autre modèle",
     "filter": {
       "all": "Tout",
@@ -1418,6 +1418,7 @@
     "criteriaOf": "{{done}} sur {{total}}",
     "linkMessage": "Message dans #{{channel}}",
     "linkMessagePlain": "Le message d'origine",
+    "removeFileText": "Le fichier reste dans le Drive.",
     "subIssues": "Sous-tâches",
     "talk": "Discuter",
     "finish": "Marquer comme terminée",

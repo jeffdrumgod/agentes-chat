@@ -345,6 +345,7 @@
   "rowpad@320 div.settings-row.settings-row--lead in div.settings-rows",
   "rowpad@320 div.settings-row.settings-row--lead.settings-row--toggle in div.settings-rows",
   "rowpad@320 li.imp-row in ul.imp-rows",
+  "rowpad@320 li.imp-row in ul.imp-rows.imp-choice",
   "rowpad@320 li.nac-pick__row.ac-faceline in ul.nac-pick__list",
   "rowpad@320 li.setup-row.ac-mediarow.ac-mediarow--row in ul.setup-cl__rows",
   "rowpad@390 article.thread-row in div.list-card",

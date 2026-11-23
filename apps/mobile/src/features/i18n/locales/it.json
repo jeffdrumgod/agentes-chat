@@ -101,7 +101,7 @@
     "chats": "Chat",
     "threads": "Thread",
     "agents": "Agenti",
-    "activity": "Attività recenti",
+    "activity": "In arrivo",
     "search": "Cerca",
     "withCount": "{{label}}, {{count}}"
   },
@@ -895,7 +895,7 @@
     }
   },
   "activity": {
-    "title": "Attività recenti",
+    "title": "Posta in arrivo",
     "chooseModel": "Scegli un altro modello",
     "filter": {
       "all": "Tutto",
@@ -1418,6 +1418,7 @@
     "criteriaOf": "{{done}} di {{total}}",
     "linkMessage": "Messaggio in #{{channel}}",
     "linkMessagePlain": "Il messaggio originale",
+    "removeFileText": "Il file resta nel Drive.",
     "subIssues": "Sottoattività",
     "talk": "Chatta",
     "finish": "Segna come completata",

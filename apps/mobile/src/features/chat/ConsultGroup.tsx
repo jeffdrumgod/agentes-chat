@@ -155,7 +155,8 @@ export function ConsultQuote({
     pair.seconds !== null ? consultTimeText(t, i18n.language, live, pair.seconds) : null,
   ]
     .filter(Boolean)
-    .join(" ");
+    // Two facts, told apart as every line's: "1 of 2 · 2.1 h".
+    .join(" · ");
   return (
     <Pressable
       onPress={() => {
@@ -177,7 +178,7 @@ export function ConsultQuote({
         <View style={quote.head}>
           {alone ? (
             <>
-              <Text variant="footnote" tone="ink2" numberOfLines={1} style={quote.asker}>
+              <Text variant="small" tone="ink2" numberOfLines={1} style={quote.asker}>
                 {nameOf(askerId)}
               </Text>
               {pair.tone === "you" ? (
@@ -199,7 +200,7 @@ export function ConsultQuote({
               </View>
             ))}
           </View>
-          <Text variant="footnote" numberOfLines={1} style={[quote.name, { color: ink }]}>
+          <Text variant="small" numberOfLines={1} style={[quote.name, { color: ink }]}>
             {to}
           </Text>
           {how ? (
@@ -209,7 +210,7 @@ export function ConsultQuote({
           ) : null}
         </View>
         {subject ? (
-          <Text variant="small" tone="muted" numberOfLines={2}>
+          <Text variant="footnote" tone="muted" numberOfLines={2}>
             {subject}
           </Text>
         ) : null}
