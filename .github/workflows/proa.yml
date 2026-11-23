@@ -26,7 +26,8 @@ concurrency:
 jobs:
   brand:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # The generators draw every icon in plain JavaScript: about half an hour on a hosted runner.
+    timeout-minutes: 90
     outputs:
       tag: ${{ steps.v.outputs.tag }}
       version: ${{ steps.v.outputs.version }}
