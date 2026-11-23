@@ -1,7 +1,7 @@
 import { normalizeServer, serverHost } from "@agenteschat/client/lib/server";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { API_URL } from "@/config";
+import { API_URL, ASKS_SERVER } from "@/config";
 import { Quiet } from "@/features/auth/AuthFlow";
 import { connectToServer, problemText } from "@/features/server";
 import { checkServerOrGate } from "@/lib/gate";
@@ -35,7 +35,9 @@ export function ServerAddress({
 }) {
   const { t } = useTranslation();
   const toast = useToast();
+  // On a build without a server of its own, every server is the person's: nothing to go back to.
   const custom = serverUrl() !== API_URL;
+  const canGoBack = custom && !ASKS_SERVER;
   const [address, setAddress] = useState(custom ? serverHost(serverUrl()) : "");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -69,7 +71,7 @@ export function ServerAddress({
       subtitle={t("mobile.auth.server.subtitle")}
       agentMode={busy ? "run" : "idle"}
       footer={
-        custom && !busy ? (
+        canGoBack && !busy ? (
           <AuthLink
             label={t("mobile.auth.server.backTo", { host: serverHost(API_URL) })}
             onPress={() => void switchTo(API_URL)}

@@ -5,6 +5,7 @@ import {
   accountsFrom,
   claimedPrefixes,
   currentServer,
+  needsServer,
   type PlaceAccount,
   perServerName,
   placeFor,
@@ -47,6 +48,11 @@ export const placeKey = () => place;
 /** The server's address, for screens that show or fetch from it. */
 export function useServer() {
   return useSyncExternalStore(subscribe, serverUrl);
+}
+
+/** No server chosen yet on a build without one of its own (`ASKS_SERVER`): the sign-in asks where it is first. */
+export function useNeedsServer() {
+  return needsServer(useSyncExternalStore(subscribe, placeKey));
 }
 
 /** The place, for what must follow a change of server or of account (the providers). */

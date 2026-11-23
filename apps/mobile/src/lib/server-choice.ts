@@ -26,6 +26,24 @@ export function placeFrom(raw: string): string | null {
   return PLACE_ID.test(id) ? placeFor(server, id) : null;
 }
 
+/**
+ * Where a server is expected and the build has none yet: an address that never resolves (`.invalid`, RFC 2606), so
+ * nothing is ever sent to it, while the app asks where its server is.
+ */
+export const NO_SERVER = "https://no-server.invalid";
+
+/**
+ * The build's own server from its setting (`EXPO_PUBLIC_API_URL`, pure): that address; unset, `fallback`; empty, none
+ * (`NO_SERVER`): the app asks for one before anything else, as the desktop app does.
+ */
+export function buildServer(setting: string | undefined, fallback: string): string {
+  if (setting === undefined) return fallback;
+  return setting.trim() === "" ? NO_SERVER : setting.replace(/\/+$/, "");
+}
+
+/** The app is on no server yet: the sign-in asks where it is first (pure). */
+export const needsServer = (place: string) => serverOf(place) === NO_SERVER;
+
 /** The place the app is on: the one the person chose ("Seu servidor", or one of its accounts), else the build's. */
 export const currentServer = (saved: string | null, build: string) => (saved ? placeFrom(saved) : null) ?? build;
 
