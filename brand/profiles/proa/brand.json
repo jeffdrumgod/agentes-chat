@@ -75,11 +75,11 @@
     },
     "packages/ui/test/sky.test.tsx": {
       "file": "override/packages/ui/test/sky.override-test.tsx",
-      "upstreamSha256": "38974b7919512d6524c2db5cbef753d2c43ba45fa2bad1623e76c98df7e53575"
+      "upstreamSha256": "49ea0a4ce4595ee334611ff18f1447c51e2224c07c244431653f7d58ca870256"
     },
     "packages/ui/test/components.test.tsx": {
       "file": "override/packages/ui/test/components.override-test.tsx",
-      "upstreamSha256": "5631a33de33c945dd2deb3f70242ebc72ba37bad17875e80f46c5b906feac8f9"
+      "upstreamSha256": "70e1695edb42ba656405015a9c7ce9eedae11a27a0c11db07cfe805ed04f768e"
     },
     "packages/ui/test/app-icons.test.ts": {
       "file": "override/packages/ui/test/app-icons.override-test.ts",
