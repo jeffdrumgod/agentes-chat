@@ -2101,7 +2101,7 @@
     "moreWhat": {
       "waiting": "あなたの返事を待っているものすべて",
       "approvals": "エージェントからの許可のお願い",
-      "proposals": "エージェントが変更を提案している内容",
+      "proposals": "エージェントが変えたことと、その理由",
       "threads": "枝分かれした会話とミッション",
       "issues": "人とエージェントのためのチームの作業",
       "wiki": "チームの知識を全員向けにまとめたもの",
@@ -2219,7 +2219,7 @@
     "summary_other": "メンバー{{people}}人 · エージェント{{agents}}体",
     "waiting": "受信トレイ",
     "approvals": "承認",
-    "proposals": "改善提案",
+    "proposals": "エージェントの改善",
     "issues": "タスク",
     "missionsWaiting_other": "{{count}}件のミッションがあなたを待っています",
     "threads": "スレッド",
@@ -2260,7 +2260,6 @@
     "gallery": "コンポーネントギャラリー",
     "unread_other": "{{count}}件の未読メッセージ",
     "pendingApprovals_other": "{{count}}件の承認待ち",
-    "pendingProposals_other": "{{count}} 件の提案があなたを待っています",
     "home": "ホーム",
     "notifications": "通知",
     "unreadMark": "未読",
@@ -2945,7 +2944,7 @@
       "team": "人が適用するカードでチーム全体を整え、変更します。対象はエージェント、メンバー、ワークスペースの設定です",
       "routines": "あなたが管理できるルーティンなら、どのエージェントのものでも実行、削除します",
       "asYou": "あなたとの会話では、あなたが見られる Drive、Wiki、タスクを読みます",
-      "mentions": "メンバーでなくても、どのチャンネルの @メンションにも答えます"
+      "mentions": "メンバーでなくても、どのチャンネルの @メンションにも、自分が最適なメッセージにも答えます"
     },
     "card": {
       "settings": "{{name}} · 設定",
@@ -2970,24 +2969,7 @@
       "to": "から",
       "editFirst": "先に編集",
       "superseded": "新しい提案に置き換えられました",
-      "onlyCreators": "エージェントを作れるのは管理者だけです",
-      "only": {
-        "model": "エージェントのモデルを変えられるのは管理者だけです",
-        "effort": "エージェントの思考レベルを変えられるのは管理者だけです",
-        "budget": "エージェントの予算を変えられるのは管理者だけです",
-        "owner": "エージェントの責任者を変えられるのは管理者だけです",
-        "archive": "エージェントをアーカイブできるのは管理者だけです",
-        "delete": "エージェントを削除できるのは管理者だけです",
-        "audience": "話せる人を変えられるのは管理者と責任者だけです",
-        "channels": "チャンネルを変えられるのは管理者と責任者だけです",
-        "skill": "エージェントのスキルを変えられるのは、そのエージェントを編集できる人だけです",
-        "ai_account": "割り当てられるのはアカウントの持ち主だけです",
-        "name": "エージェントの名前を変えられるのは管理者だけです",
-        "look": "見た目を変えられるのは管理者と責任者だけです",
-        "group": "エージェントの部署を変えられるのは管理者だけです",
-        "reports_to": "エージェントの報告先を変えられるのは管理者だけです",
-        "many": "これらの変更ができるのは管理者だけです"
-      }
+      "onlyCreators": "エージェントを作れるのは管理者だけです"
     },
     "field": {
       "model": "モデル",
@@ -3026,10 +3008,6 @@
     "remove": {
       "archiveTitle_other": "{{count}}体のエージェントをアーカイブしますか？",
       "deleteTitle_other": "{{count}}体のエージェントを完全に削除しますか？",
-      "archiveAll": "すべてアーカイブ",
-      "deleteAll": "すべて削除",
-      "archiveSome_other": "{{count}}体をアーカイブ",
-      "deleteSome_other": "{{count}}体を削除",
       "deleteHelp": "指示、メモリー、ルーティンは完全に消えます。メッセージは残ります。"
     },
     "people": {
@@ -4004,8 +3982,7 @@
   "inlineProposal": {
     "group": "{{name}}が提案した変更",
     "groupMany": "{{name}}による{{count}}体のエージェントへの変更提案",
-    "edit": "編集",
-    "open": "提案で開く"
+    "open": "「エージェントの改善」で開く"
   },
   "newChannel": {
     "open": "チャンネルを作成",
@@ -4946,7 +4923,6 @@
       }
     },
     "asks": "<b>{{agent}}</b>が承認を求めています",
-    "waitingYou": "あなたの対応待ち",
     "approve": {
       "merge": "マージを承認",
       "deploy": "デプロイを承認",
@@ -5222,6 +5198,9 @@
       "joinOutside": "<b>{{name}}</b>が<b>{{outsideOf}}</b>の外部協力者として参加をリクエストしました。プランの席は使いません",
       "changeRequest": "<b>{{name}}</b>が<b>{{agent}}</b>の変更を依頼しています",
       "proposalWaiting": "<b>{{names}}</b> からの改善提案",
+      "proposalApplied_other": "<b>{{name}}</b> が改善を{{count}}件適用しました",
+      "proposalAppliedMany_other": "<b>{{names}}</b> が改善を{{count}}件適用しました",
+      "proposalAppliedAuto_other": "{{count}}件の改善が自動で適用されました",
       "changeRequestAgent": "<b>{{name}}</b>が新しいエージェントを依頼しています：<b>{{agent}}</b>",
       "changeRequestAction": "<b>{{name}}</b>がワークスペースの変更を依頼しています",
       "approvalCover": "<b>{{name}}</b>が「代わりに承認する人」にあなたを選びました",
@@ -5343,7 +5322,6 @@
     "noneHere": "今は何もありません。",
     "noneDone": "過去30日間に完了にしたものはありません。",
     "noneRequests": "決定済みのリクエストはまだありません。",
-    "proposes": "が改善を提案しています",
     "more": "さらに表示"
   },
   "approvals": {
@@ -5896,6 +5874,7 @@
       "overview": "概要",
       "instructions": "指示",
       "access": "ツールとアクセス",
+      "skills": "スキル",
       "memory": "メモリ",
       "files": "ファイル",
       "usage": "使用量",
@@ -6007,9 +5986,6 @@
       "approvalsYou": "「承認」またはチャットで承認・却下できます",
       "approvalsWait": "オーナーまたは管理者の対応待ち",
       "seeApprovals": "リクエストを見る",
-      "proposes": "{{name}}が自分の指示の変更を提案しています",
-      "proposes_female": "{{name}}が自分の指示の変更を提案しています",
-      "review": "確認する",
       "does": "{{name}}の仕事",
       "readAll": "すべて読む",
       "recent": "最近の作業",
@@ -6041,8 +6017,7 @@
       "showDiff": "変更点を見る",
       "hideDiff": "変更点を隠す",
       "diff": "指示の変更点",
-      "add": "追加",
-      "proposals_other": "変更の提案 {{count}}件"
+      "add": "追加"
     },
     "access": {
       "search": "コネクタまたはエリアを検索",
@@ -6075,15 +6050,9 @@
       "lessons": "教訓",
       "fromTeam": "チームから学んだこと",
       "fromTeamRightHand": "あなたから学んだこと",
-      "proposals": "提案",
-      "waiting": "判断待ち",
-      "noneWaiting": "判断待ちなし",
-      "waitingCount_other": "判断待ちの提案 {{count}}件",
+      "improvements": "改善",
+      "improvementsApplied": "適用済み",
       "full": "メモリ全体を開く",
-      "accepted": "変更を承認しました。指示が更新されました。",
-      "refused": "提案を却下しました。{{name}}は理由を記録しました。",
-      "decides": "{{who}}が判断します。",
-      "adminDecides": "管理者が判断します。",
       "learned": "学んだこと",
       "learnedEmpty": "見つけた修正点、好み、仕事の進め方がここに表示されます。",
       "learnedEmptyTitle": "修正のたびに学びます",
@@ -6298,7 +6267,6 @@
     "title": "{{name}}が知っていること",
     "subtitle": "{{name}}が会話やチームの訂正から学んだことです。",
     "subtitlePersonal": "{{name}}があなたとの会話や訂正から学んだことです。",
-    "proposals_other": "改善提案{{count}}件",
     "tabsLabel": "種類",
     "tabs": {
       "known": "事実と決定事項",
@@ -6327,9 +6295,6 @@
     "unverifiedTitle": "エージェントが言っただけの情報です。印付きのヒントとしてコンテキストに入ります。",
     "pinned": "常にコンテキストに含める",
     "lowTrust": "外部の情報源で、信頼されていません",
-    "confirm": "確認する",
-    "confirmTitle": "正しいと伝えると、エージェントは信頼できる情報として使います。",
-    "confirmed": "確認しました",
     "used_other": "{{count}}回使用",
     "unusedFor": "{{days}}日間未使用",
     "supersedes": "置き換え前:",
@@ -6359,7 +6324,7 @@
     }
   },
   "proposals": {
-    "title": "改善提案",
+    "title": "エージェントの改善",
     "whyCode": {
       "refused": "拒否されました: {{text}}",
       "corrected": "修正されました: {{text}}",
@@ -6369,9 +6334,9 @@
       "budget": "今週、月間予算に達して停止しました。",
       "noChannel": "どのチャンネルにも入っていません。"
     },
-    "subtitle": "エージェントが提案する変更。誰かが承認するまで何も変わりません。",
-    "subtitlePersonal": "エージェントが提案する変更。あなたが承認するまで何も変わりません。",
-    "list": "提案",
+    "subtitle": "エージェントがチームで変えたことと、その理由。元に戻すこともできます。",
+    "subtitlePersonal": "あなたのエージェントが変えたことと、その理由。元に戻すこともできます。",
+    "list": "改善",
     "proposes": "<b>{{agent}}</b>からの提案 · {{target}}",
     "proposesMany": "<b>{{agent}}</b>からの提案 · {{count}}体のエージェントの指示",
     "proposesManyChanges": "<b>{{agent}}</b>からの提案 · {{count}}体のエージェントの変更",
@@ -6390,51 +6355,31 @@
     "roleLine": "ロール: {{from}} → {{to}}",
     "accessOn": "オンにする: {{app}}",
     "accessOff": "オフにする: {{app}}",
-    "include": "{{name}}を含める",
-    "acceptAll": "すべてに適用して承認",
-    "acceptSome": "{{count}}件を承認",
-    "all": {
-      "label": "すべての提案を判断",
-      "accept": "すべて承認",
-      "refuse": "すべて却下",
-      "acceptAsk_other": "{{count}}件の提案をすべて承認しますか？それぞれすぐに反映されます。",
-      "refuseAsk_other": "{{count}}件の提案をすべて却下しますか？エージェントは同じ提案をしなくなります。",
-      "acceptGo_other": "{{count}}件を承認",
-      "refuseGo_other": "{{count}}件を却下"
-    },
-    "staleSome_other": "{{count}}件は承認されませんでした。提案後にテキストが変更されています。",
-    "staleSomeAgent_other": "{{count}}件は承認されませんでした。提案後にエージェントが変更されています。",
-    "waitingFor": "{{name}}の対応待ち",
+    "reviewing": "確認中…",
+    "appliedByAgent": "{{name}}が適用",
+    "appliedByAgent_female": "{{name}}が適用",
+    "appliedAuto": "自動で適用",
+    "leftOutBy": "{{name}}が見送り",
+    "leftOutBy_female": "{{name}}が見送り",
+    "leftOut": "見送り",
+    "undoneBy": "{{name}}が元に戻しました",
+    "undoneByYou": "あなたが元に戻しました",
+    "undo": "元に戻す",
+    "appliedSome": "{{total}}件中{{done}}件を適用",
     "waitingAdmin": "管理者の対応待ち",
     "stale": "古い提案",
-    "staleError": "この提案は古くなっています。提案後にテキストが変更されました。リストを更新しました。",
-    "staleNote": "この提案の後にテキストが変更されたため、承認できなくなりました。",
-    "staleErrorAgent": "この提案は古くなっています。提案後にエージェントが変更されました。リストを更新しました。",
-    "staleNoteAgent": "この提案の後にエージェントが変更されたため、承認できなくなりました。",
+    "staleNote": "この提案の後にテキストが変更されたため、適用できなくなりました。",
+    "staleNoteAgent": "この提案の後にエージェントが変更されたため、適用できなくなりました。",
     "accepted": "承認済み",
     "refused": "却下済み",
-    "acceptedSome": "{{total}}件中{{done}}件を承認",
-    "acceptedBy": "{{name}}が承認 · {{when}}",
-    "refusedBy": "{{name}}が却下 · {{when}}",
-    "acceptedByYou": "あなたが承認 · {{when}}",
-    "refusedByYou": "あなたが却下 · {{when}}",
     "why": "理由",
     "change": "{{target}}の変更",
     "changeLabel": "提案された変更",
-    "editFirst": "編集してから承認",
-    "viewDiff": "差分を見る",
-    "finalText": "指示の最終テキスト",
-    "finalTextContext": "コンテキストの最終テキスト",
-    "accept": "変更を承認",
-    "acceptEdited": "編集して承認",
-    "refuse": "却下",
-    "refuseNote": "却下すると、{{name}}は同じ提案をしないよう学習します。",
-    "refuseNote_female": "却下すると、{{name}}は同じ提案をしないよう学習します。",
     "added": "追加:",
     "removed": "削除:",
     "sameLines_other": "変更のない{{count}}行",
-    "empty": "誰かがエージェントに変更を頼んだり、同じ学びが繰り返されたりすると、提案がここに表示されます。",
-    "emptyTitle": "確認するものはありません",
+    "empty": "エージェントが自分や仲間の指示を改善すると、その変更が「元に戻す」付きでここに表示されます。",
+    "emptyTitle": "まだ何も変わっていません",
     "titleInstructions": "{{name}}の指示を更新",
     "titleInstructions_female": "{{name}}の指示を更新",
     "titleRole": "{{name}}のロールを変更",
@@ -10309,7 +10254,80 @@
       "text": "キーがなくてもエージェントは動き続けます。"
     }
   },
+  "aiHub": {
+    "tab": "AIアカウント",
+    "usageTab": "使用量",
+    "accounts": "アカウント",
+    "accountsHint": "誰が接続したかに関わらず、エージェントが考えるのに使えるすべてのプランとAPIキー。",
+    "apiKey": "APIキー",
+    "of": "{{name}}さんの",
+    "moreSpeed": "速度とコンテキストウィンドウ",
+    "whoThinks": "考える担当",
+    "bulk": {
+      "sub": "AIを選び、次にそれを使うエージェントを選びます。"
+    },
+    "choice": {
+      "workspace": "ワークスペースのもの",
+      "none": "アカウントを選択",
+      "search": "名前、AI、プラン、所有者で検索",
+      "noMatch": "一致するアカウントはありません。",
+      "noModel": "一致するモデルはありません。",
+      "groups": {
+        "yours": "あなたの",
+        "others": "チームの",
+        "keys": "ワークスペースの"
+      }
+    },
+    "order": {
+      "title": "使用順",
+      "tip": "エージェントが最初に使うアカウント",
+      "sub": "上限に達すると、エージェントは次のアカウントに移ります。",
+      "group": "{{maker}} · {{computer}}",
+      "signedOut": "サインアウト · スキップ",
+      "skipped": "スキップ",
+      "fallback": "すべてのプランが上限に達したらAPIキーで続ける",
+      "fallbackHint": "オフ: エージェントは最初のプランの更新を待ちます。オン: 従量課金のワークスペースのAPIキーで続けます。ミッションでは続けません。"
+    },
+    "detail": {
+      "limits": "上限",
+      "noLimits": "上限はまだ読み取られていません。",
+      "permissions": "権限",
+      "saved": "権限を保存しました。",
+      "more": "{{name}}のその他の操作",
+      "manage": "管理",
+      "manageLine": "名前の変更、再サインイン、削除",
+      "manageHint": "このアカウントの名前変更、再サインイン、削除、これらの権限の変更ができる人。",
+      "use": "エージェントで使う",
+      "useLine": "「考える担当」で選ぶ",
+      "useHint": "このアカウントで考えられるエージェントの所有者。",
+      "reply": "全員に応答",
+      "replyLine": "エージェントが話す相手",
+      "replyHint": "このアカウントのエージェントが、自分の所有者以外に応答する相手。",
+      "claudeTerms": "Claudeの規約では、個人プランは一人のものです。共有はグレーゾーンです。",
+      "pickRoles": "これらのロールを持つ人。",
+      "pickPeople": "アカウントの所有者に加えて。",
+      "searchRoles": "ロールを検索",
+      "searchPeople": "メンバーを検索",
+      "nobody": "選べる人がいません。"
+    },
+    "modes": {
+      "owner": "あなただけ",
+      "ownerOf": "{{name}}さんだけ",
+      "admins": "あなたと管理者",
+      "adminsOf": "{{name}}さんと管理者",
+      "roles": "ロール…",
+      "people": "メンバー…",
+      "everyone": "全員",
+      "replyOwner": "エージェントの所有者だけ"
+    }
+  },
   "aiAccounts": {
+    "useReason": {
+      "signed_out": "サインアウト済み",
+      "owner_left": "{{owner}} さんはワークスペースを退出しました",
+      "owner_only": "{{owner}} さんだけが使います",
+      "not_allowed": "あなたのエージェントには開放されていません"
+    },
     "unnamed": "名前のないアカウント",
     "rename": {
       "action": "{{label}} の名前を変更",
@@ -12246,7 +12264,6 @@
     "count_other": "{{count}}件",
     "searchHint": "検索のショートカット",
     "who": "作成者",
-    "everyone": "全員",
     "kindMany": {
       "document": "ドキュメント",
       "table": "表",
@@ -12264,8 +12281,10 @@
     "view": "表示",
     "viewGrid": "グリッド",
     "viewList": "リスト",
-    "arrange": "並べ方",
-    "arrangeValue": "並べ方: {{group}}",
+    "display": "表示設定",
+    "displayValue": "表示設定：{{view}} · {{group}}",
+    "filterButton": "フィルター",
+    "filterValue": "{{filter}}：{{value}}",
     "groupBy": "グループ化",
     "group": {
       "date": "日付",
@@ -12706,7 +12725,6 @@
     "added": "保存すると{{repo}}がリストに追加されます。"
   },
   "connectors": {
-    "title": "コネクタ",
     "store": {
       "featured": "注目",
       "suggested": "おすすめ",
@@ -12745,6 +12763,7 @@
       "addressPassword": "アドレスとパスワード",
       "composio": "Composio経由"
     },
+    "title": "コネクタ",
     "add": "コネクタを追加",
     "personal": {
       "note": "これらの接続を開けるのはあなただけです。エージェントは、あなたが頼んだときだけ使います。",
@@ -15186,6 +15205,12 @@
     "teamProposal": {
       "undoExpired": "このチームの作成から1日以上たったため、ここでは取り消せません。各エージェントのページでアーカイブしてください。"
     },
+    "proposal": {
+      "changed": "適用後に変更されています。手動で調整してください。",
+      "notApplied": "この変更は適用されていないため、元に戻すものはありません。",
+      "notUndoable": "削除したエージェントは元に戻せません。",
+      "notAllowed": "この変更を元に戻せるのは、この変更を行える人だけです。"
+    },
     "agentProposal": {
       "decided": "この提案はすでに誰かが判断しました。",
       "expired": "この提案は期限切れです。1日以内に誰も判断しませんでした。",
@@ -15436,6 +15461,7 @@
     "account": {
       "notRestorable": "このアカウントはもう復元できません。",
       "notOwner": "これができるのは、このアカウントまたはプランを接続した人だけです。",
+      "permissionForbidden": "これを変更できるのは、アカウントの所有者、管理者、またはアカウントを管理できる人だけです。",
       "orderForbidden": "順番の中での位置を変えられるのは、このアカウントを接続した人か管理者だけです。"
     },
     "channel": {

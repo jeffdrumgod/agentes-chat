@@ -2101,7 +2101,7 @@
     "moreWhat": {
       "waiting": "所有等你答复的事",
       "approvals": "智能体请求你允许的事",
-      "proposals": "智能体提议更改的内容",
+      "proposals": "智能体改了什么，以及原因",
       "threads": "分支出去的对话和专项任务",
       "issues": "团队的工作，成员和智能体都有",
       "wiki": "团队知道的事，写给所有人看",
@@ -2219,7 +2219,7 @@
     "summary_other": "{{people}} 位成员 · {{agents}} 个智能体",
     "waiting": "收件箱",
     "approvals": "审批",
-    "proposals": "改进建议",
+    "proposals": "智能体改进",
     "issues": "任务",
     "missionsWaiting_other": "{{count}} 个专项任务在等你",
     "threads": "话题",
@@ -2260,7 +2260,6 @@
     "gallery": "组件库",
     "unread_other": "{{count}} 条未读消息",
     "pendingApprovals_other": "{{count}} 个待审批",
-    "pendingProposals_other": "{{count}} 条提议等你处理",
     "home": "首页",
     "notifications": "通知",
     "unreadMark": "未读",
@@ -2944,7 +2943,7 @@
       "team": "通过由人来应用的卡片搭建和调整整个团队，包括智能体、成员和工作区设置",
       "routines": "运行和删除你有权管理的任何智能体的例行任务",
       "asYou": "在你自己的对话里，读取你能看到的 Drive、Wiki 和任务",
-      "mentions": "不是成员也能回应任何频道里的 @提及"
+      "mentions": "不是成员也能回应任何频道里的 @提及，以及最适合由它回答的消息"
     },
     "card": {
       "settings": "{{name}} · 设置",
@@ -2969,24 +2968,7 @@
       "to": "改为",
       "editFirst": "先编辑",
       "superseded": "已被更新的提议取代",
-      "onlyCreators": "只有管理员能创建智能体",
-      "only": {
-        "model": "只有管理员能更改智能体的模型",
-        "effort": "只有管理员能更改智能体的投入程度",
-        "budget": "只有管理员能更改智能体的预算",
-        "owner": "只有管理员能更改智能体的负责人",
-        "archive": "只有管理员能归档智能体",
-        "delete": "只有管理员能删除智能体",
-        "audience": "只有管理员和负责人能更改谁能和它交谈",
-        "channels": "只有管理员和负责人能更改它的频道",
-        "skill": "只有能编辑该智能体的人能更改它的技能",
-        "ai_account": "只有账户所有者能分配它",
-        "name": "只有管理员能重命名智能体",
-        "look": "只有管理员和负责人能更改它的外观",
-        "group": "只有管理员能更改智能体所在的部门",
-        "reports_to": "只有管理员能更改智能体的汇报对象",
-        "many": "只有管理员能做这些更改"
-      }
+      "onlyCreators": "只有管理员能创建智能体"
     },
     "field": {
       "model": "模型",
@@ -3025,10 +3007,6 @@
     "remove": {
       "archiveTitle_other": "归档 {{count}} 个智能体？",
       "deleteTitle_other": "永久删除 {{count}} 个智能体？",
-      "archiveAll": "全部归档",
-      "deleteAll": "全部删除",
-      "archiveSome_other": "归档 {{count}} 个",
-      "deleteSome_other": "删除 {{count}} 个",
       "deleteHelp": "它们的指令、记忆和例行任务会被永久删除。消息会保留。"
     },
     "people": {
@@ -4004,8 +3982,7 @@
   "inlineProposal": {
     "group": "{{name}} 提出的修改",
     "groupMany": "{{name}} 针对 {{count}} 个智能体的修改建议",
-    "edit": "编辑",
-    "open": "在“建议”中打开"
+    "open": "在“智能体改进”中打开"
   },
   "newChannel": {
     "open": "创建频道",
@@ -4946,7 +4923,6 @@
       }
     },
     "asks": "<b>{{agent}}</b> 请求审批",
-    "waitingYou": "等你处理",
     "approve": {
       "merge": "批准合并",
       "deploy": "批准部署",
@@ -5224,6 +5200,9 @@
       "joinOutside": "<b>{{name}}</b> 申请以 <b>{{outsideOf}}</b> 外部协作者身份加入，不占用席位",
       "changeRequest": "<b>{{name}}</b> 请求更改 <b>{{agent}}</b>",
       "proposalWaiting": "来自 <b>{{names}}</b> 的改进提议",
+      "proposalApplied_other": "<b>{{name}}</b> 应用了 {{count}} 项改进",
+      "proposalAppliedMany_other": "<b>{{names}}</b> 应用了 {{count}} 项改进",
+      "proposalAppliedAuto_other": "已自动应用 {{count}} 项改进",
       "changeRequestAgent": "<b>{{name}}</b> 请求新的智能体：<b>{{agent}}</b>",
       "changeRequestAction": "<b>{{name}}</b> 请求在工作区做一项更改",
       "approvalCover": "<b>{{name}}</b> 在“谁替我审批”中选了你",
@@ -5345,7 +5324,6 @@
     "noneHere": "这里暂时没有内容。",
     "noneDone": "过去 30 天内没有标记为完成的内容。",
     "noneRequests": "还没有已决定的请求。",
-    "proposes": "提出了一项改进",
     "more": "显示更多"
   },
   "approvals": {
@@ -5923,6 +5901,7 @@
       "overview": "概览",
       "instructions": "指令",
       "access": "工具和权限",
+      "skills": "技能",
       "memory": "记忆",
       "files": "文件",
       "usage": "用量",
@@ -6037,9 +6016,6 @@
       "approvalsYou": "在“审批”或聊天中批准或拒绝",
       "approvalsWait": "等待所有者或管理员处理",
       "seeApprovals": "查看请求",
-      "proposes": "{{name}} 提议修改他的指令",
-      "proposes_female": "{{name}} 提议修改她的指令",
-      "review": "查看",
       "does": "{{name}} 做什么",
       "does_female": "{{name}} 做什么",
       "readAll": "阅读全部",
@@ -6072,8 +6048,7 @@
       "showDiff": "查看改动",
       "hideDiff": "隐藏改动",
       "diff": "指令的改动",
-      "add": "添加",
-      "proposals_other": "{{count}} 项提议的更改"
+      "add": "添加"
     },
     "access": {
       "search": "搜索连接器或领域",
@@ -6106,16 +6081,9 @@
       "lessons": "经验",
       "fromTeam": "从团队中学到",
       "fromTeamRightHand": "从你这里学到",
-      "proposals": "提议",
-      "waiting": "等待决定",
-      "noneWaiting": "没有待处理的",
-      "waitingCount_other": "{{count}} 条提议待处理",
+      "improvements": "改进",
+      "improvementsApplied": "已应用",
       "full": "打开完整记忆",
-      "accepted": "已接受更改，指令已更新。",
-      "refused": "已拒绝提议。{{name}} 记下了原因。",
-      "refused_female": "已拒绝提议。{{name}} 记下了原因。",
-      "decides": "由 {{who}} 决定。",
-      "adminDecides": "由管理员决定。",
       "learned": "它学到的内容",
       "learnedEmpty": "它发现的更正、偏好和做事方式会显示在这里。",
       "learnedEmptyTitle": "从每次修正中学习",
@@ -6343,7 +6311,6 @@
     "title": "{{name}} 知道的事",
     "subtitle": "{{name}} 从对话和团队的纠正中学到的内容。",
     "subtitlePersonal": "{{name}} 从你的对话和纠正中学到的内容。",
-    "proposals_other": "{{count}} 条改进建议",
     "tabsLabel": "类型",
     "tabs": {
       "known": "事实和决定",
@@ -6372,9 +6339,6 @@
     "unverifiedTitle": "只是智能体这么说的。会作为带标记的提示进入上下文。",
     "pinned": "始终在上下文中",
     "lowTrust": "外部来源，不可信",
-    "confirm": "确认",
-    "confirmTitle": "确认无误后，智能体会把它当作可信内容使用。",
-    "confirmed": "已确认",
     "used_other": "已使用 {{count}} 次",
     "unusedFor": "已 {{days}} 天未使用",
     "supersedes": "取代：",
@@ -6404,7 +6368,7 @@
     }
   },
   "proposals": {
-    "title": "改进建议",
+    "title": "智能体改进",
     "whyCode": {
       "refused": "有人拒绝：{{text}}",
       "corrected": "有人更正：{{text}}",
@@ -6414,9 +6378,9 @@
       "budget": "本周已达到每月预算并停止。",
       "noChannel": "不在任何频道中。"
     },
-    "subtitle": "智能体提议的更改。有人接受之前，什么都不会变。",
-    "subtitlePersonal": "你的智能体提议的更改。你接受之前，什么都不会变。",
-    "list": "建议",
+    "subtitle": "智能体在团队中做了哪些更改，以及原因。你可以撤销。",
+    "subtitlePersonal": "你的智能体做了哪些更改，以及原因。你可以撤销。",
+    "list": "改进",
     "proposes": "<b>{{agent}}</b> 提议 · {{target}}",
     "proposesMany": "<b>{{agent}}</b> 提议 · {{count}} 个智能体的指令",
     "proposesManyChanges": "<b>{{agent}}</b> 提议 · 修改 {{count}} 个智能体",
@@ -6431,50 +6395,31 @@
     "roleLine": "角色：{{from}} → {{to}}",
     "accessOn": "开启：{{app}}",
     "accessOff": "关闭：{{app}}",
-    "include": "包括 {{name}}",
-    "acceptAll": "全部接受",
-    "acceptSome": "接受 {{count}} 项",
-    "all": {
-      "label": "处理全部建议",
-      "accept": "全部接受",
-      "refuse": "全部拒绝",
-      "acceptAsk_other": "接受全部 {{count}} 条建议？每条都会立即生效。",
-      "refuseAsk_other": "拒绝全部 {{count}} 条建议？智能体不会再提这些建议。",
-      "acceptGo_other": "接受 {{count}} 条",
-      "refuseGo_other": "拒绝 {{count}} 条"
-    },
-    "staleSome_other": "有 {{count}} 项未被接受：提议后文本已更改。",
-    "staleSomeAgent_other": "有 {{count}} 项未被接受：提议后智能体已更改。",
-    "waitingFor": "等待 {{name}}",
+    "reviewing": "评估中…",
+    "appliedByAgent": "由 {{name}} 应用",
+    "appliedByAgent_female": "由 {{name}} 应用",
+    "appliedAuto": "已自动应用",
+    "leftOutBy": "{{name}} 决定不应用",
+    "leftOutBy_female": "{{name}} 决定不应用",
+    "leftOut": "未应用",
+    "undoneBy": "已由 {{name}} 撤销",
+    "undoneByYou": "已由你撤销",
+    "undo": "撤销",
+    "appliedSome": "已应用 {{done}}/{{total}}",
     "waitingAdmin": "等待管理员",
     "stale": "已过时",
-    "staleError": "这条建议已过时：提出后文本已被修改。列表已刷新。",
-    "staleNote": "这条建议提出后文本已被修改，因此无法再接受。",
-    "staleErrorAgent": "这条建议已过时：提出后智能体已被修改。列表已刷新。",
-    "staleNoteAgent": "这条建议提出后智能体已被修改，因此无法再接受。",
+    "staleNote": "这条建议提出后文本已被修改，因此无法再应用。",
+    "staleNoteAgent": "这条建议提出后智能体已被修改，因此无法再应用。",
     "accepted": "已接受",
     "refused": "已拒绝",
-    "acceptedSome": "已接受 {{done}}/{{total}}",
-    "acceptedBy": "{{name}} 已接受 · {{when}}",
-    "refusedBy": "{{name}} 已拒绝 · {{when}}",
-    "acceptedByYou": "你已接受 · {{when}}",
-    "refusedByYou": "你已拒绝 · {{when}}",
     "why": "原因",
     "change": "修改{{target}}",
     "changeLabel": "建议的修改",
-    "editFirst": "先编辑再接受",
-    "viewDiff": "查看差异",
-    "finalText": "最终指令文本",
-    "finalTextContext": "最终背景信息文本",
-    "accept": "接受修改",
-    "acceptEdited": "编辑后接受",
-    "refuse": "拒绝",
-    "refuseNote": "拒绝后，{{name}} 就不会再提这条建议。",
     "added": "新增：",
     "removed": "删除：",
     "sameLines_other": "{{count}} 行未改动",
-    "empty": "有人请智能体做出改变，或某条经验反复出现时，建议会显示在这里。",
-    "emptyTitle": "没有待审核的内容",
+    "empty": "当智能体改进自己或同伴的指令时，更改会显示在这里，并可撤销。",
+    "emptyTitle": "还没有任何更改",
     "titleInstructions": "更新 {{name}} 的指令",
     "titleRole": "更改 {{name}} 的角色",
     "titleAccess": "更改 {{name}} 的访问权限",
@@ -10352,7 +10297,80 @@
       "text": "没有它，智能体也会继续工作。"
     }
   },
+  "aiHub": {
+    "tab": "AI 账号",
+    "usageTab": "用量",
+    "accounts": "账号",
+    "accountsHint": "智能体可以用来思考的所有套餐和 API 密钥，无论是谁连接的。",
+    "apiKey": "API 密钥",
+    "of": "{{name}} 的",
+    "moreSpeed": "速度和上下文窗口",
+    "whoThinks": "由谁思考",
+    "bulk": {
+      "sub": "先选 AI，再选使用它的智能体。"
+    },
+    "choice": {
+      "workspace": "工作区的",
+      "none": "选择账号",
+      "search": "按名称、AI、套餐或所有者搜索",
+      "noMatch": "没有匹配的账号。",
+      "noModel": "没有匹配的模型。",
+      "groups": {
+        "yours": "你的",
+        "others": "团队的",
+        "keys": "工作区的"
+      }
+    },
+    "order": {
+      "title": "使用顺序",
+      "tip": "智能体先用哪个账号",
+      "sub": "达到上限时，智能体会换到下一个账号。",
+      "group": "{{maker}} · {{computer}}",
+      "signedOut": "已退出 · 跳过",
+      "skipped": "跳过",
+      "fallback": "所有套餐都达到上限时继续使用 API 密钥",
+      "fallbackHint": "关闭：智能体等待第一个套餐恢复。开启：它们继续使用工作区按用量付费的 API 密钥。任务从不继续。"
+    },
+    "detail": {
+      "limits": "上限",
+      "noLimits": "尚未读取上限。",
+      "permissions": "权限",
+      "saved": "权限已保存。",
+      "more": "{{name}} 的更多操作",
+      "manage": "管理",
+      "manageLine": "重命名、重新登录、移除",
+      "manageHint": "谁可以重命名此账号、重新登录、移除它并更改这些权限。",
+      "use": "用于智能体",
+      "useLine": "在“由谁思考”中选择",
+      "useHint": "谁的智能体可以用此账号思考。",
+      "reply": "回复所有人",
+      "replyLine": "智能体与谁交谈",
+      "replyHint": "此账号上的智能体除了自己的所有者之外还回复谁。",
+      "claudeTerms": "根据 Claude 的条款，个人套餐归一个人所有。共享属于灰色地带。",
+      "pickRoles": "拥有这些角色的人。",
+      "pickPeople": "除账号所有者之外。",
+      "searchRoles": "搜索角色",
+      "searchPeople": "搜索成员",
+      "nobody": "没有可选择的人。"
+    },
+    "modes": {
+      "owner": "仅你",
+      "ownerOf": "仅 {{name}}",
+      "admins": "你和管理员",
+      "adminsOf": "{{name}} 和管理员",
+      "roles": "角色…",
+      "people": "成员…",
+      "everyone": "所有人",
+      "replyOwner": "仅智能体的所有者"
+    }
+  },
   "aiAccounts": {
+    "useReason": {
+      "signed_out": "已退出登录",
+      "owner_left": "{{owner}} 已离开工作区",
+      "owner_only": "只有 {{owner}} 使用",
+      "not_allowed": "未向你的智能体开放"
+    },
     "unnamed": "未命名账号",
     "rename": {
       "action": "重命名 {{label}}",
@@ -12319,7 +12337,6 @@
     "count_other": "{{count}} 项",
     "searchHint": "搜索快捷键",
     "who": "创建者",
-    "everyone": "所有人",
     "kindMany": {
       "document": "文档",
       "table": "表格",
@@ -12337,8 +12354,10 @@
     "view": "视图",
     "viewGrid": "网格",
     "viewList": "列表",
-    "arrange": "排列",
-    "arrangeValue": "排列：{{group}}",
+    "display": "显示",
+    "displayValue": "显示：{{view}} · {{group}}",
+    "filterButton": "筛选",
+    "filterValue": "{{filter}}：{{value}}",
     "groupBy": "分组方式",
     "group": {
       "date": "日期",
@@ -12775,7 +12794,6 @@
     "added": "保存后，{{repo}} 会加入列表。"
   },
   "connectors": {
-    "title": "连接器",
     "store": {
       "featured": "精选",
       "suggested": "推荐",
@@ -12814,6 +12832,7 @@
       "addressPassword": "地址和密码",
       "composio": "通过 Composio"
     },
+    "title": "连接器",
     "add": "添加连接器",
     "personal": {
       "note": "只有你能打开这些连接。你的智能体只在你要求时使用它们。",
@@ -15255,6 +15274,12 @@
     "teamProposal": {
       "undoExpired": "这个团队创建已超过一天，无法在这里撤销。请在各智能体的页面上归档它们。"
     },
+    "proposal": {
+      "changed": "应用后又有了改动：请手动调整。",
+      "notApplied": "这项更改没有被应用，所以无需撤销。",
+      "notUndoable": "已删除的智能体无法恢复。",
+      "notAllowed": "只有有权做这项更改的人才能撤销它。"
+    },
     "agentProposal": {
       "decided": "已经有人对这条建议做出了决定。",
       "expired": "这条建议已过期：一天内没有人做出决定。",
@@ -15505,6 +15530,7 @@
     "account": {
       "notRestorable": "这个账号已无法恢复。",
       "notOwner": "只有连接此账号或套餐的人可以执行此操作。",
+      "permissionForbidden": "只有账号的所有者、管理员或可以管理它的人才能更改。",
       "orderForbidden": "只有连接此账号的人或管理员可以调整它在顺序中的位置。"
     },
     "channel": {

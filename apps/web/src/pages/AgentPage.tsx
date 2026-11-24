@@ -8,7 +8,6 @@ import {
   useAgentSkills,
   useCredentials,
   useModels,
-  useProposals,
   useRuns,
   useSettings,
   useUpdateAgent,
@@ -34,7 +33,6 @@ import { agentGrammar } from "@agenteschat/client/lib/grammar";
 import { overLimitText, tooLongToSend } from "@agenteschat/client/lib/message-length";
 import { edit, optimistic, without } from "@agenteschat/client/lib/optimistic";
 import { can } from "@agenteschat/client/lib/permissions";
-import { pendingOnAgent } from "@agenteschat/client/lib/proposals";
 import { isAuto } from "@agenteschat/client/lib/providers";
 import { type RepoChoice, repoChoiceOf, repoListOf, reposText } from "@agenteschat/client/lib/repos";
 import { isRightHand, tellsNameStory } from "@agenteschat/client/lib/right-hand";
@@ -88,6 +86,7 @@ import {
   PERSONAL_AGENT_TABS,
   revertKey,
   type Saved,
+  SKILLS_AREA,
   shownAgentTab,
   thisMonth,
   type Viewer,
@@ -110,6 +109,7 @@ import { useVisibleChannels } from "./agent/pieces";
 import { RepoDialog } from "./agent/Repos";
 import { SaveBar } from "./agent/SaveBar";
 import { SettingsTab } from "./agent/SettingsTab";
+import { SkillsTab } from "./agent/SkillsTab";
 import { UsageTab } from "./agent/UsageTab";
 import { type WorkDialog, WorkDialogs } from "./agent/Work";
 
@@ -119,10 +119,10 @@ const sortIds = (ids: string[]) => [...ids].sort();
  * The tabs always in the bar; the rest live in its "More" menu, and the one open from there shows in the bar. A
  * personal workspace's bar (ADR 0159 §3) is `PERSONAL_AGENT_TABS`, with Advanced instead of "More".
  */
-const MAIN_TABS: AgentTab[] = ["overview", "instructions", "memory", "activity"];
+const MAIN_TABS: AgentTab[] = ["overview", "instructions", "skills", "memory", "activity"];
 const MORE_TABS = AGENT_TABS.filter((id) => !MAIN_TABS.includes(id) && id !== "advanced");
 const PERSONAL_TABS: readonly AgentTab[] = PERSONAL_AGENT_TABS;
-const RIGHT_HAND_TABS: readonly AgentTab[] = ["settings", "access", "memory"];
+const RIGHT_HAND_TABS: readonly AgentTab[] = ["settings", "access", "skills", "memory"];
 const MORE_ICON: Partial<Record<AgentTab, IconName>> = {
   access: "plug",
   files: "file",
@@ -230,7 +230,6 @@ function AgentProfile({
   const repos = useAgentRepos(org.id, agent.id);
   const groups = useAgentGroups(org.id);
   const library = useAgentSkills(org.id, agent.id);
-  const proposals = useProposals(org.id);
   const runs = useRuns(org.id, agent.id, ownsOrManages(viewer));
   const visible = useVisibleChannels();
   const items = useConnectedById();
@@ -376,10 +375,16 @@ function AgentProfile({
       // The right hand's page has no Advanced: all of what it may use is on one tab.
       !rightHand &&
       (field === "skills" || (field === "levels" && resourceById.get(resource ?? "")?.kind !== "connector"));
+    // The level of the skills' own area is on the Skills tab, with the skills.
+    const onSkills = field === "skills" || (field === "levels" && resource === SKILLS_AREA);
     const base = {
       key,
       field,
-      tab: advanced ? ("advanced" as const) : shownAgentTab(place.tab, place.sec, personal),
+      tab: advanced
+        ? ("advanced" as const)
+        : onSkills
+          ? ("skills" as const)
+          : shownAgentTab(place.tab, place.sec, personal),
       sec: place.sec,
     };
     const label = (f: Field) => t(`agentPage.fields.${f}`);
@@ -748,7 +753,6 @@ function AgentProfile({
 
   /* ---------- Tabs ---------- */
 
-  const pending = pendingOnAgent(proposals.data ?? [], agent.id).length;
   const failures = !ownsOrManages(viewer)
     ? 0
     : (runs.data ?? []).filter((r) => r.status === "failed" && thisMonth(r.createdAt)).length;
@@ -760,15 +764,6 @@ function AgentProfile({
         <span className="agp-badge agp-badge--edit ac-num" title={t("agentPage.changesCount", { count: n })}>
           <Icon name="edit" size={14} />
           {n}
-        </span>
-      );
-    else if (id === "memory" && pending > 0)
-      badge = (
-        <span
-          className="agp-badge agp-badge--ask ac-num"
-          title={t("agentPage.memory.waitingCount", { count: pending })}
-        >
-          {pending}
         </span>
       );
     else if ((id === "activity" || (personal && id === "advanced" && view !== "activity")) && failures > 0)
@@ -837,6 +832,8 @@ function AgentProfile({
           </div>
           {view === "access" ? (
             <AccessTab />
+          ) : view === "skills" ? (
+            <SkillsTab />
           ) : view === "memory" ? (
             <MemoryTab item={item} />
           ) : (
@@ -906,6 +903,7 @@ function AgentProfile({
                   {view === "overview" && <OverviewTab />}
                   {view === "instructions" && <InstructionsTab />}
                   {view === "access" && <AccessTab part={personal ? "basic" : "all"} />}
+                  {view === "skills" && <SkillsTab />}
                   {view === "memory" && <MemoryTab item={item} />}
                   {view === "files" && <FilesTab />}
                   {view === "usage" && <UsageTab />}

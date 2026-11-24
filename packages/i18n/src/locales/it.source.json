@@ -5340,7 +5340,7 @@
     "value": "What agents ask you to allow"
   },
   "shell.moreWhat.proposals": {
-    "value": "What agents propose to change"
+    "value": "What agents changed, and why"
   },
   "shell.moreWhat.threads": {
     "value": "Conversations that branch off, and missions"
@@ -5676,7 +5676,7 @@
     "value": "Approvals"
   },
   "shell.proposals": {
-    "value": "Improvement proposals"
+    "value": "Agent improvements"
   },
   "shell.issues": {
     "value": "Tasks"
@@ -5805,12 +5805,6 @@
     "value": {
       "one": "{{count}} pending approval",
       "other": "{{count}} pending approvals"
-    }
-  },
-  "shell.pendingProposals": {
-    "value": {
-      "one": "{{count}} proposal waiting for you",
-      "other": "{{count}} proposals waiting for you"
     }
   },
   "shell.home": {
@@ -7626,7 +7620,7 @@
     "value": "In your own conversation, reads the Drive, the wiki and the tasks you can see"
   },
   "rightHand.powers.mentions": {
-    "value": "Answers an @mention in any channel without being a member"
+    "value": "Answers an @mention in any channel without being a member, and messages it fits best"
   },
   "rightHand.card.settings": {
     "value": "{{name}} · Settings"
@@ -7696,51 +7690,6 @@
   },
   "rightHand.card.onlyCreators": {
     "value": "Only admins create agents"
-  },
-  "rightHand.card.only.model": {
-    "value": "Only admins change an agent's model"
-  },
-  "rightHand.card.only.effort": {
-    "value": "Only admins change an agent's effort"
-  },
-  "rightHand.card.only.budget": {
-    "value": "Only admins change an agent's budget"
-  },
-  "rightHand.card.only.owner": {
-    "value": "Only admins change who owns an agent"
-  },
-  "rightHand.card.only.archive": {
-    "value": "Only admins archive an agent"
-  },
-  "rightHand.card.only.delete": {
-    "value": "Only admins delete an agent"
-  },
-  "rightHand.card.only.audience": {
-    "value": "Only admins and its owner change who talks to it"
-  },
-  "rightHand.card.only.channels": {
-    "value": "Only admins and its owner change its channels"
-  },
-  "rightHand.card.only.skill": {
-    "value": "Only whoever can edit an agent changes its skills"
-  },
-  "rightHand.card.only.ai_account": {
-    "value": "Only the account's owner gives it"
-  },
-  "rightHand.card.only.name": {
-    "value": "Only admins rename an agent"
-  },
-  "rightHand.card.only.look": {
-    "value": "Only admins and its owner change its look"
-  },
-  "rightHand.card.only.group": {
-    "value": "Only admins move an agent to another department"
-  },
-  "rightHand.card.only.reports_to": {
-    "value": "Only admins change who an agent reports to"
-  },
-  "rightHand.card.only.many": {
-    "value": "Only admins make these changes"
   },
   "rightHand.field.model": {
     "value": "Model"
@@ -7842,24 +7791,6 @@
     "value": {
       "one": "Delete {{count}} agent for good?",
       "other": "Delete {{count}} agents for good?"
-    }
-  },
-  "rightHand.remove.archiveAll": {
-    "value": "Archive all"
-  },
-  "rightHand.remove.deleteAll": {
-    "value": "Delete all"
-  },
-  "rightHand.remove.archiveSome": {
-    "value": {
-      "one": "Archive {{count}}",
-      "other": "Archive {{count}}"
-    }
-  },
-  "rightHand.remove.deleteSome": {
-    "value": {
-      "one": "Delete {{count}}",
-      "other": "Delete {{count}}"
     }
   },
   "rightHand.remove.deleteHelp": {
@@ -10175,11 +10106,8 @@
   "inlineProposal.groupMany": {
     "value": "{{name}}'s change proposal for {{count}} agents"
   },
-  "inlineProposal.edit": {
-    "value": "Edit"
-  },
   "inlineProposal.open": {
-    "value": "Open in Proposals"
+    "value": "Open in Agent improvements"
   },
   "newChannel.open": {
     "value": "Create channel"
@@ -12601,9 +12529,6 @@
   "approval.asks": {
     "value": "<b>{{agent}}</b> asks for approval"
   },
-  "approval.waitingYou": {
-    "value": "Waiting for you"
-  },
   "approval.approve.merge": {
     "value": "Approve merge"
   },
@@ -13315,6 +13240,24 @@
   "notifications.what.proposalWaiting": {
     "value": "Improvement proposals from <b>{{names}}</b>"
   },
+  "notifications.what.proposalApplied": {
+    "value": {
+      "one": "<b>{{name}}</b> applied an improvement",
+      "other": "<b>{{name}}</b> applied {{count}} improvements"
+    }
+  },
+  "notifications.what.proposalAppliedMany": {
+    "value": {
+      "one": "<b>{{names}}</b> applied an improvement",
+      "other": "<b>{{names}}</b> applied {{count}} improvements"
+    }
+  },
+  "notifications.what.proposalAppliedAuto": {
+    "value": {
+      "one": "An improvement was applied automatically",
+      "other": "{{count}} improvements were applied automatically"
+    }
+  },
   "notifications.what.changeRequestAgent": {
     "value": "<b>{{name}}</b> asks for a new agent: <b>{{agent}}</b>"
   },
@@ -13662,9 +13605,6 @@
   },
   "notifications.noneRequests": {
     "value": "No request decided yet."
-  },
-  "notifications.proposes": {
-    "value": "proposes an improvement"
   },
   "notifications.more": {
     "value": "Show more"
@@ -15104,6 +15044,9 @@
   "agentPage.tabs.access": {
     "value": "Tools and access"
   },
+  "agentPage.tabs.skills": {
+    "value": "Skills"
+  },
   "agentPage.tabs.memory": {
     "value": "Memory"
   },
@@ -15402,13 +15345,6 @@
   "agentPage.overview.seeApprovals": {
     "value": "See requests"
   },
-  "agentPage.overview.proposes": {
-    "value": "{{name}} proposes changing his instructions",
-    "female": "{{name}} proposes changing her instructions"
-  },
-  "agentPage.overview.review": {
-    "value": "Review"
-  },
   "agentPage.overview.does": {
     "value": "What {{name}} does"
   },
@@ -15495,12 +15431,6 @@
   "agentPage.instructions.add": {
     "value": "Add"
   },
-  "agentPage.instructions.proposals": {
-    "value": {
-      "one": "{{count}} proposed change",
-      "other": "{{count}} proposed changes"
-    }
-  },
   "agentPage.access.search": {
     "value": "Search a connector or area"
   },
@@ -15576,35 +15506,14 @@
   "agentPage.memory.fromTeamRightHand": {
     "value": "learned from you"
   },
-  "agentPage.memory.proposals": {
-    "value": "Proposals"
+  "agentPage.memory.improvements": {
+    "value": "Improvements"
   },
-  "agentPage.memory.waiting": {
-    "value": "waiting for a decision"
-  },
-  "agentPage.memory.noneWaiting": {
-    "value": "none waiting"
-  },
-  "agentPage.memory.waitingCount": {
-    "value": {
-      "one": "{{count}} proposal waiting",
-      "other": "{{count}} proposals waiting"
-    }
+  "agentPage.memory.improvementsApplied": {
+    "value": "applied"
   },
   "agentPage.memory.full": {
     "value": "Open the full memory"
-  },
-  "agentPage.memory.accepted": {
-    "value": "Change accepted. The instructions were updated."
-  },
-  "agentPage.memory.refused": {
-    "value": "Proposal declined. {{name}} kept the reason."
-  },
-  "agentPage.memory.decides": {
-    "value": "{{who}} decides."
-  },
-  "agentPage.memory.adminDecides": {
-    "value": "An admin decides."
   },
   "agentPage.memory.learned": {
     "value": "What it learned"
@@ -16179,12 +16088,6 @@
   "memory.subtitlePersonal": {
     "value": "What {{name}} learned from your conversations and corrections."
   },
-  "memory.proposals": {
-    "value": {
-      "one": "{{count}} improvement proposal",
-      "other": "{{count}} improvement proposals"
-    }
-  },
   "memory.tabsLabel": {
     "value": "Type"
   },
@@ -16250,15 +16153,6 @@
   },
   "memory.lowTrust": {
     "value": "External source, not trusted"
-  },
-  "memory.confirm": {
-    "value": "Confirm"
-  },
-  "memory.confirmTitle": {
-    "value": "Say it's right: agents then use it as trusted."
-  },
-  "memory.confirmed": {
-    "value": "Confirmed"
   },
   "memory.used": {
     "value": {
@@ -16340,7 +16234,7 @@
     "value": " in #{{channel}}"
   },
   "proposals.title": {
-    "value": "Improvement proposals"
+    "value": "Agent improvements"
   },
   "proposals.whyCode.refused": {
     "value": "A person refused: {{text}}"
@@ -16364,13 +16258,13 @@
     "value": "It is in no channel."
   },
   "proposals.subtitle": {
-    "value": "Changes the agents propose. Nothing changes until someone accepts."
+    "value": "What the agents changed in the team, and why. You can undo it."
   },
   "proposals.subtitlePersonal": {
-    "value": "Changes your agents propose. Nothing changes until you accept."
+    "value": "What your agents changed, and why. You can undo it."
   },
   "proposals.list": {
-    "value": "Proposals"
+    "value": "Improvements"
   },
   "proposals.proposes": {
     "value": "<b>{{agent}}</b> proposes · {{target}}"
@@ -16414,62 +16308,32 @@
   "proposals.accessOff": {
     "value": "Turn off: {{app}}"
   },
-  "proposals.include": {
-    "value": "Include {{name}}"
+  "proposals.reviewing": {
+    "value": "Reviewing…"
   },
-  "proposals.acceptAll": {
-    "value": "Accept for all"
+  "proposals.appliedByAgent": {
+    "value": "Applied by {{name}}"
   },
-  "proposals.acceptSome": {
-    "value": "Accept for {{count}}"
+  "proposals.appliedAuto": {
+    "value": "Applied automatically"
   },
-  "proposals.all.label": {
-    "value": "Decide every proposal"
+  "proposals.leftOutBy": {
+    "value": "Left out by {{name}}"
   },
-  "proposals.all.accept": {
-    "value": "Accept all"
+  "proposals.leftOut": {
+    "value": "Left out"
   },
-  "proposals.all.refuse": {
-    "value": "Refuse all"
+  "proposals.undoneBy": {
+    "value": "Undone by {{name}}"
   },
-  "proposals.all.acceptAsk": {
-    "value": {
-      "one": "Accept the proposal? It applies right away.",
-      "other": "Accept all {{count}} proposals? Each one applies right away."
-    }
+  "proposals.undoneByYou": {
+    "value": "Undone by you"
   },
-  "proposals.all.refuseAsk": {
-    "value": {
-      "one": "Refuse the proposal? The agent won't propose it again.",
-      "other": "Refuse all {{count}} proposals? The agents won't propose them again."
-    }
+  "proposals.undo": {
+    "value": "Undo"
   },
-  "proposals.all.acceptGo": {
-    "value": {
-      "one": "Accept",
-      "other": "Accept {{count}}"
-    }
-  },
-  "proposals.all.refuseGo": {
-    "value": {
-      "one": "Refuse",
-      "other": "Refuse {{count}}"
-    }
-  },
-  "proposals.staleSome": {
-    "value": {
-      "one": "One wasn't accepted: its text changed after the proposal.",
-      "other": "{{count}} weren't accepted: their text changed after the proposal."
-    }
-  },
-  "proposals.staleSomeAgent": {
-    "value": {
-      "one": "One wasn't accepted: the agent changed after the proposal.",
-      "other": "{{count}} weren't accepted: the agents changed after the proposal."
-    }
-  },
-  "proposals.waitingFor": {
-    "value": "Waiting for {{name}}"
+  "proposals.appliedSome": {
+    "value": "{{done}} of {{total}} applied"
   },
   "proposals.waitingAdmin": {
     "value": "Waiting for an admin"
@@ -16477,38 +16341,17 @@
   "proposals.stale": {
     "value": "Stale"
   },
-  "proposals.staleError": {
-    "value": "This proposal is stale: the text changed after it was made. The list was refreshed."
-  },
   "proposals.staleNote": {
-    "value": "The text changed after this proposal, so it can't be accepted anymore."
-  },
-  "proposals.staleErrorAgent": {
-    "value": "This proposal is stale: the agent changed after it was made. The list was refreshed."
+    "value": "The text changed after this proposal, so it can't be applied anymore."
   },
   "proposals.staleNoteAgent": {
-    "value": "The agent changed after this proposal, so it can't be accepted anymore."
+    "value": "The agent changed after this proposal, so it can't be applied anymore."
   },
   "proposals.accepted": {
     "value": "Accepted"
   },
   "proposals.refused": {
     "value": "Refused"
-  },
-  "proposals.acceptedSome": {
-    "value": "{{done}} of {{total}} accepted"
-  },
-  "proposals.acceptedBy": {
-    "value": "Accepted by {{name}} · {{when}}"
-  },
-  "proposals.refusedBy": {
-    "value": "Refused by {{name}} · {{when}}"
-  },
-  "proposals.acceptedByYou": {
-    "value": "Accepted by you · {{when}}"
-  },
-  "proposals.refusedByYou": {
-    "value": "Refused by you · {{when}}"
   },
   "proposals.why": {
     "value": "Why"
@@ -16518,30 +16361,6 @@
   },
   "proposals.changeLabel": {
     "value": "Proposed change"
-  },
-  "proposals.editFirst": {
-    "value": "Edit before accepting"
-  },
-  "proposals.viewDiff": {
-    "value": "View differences"
-  },
-  "proposals.finalText": {
-    "value": "Final instructions text"
-  },
-  "proposals.finalTextContext": {
-    "value": "Final context text"
-  },
-  "proposals.accept": {
-    "value": "Accept change"
-  },
-  "proposals.acceptEdited": {
-    "value": "Accept with edits"
-  },
-  "proposals.refuse": {
-    "value": "Refuse"
-  },
-  "proposals.refuseNote": {
-    "value": "Refusing teaches {{name}} not to propose this again."
   },
   "proposals.added": {
     "value": "Added: "
@@ -16556,10 +16375,10 @@
     }
   },
   "proposals.empty": {
-    "value": "When someone asks an agent for a change, or a lesson repeats, the proposal shows up here."
+    "value": "When an agent improves its instructions or a teammate's, the change shows here, with Undo."
   },
   "proposals.emptyTitle": {
-    "value": "Nothing to review"
+    "value": "Nothing changed yet"
   },
   "proposals.titleInstructions": {
     "value": "Update {{name}}'s instructions"
@@ -26144,6 +25963,177 @@
   "jev.remove.text": {
     "value": "Agents keep working without it."
   },
+  "aiHub.tab": {
+    "value": "AI accounts"
+  },
+  "aiHub.usageTab": {
+    "value": "Usage"
+  },
+  "aiHub.accounts": {
+    "value": "Accounts"
+  },
+  "aiHub.accountsHint": {
+    "value": "Every plan and API key the agents can think with, whoever connected it."
+  },
+  "aiHub.apiKey": {
+    "value": "API key"
+  },
+  "aiHub.of": {
+    "value": "{{name}}'s"
+  },
+  "aiHub.moreSpeed": {
+    "value": "Speed and context window"
+  },
+  "aiHub.whoThinks": {
+    "value": "Who thinks"
+  },
+  "aiHub.bulk.sub": {
+    "value": "Pick the AI, then the agents that take it."
+  },
+  "aiHub.choice.workspace": {
+    "value": "The workspace's"
+  },
+  "aiHub.choice.none": {
+    "value": "Pick an account"
+  },
+  "aiHub.choice.search": {
+    "value": "Search by name, AI, plan or owner"
+  },
+  "aiHub.choice.noMatch": {
+    "value": "No account matches."
+  },
+  "aiHub.choice.noModel": {
+    "value": "No model matches."
+  },
+  "aiHub.choice.groups.yours": {
+    "value": "Yours"
+  },
+  "aiHub.choice.groups.others": {
+    "value": "The team's"
+  },
+  "aiHub.choice.groups.keys": {
+    "value": "The workspace's"
+  },
+  "aiHub.order.title": {
+    "value": "Order of use"
+  },
+  "aiHub.order.tip": {
+    "value": "Which account agents use first"
+  },
+  "aiHub.order.sub": {
+    "value": "At a limit, agents move on to the next account."
+  },
+  "aiHub.order.group": {
+    "value": "{{maker}} · {{computer}}"
+  },
+  "aiHub.order.signedOut": {
+    "value": "Signed out · skipped"
+  },
+  "aiHub.order.skipped": {
+    "value": "Skipped"
+  },
+  "aiHub.order.fallback": {
+    "value": "Continue with the API key when every plan is at its limit"
+  },
+  "aiHub.order.fallbackHint": {
+    "value": "Off: agents wait for the first plan to renew. On: they go on with the workspace's API key, which is paid per use. A mission never does."
+  },
+  "aiHub.detail.limits": {
+    "value": "Limits"
+  },
+  "aiHub.detail.noLimits": {
+    "value": "No limits read yet."
+  },
+  "aiHub.detail.permissions": {
+    "value": "Permissions"
+  },
+  "aiHub.detail.saved": {
+    "value": "Permissions saved."
+  },
+  "aiHub.detail.more": {
+    "value": "More for {{name}}"
+  },
+  "aiHub.detail.manage": {
+    "value": "Manage"
+  },
+  "aiHub.detail.manageLine": {
+    "value": "Rename, sign in again, remove"
+  },
+  "aiHub.detail.manageHint": {
+    "value": "Who may rename this account, sign in to it again, remove it and change these permissions."
+  },
+  "aiHub.detail.use": {
+    "value": "Use in agents"
+  },
+  "aiHub.detail.useLine": {
+    "value": "Pick it in Who thinks"
+  },
+  "aiHub.detail.useHint": {
+    "value": "Whose agents may think with this account."
+  },
+  "aiHub.detail.reply": {
+    "value": "Answer everyone"
+  },
+  "aiHub.detail.replyLine": {
+    "value": "Who agents on it talk to"
+  },
+  "aiHub.detail.replyHint": {
+    "value": "Who an agent on this account answers besides its own owner."
+  },
+  "aiHub.detail.claudeTerms": {
+    "value": "Under Claude's terms a personal plan is one person's. Sharing it is a gray area."
+  },
+  "aiHub.detail.pickRoles": {
+    "value": "The people who hold these roles."
+  },
+  "aiHub.detail.pickPeople": {
+    "value": "Besides the account's owner."
+  },
+  "aiHub.detail.searchRoles": {
+    "value": "Search roles"
+  },
+  "aiHub.detail.searchPeople": {
+    "value": "Search people"
+  },
+  "aiHub.detail.nobody": {
+    "value": "Nobody to pick."
+  },
+  "aiHub.modes.owner": {
+    "value": "Only you"
+  },
+  "aiHub.modes.ownerOf": {
+    "value": "Only {{name}}"
+  },
+  "aiHub.modes.admins": {
+    "value": "You and admins"
+  },
+  "aiHub.modes.adminsOf": {
+    "value": "{{name}} and admins"
+  },
+  "aiHub.modes.roles": {
+    "value": "Roles…"
+  },
+  "aiHub.modes.people": {
+    "value": "People…"
+  },
+  "aiHub.modes.everyone": {
+    "value": "Everyone"
+  },
+  "aiHub.modes.replyOwner": {
+    "value": "Only the agent's owner"
+  },
+  "aiAccounts.useReason.signed_out": {
+    "value": "Signed out"
+  },
+  "aiAccounts.useReason.owner_left": {
+    "value": "{{owner}} left the workspace"
+  },
+  "aiAccounts.useReason.owner_only": {
+    "value": "Only {{owner}} uses it"
+  },
+  "aiAccounts.useReason.not_allowed": {
+    "value": "Not open to your agents"
+  },
   "aiAccounts.unnamed": {
     "value": "Unnamed account"
   },
@@ -31180,9 +31170,6 @@
   "drive.who": {
     "value": "Made by"
   },
-  "drive.everyone": {
-    "value": "Everyone"
-  },
   "drive.kindMany.document": {
     "value": "Documents"
   },
@@ -31228,11 +31215,17 @@
   "drive.viewList": {
     "value": "List"
   },
-  "drive.arrange": {
-    "value": "Arrange"
+  "drive.display": {
+    "value": "Display"
   },
-  "drive.arrangeValue": {
-    "value": "Arrange: {{group}}"
+  "drive.displayValue": {
+    "value": "Display: {{view}} · {{group}}"
+  },
+  "drive.filterButton": {
+    "value": "Filter"
+  },
+  "drive.filterValue": {
+    "value": "{{filter}}: {{value}}"
   },
   "drive.groupBy": {
     "value": "Group by"
@@ -32414,9 +32407,6 @@
   "repos.added": {
     "value": "{{repo}} joins the list when you save."
   },
-  "connectors.title": {
-    "value": "Connectors"
-  },
   "connectors.store.featured": {
     "value": "Featured"
   },
@@ -32530,6 +32520,9 @@
   },
   "connectors.howShort.composio": {
     "value": "Through Composio"
+  },
+  "connectors.title": {
+    "value": "Connectors"
   },
   "connectors.add": {
     "value": "Add connector"
@@ -38747,6 +38740,18 @@
   "errors.teamProposal.undoExpired": {
     "value": "It is more than a day since this team was created, so it can't be undone here. Archive its agents on their pages."
   },
+  "errors.proposal.changed": {
+    "value": "This changed after it was applied: adjust it by hand."
+  },
+  "errors.proposal.notApplied": {
+    "value": "This change wasn't applied, so there is nothing to undo."
+  },
+  "errors.proposal.notUndoable": {
+    "value": "A deleted agent can't come back."
+  },
+  "errors.proposal.notAllowed": {
+    "value": "Only someone who may make this change can undo it."
+  },
   "errors.agentProposal.decided": {
     "value": "Someone already decided this proposal."
   },
@@ -39346,6 +39351,9 @@
   },
   "errors.account.notOwner": {
     "value": "Only the person who connected this account or plan can do this."
+  },
+  "errors.account.permissionForbidden": {
+    "value": "Only the account's owner, an admin or whoever may manage it can change this."
   },
   "errors.account.orderForbidden": {
     "value": "Only the person who connected this account or an admin can change its place in the order."

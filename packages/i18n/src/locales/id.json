@@ -2101,7 +2101,7 @@
     "moreWhat": {
       "waiting": "Semua yang menunggu jawabanmu",
       "approvals": "Yang diminta agen untuk kamu izinkan",
-      "proposals": "Yang diusulkan agen untuk diubah",
+      "proposals": "Yang diubah agen, dan alasannya",
       "threads": "Percakapan yang bercabang, dan misi",
       "issues": "Pekerjaan tim, untuk orang dan agen",
       "wiki": "Yang diketahui tim, ditulis untuk semua orang",
@@ -2219,7 +2219,7 @@
     "summary_other": "{{people}} anggota · {{agents}} agen",
     "waiting": "Kotak masuk",
     "approvals": "Persetujuan",
-    "proposals": "Usulan perbaikan",
+    "proposals": "Perbaikan agen",
     "issues": "Tugas",
     "missionsWaiting_other": "{{count}} misi menunggumu",
     "threads": "Utas",
@@ -2260,7 +2260,6 @@
     "gallery": "Galeri komponen",
     "unread_other": "{{count}} pesan belum dibaca",
     "pendingApprovals_other": "{{count}} persetujuan tertunda",
-    "pendingProposals_other": "{{count}} usulan menunggu Anda",
     "home": "Beranda",
     "notifications": "Notifikasi",
     "unreadMark": "Belum dibaca",
@@ -2945,7 +2944,7 @@
       "team": "Menyiapkan dan mengubah seluruh tim lewat kartu yang diterapkan seseorang: agen, orang, dan pengaturan workspace",
       "routines": "Menjalankan dan menghapus rutinitas agen mana pun yang boleh Anda kelola",
       "asYou": "Dalam percakapan Anda sendiri, membaca Drive, wiki, dan tugas yang bisa Anda lihat",
-      "mentions": "Menjawab @mention di kanal mana pun tanpa menjadi anggota"
+      "mentions": "Menjawab @mention di kanal mana pun tanpa menjadi anggota, dan pesan yang paling cocok untuknya"
     },
     "card": {
       "settings": "{{name}} · Pengaturan",
@@ -2970,24 +2969,7 @@
       "to": "menjadi",
       "editFirst": "Edit dulu",
       "superseded": "Diganti oleh usulan yang lebih baru",
-      "onlyCreators": "Hanya admin yang membuat agen",
-      "only": {
-        "model": "Hanya admin yang mengubah model agen",
-        "effort": "Hanya admin yang mengubah upaya agen",
-        "budget": "Hanya admin yang mengubah anggaran agen",
-        "owner": "Hanya admin yang mengubah penanggung jawab agen",
-        "archive": "Hanya admin yang mengarsipkan agen",
-        "delete": "Hanya admin yang menghapus agen",
-        "audience": "Hanya admin dan penanggung jawabnya yang mengubah siapa yang bicara dengannya",
-        "channels": "Hanya admin dan penanggung jawabnya yang mengubah kanalnya",
-        "skill": "Hanya yang bisa mengedit agen yang mengubah skill-nya",
-        "ai_account": "Hanya pemilik akun yang memberikannya",
-        "name": "Hanya admin yang mengganti nama agen",
-        "look": "Hanya admin dan penanggung jawabnya yang mengubah tampilannya",
-        "group": "Hanya admin yang memindahkan agen ke departemen lain",
-        "reports_to": "Hanya admin yang mengubah kepada siapa agen melapor",
-        "many": "Hanya admin yang membuat perubahan ini"
-      }
+      "onlyCreators": "Hanya admin yang membuat agen"
     },
     "field": {
       "model": "Model",
@@ -3026,10 +3008,6 @@
     "remove": {
       "archiveTitle_other": "Arsipkan {{count}} agen?",
       "deleteTitle_other": "Hapus {{count}} agen selamanya?",
-      "archiveAll": "Arsipkan semua",
-      "deleteAll": "Hapus semua",
-      "archiveSome_other": "Arsipkan {{count}}",
-      "deleteSome_other": "Hapus {{count}}",
       "deleteHelp": "Instruksi, memori, dan rutinnya hilang selamanya. Pesannya tetap ada."
     },
     "people": {
@@ -4020,8 +3998,7 @@
   "inlineProposal": {
     "group": "Perubahan yang diusulkan {{name}}",
     "groupMany": "Usulan perubahan dari {{name}} untuk {{count}} agen",
-    "edit": "Ubah",
-    "open": "Buka di Usulan"
+    "open": "Buka di Perbaikan agen"
   },
   "newChannel": {
     "open": "Buat kanal",
@@ -4962,7 +4939,6 @@
       }
     },
     "asks": "<b>{{agent}}</b> meminta persetujuan",
-    "waitingYou": "Menunggumu",
     "approve": {
       "merge": "Setujui merge",
       "deploy": "Setujui deploy",
@@ -5241,6 +5217,9 @@
       "joinOutside": "<b>{{name}}</b> minta bergabung sebagai kolaborator eksternal untuk <b>{{outsideOf}}</b>, tanpa memakai kursi",
       "changeRequest": "<b>{{name}}</b> meminta perubahan pada <b>{{agent}}</b>",
       "proposalWaiting": "Usulan perbaikan dari <b>{{names}}</b>",
+      "proposalApplied_other": "<b>{{name}}</b> menerapkan {{count}} perbaikan",
+      "proposalAppliedMany_other": "<b>{{names}}</b> menerapkan {{count}} perbaikan",
+      "proposalAppliedAuto_other": "{{count}} perbaikan diterapkan secara otomatis",
       "changeRequestAgent": "<b>{{name}}</b> meminta agen baru: <b>{{agent}}</b>",
       "changeRequestAction": "<b>{{name}}</b> meminta perubahan di ruang kerja",
       "approvalCover": "<b>{{name}}</b> memilihmu di Siapa yang menyetujui untukku",
@@ -5363,7 +5342,6 @@
     "noneHere": "Belum ada apa-apa di sini.",
     "noneDone": "Tidak ada yang ditandai selesai dalam 30 hari terakhir.",
     "noneRequests": "Belum ada permintaan yang diputuskan.",
-    "proposes": "mengusulkan perbaikan",
     "more": "Tampilkan lebih banyak"
   },
   "approvals": {
@@ -5916,6 +5894,7 @@
       "overview": "Ringkasan",
       "instructions": "Instruksi",
       "access": "Alat dan akses",
+      "skills": "Skill",
       "memory": "Memori",
       "files": "File",
       "usage": "Pemakaian",
@@ -6027,9 +6006,6 @@
       "approvalsYou": "Setujui atau tolak di Persetujuan atau di chat",
       "approvalsWait": "Menunggu pemilik atau admin",
       "seeApprovals": "Lihat permintaan",
-      "proposes": "{{name}} mengusulkan perubahan pada instruksinya",
-      "proposes_female": "{{name}} mengusulkan perubahan pada instruksinya",
-      "review": "Tinjau",
       "does": "Yang dikerjakan {{name}}",
       "readAll": "Baca semua",
       "recent": "Pekerjaan terbaru",
@@ -6061,8 +6037,7 @@
       "showDiff": "Lihat yang berubah",
       "hideDiff": "Sembunyikan yang berubah",
       "diff": "Yang berubah di instruksi",
-      "add": "Tambah",
-      "proposals_other": "{{count}} usulan perubahan"
+      "add": "Tambah"
     },
     "access": {
       "search": "Cari konektor atau area",
@@ -6095,15 +6070,9 @@
       "lessons": "Pelajaran",
       "fromTeam": "dipelajari dari tim",
       "fromTeamRightHand": "dipelajari dari Anda",
-      "proposals": "Usulan",
-      "waiting": "menunggu keputusan",
-      "noneWaiting": "tidak ada yang menunggu",
-      "waitingCount_other": "{{count}} usulan menunggu",
+      "improvements": "Perbaikan",
+      "improvementsApplied": "diterapkan",
       "full": "Buka memori lengkap",
-      "accepted": "Perubahan diterima. Instruksi sudah diperbarui.",
-      "refused": "Usulan ditolak. {{name}} menyimpan alasannya.",
-      "decides": "{{who}} yang memutuskan.",
-      "adminDecides": "Admin yang memutuskan.",
       "learned": "Yang dipelajarinya",
       "learnedEmpty": "Koreksi, preferensi, dan cara kerja yang ia temukan muncul di sini.",
       "learnedEmptyTitle": "Belajar dari setiap koreksi",
@@ -6320,7 +6289,6 @@
     "subtitle": "Yang dipelajari {{name}} dari percakapan dan koreksi tim.",
     "subtitle_female": "Yang dipelajari {{name}} dari percakapan dan koreksi tim.",
     "subtitlePersonal": "Yang dipelajari {{name}} dari percakapan dan koreksimu.",
-    "proposals_other": "{{count}} usulan perbaikan",
     "tabsLabel": "Jenis",
     "tabs": {
       "known": "Fakta dan keputusan",
@@ -6350,9 +6318,6 @@
     "unverifiedTitle": "Hanya agen yang mengatakan ini. Masuk ke konteks sebagai petunjuk bertanda.",
     "pinned": "Selalu ada di konteks",
     "lowTrust": "Sumber eksternal, tidak tepercaya",
-    "confirm": "Konfirmasi",
-    "confirmTitle": "Nyatakan bahwa ini benar: agen lalu memakainya sebagai tepercaya.",
-    "confirmed": "Dikonfirmasi",
     "used_other": "dipakai {{count}} kali",
     "unusedFor": "tidak dipakai selama {{days}} hari",
     "supersedes": "Menggantikan:",
@@ -6382,7 +6347,7 @@
     }
   },
   "proposals": {
-    "title": "Usulan perbaikan",
+    "title": "Perbaikan agen",
     "whyCode": {
       "refused": "Seseorang menolak: {{text}}",
       "corrected": "Seseorang mengoreksi: {{text}}",
@@ -6392,9 +6357,9 @@
       "budget": "Berhenti minggu ini karena mencapai anggaran bulanan.",
       "noChannel": "Tidak ada di kanal mana pun."
     },
-    "subtitle": "Perubahan yang diusulkan agen. Tidak ada yang berubah sebelum ada yang menerima.",
-    "subtitlePersonal": "Perubahan yang diusulkan agenmu. Tidak ada yang berubah sebelum kamu menerimanya.",
-    "list": "Usulan",
+    "subtitle": "Yang diubah agen di tim, dan alasannya. Kamu bisa mengurungkannya.",
+    "subtitlePersonal": "Yang diubah agenmu, dan alasannya. Kamu bisa mengurungkannya.",
+    "list": "Perbaikan",
     "proposes": "<b>{{agent}}</b> mengusulkan · {{target}}",
     "proposesMany": "<b>{{agent}}</b> mengusulkan · instruksi {{count}} agen",
     "proposesManyChanges": "<b>{{agent}}</b> mengusulkan · perubahan untuk {{count}} agen",
@@ -6413,51 +6378,31 @@
     "roleLine": "Peran: {{from}} → {{to}}",
     "accessOn": "Aktifkan: {{app}}",
     "accessOff": "Nonaktifkan: {{app}}",
-    "include": "Sertakan {{name}}",
-    "acceptAll": "Terima untuk semua",
-    "acceptSome": "Terima untuk {{count}}",
-    "all": {
-      "label": "Putuskan semua usulan",
-      "accept": "Terima semua",
-      "refuse": "Tolak semua",
-      "acceptAsk_other": "Terima {{count}} usulan? Masing-masing langsung berlaku.",
-      "refuseAsk_other": "Tolak {{count}} usulan? Agen tidak akan mengusulkannya lagi.",
-      "acceptGo_other": "Terima {{count}}",
-      "refuseGo_other": "Tolak {{count}}"
-    },
-    "staleSome_other": "{{count}} tidak diterima: teksnya berubah setelah usulan dibuat.",
-    "staleSomeAgent_other": "{{count}} tidak diterima: agennya berubah setelah usulan dibuat.",
-    "waitingFor": "Menunggu {{name}}",
+    "reviewing": "Sedang ditinjau…",
+    "appliedByAgent": "Diterapkan oleh {{name}}",
+    "appliedByAgent_female": "Diterapkan oleh {{name}}",
+    "appliedAuto": "Diterapkan otomatis",
+    "leftOutBy": "Tidak diterapkan oleh {{name}}",
+    "leftOutBy_female": "Tidak diterapkan oleh {{name}}",
+    "leftOut": "Tidak diterapkan",
+    "undoneBy": "Diurungkan oleh {{name}}",
+    "undoneByYou": "Diurungkan olehmu",
+    "undo": "Urungkan",
+    "appliedSome": "{{done}} dari {{total}} diterapkan",
     "waitingAdmin": "Menunggu admin",
     "stale": "Kedaluwarsa",
-    "staleError": "Usulan ini kedaluwarsa: teksnya berubah setelah usulan dibuat. Daftarnya sudah dimuat ulang.",
-    "staleNote": "Teksnya berubah setelah usulan ini dibuat, jadi usulan ini tidak bisa diterima lagi.",
-    "staleErrorAgent": "Usulan ini kedaluwarsa: agennya berubah setelah usulan dibuat. Daftarnya sudah dimuat ulang.",
-    "staleNoteAgent": "Agennya berubah setelah usulan ini dibuat, jadi usulan ini tidak bisa diterima lagi.",
+    "staleNote": "Teksnya berubah setelah usulan ini dibuat, jadi usulan ini tidak bisa diterapkan lagi.",
+    "staleNoteAgent": "Agennya berubah setelah usulan ini dibuat, jadi usulan ini tidak bisa diterapkan lagi.",
     "accepted": "Diterima",
     "refused": "Ditolak",
-    "acceptedSome": "{{done}} dari {{total}} diterima",
-    "acceptedBy": "Diterima oleh {{name}} · {{when}}",
-    "refusedBy": "Ditolak oleh {{name}} · {{when}}",
-    "acceptedByYou": "Diterima olehmu · {{when}}",
-    "refusedByYou": "Ditolak olehmu · {{when}}",
     "why": "Alasan",
     "change": "Ubah ke {{target}}",
     "changeLabel": "Perubahan yang diusulkan",
-    "editFirst": "Ubah sebelum menerima",
-    "viewDiff": "Lihat perbedaan",
-    "finalText": "Teks akhir instruksi",
-    "finalTextContext": "Teks akhir konteks",
-    "accept": "Terima perubahan",
-    "acceptEdited": "Terima dengan editan",
-    "refuse": "Tolak",
-    "refuseNote": "Menolak mengajari {{name}} agar tidak mengusulkan ini lagi.",
-    "refuseNote_female": "Menolak mengajari {{name}} agar tidak mengusulkan ini lagi.",
     "added": "Ditambahkan: ",
     "removed": "Dihapus: ",
     "sameLines_other": "{{count}} baris tidak berubah",
-    "empty": "Saat seseorang meminta perubahan ke agen, atau suatu pelajaran berulang, usulannya muncul di sini.",
-    "emptyTitle": "Tidak ada yang perlu ditinjau",
+    "empty": "Saat agen memperbaiki instruksinya sendiri atau instruksi rekannya, perubahannya muncul di sini, dengan Urungkan.",
+    "emptyTitle": "Belum ada yang berubah",
     "titleInstructions": "Perbarui instruksi {{name}}",
     "titleInstructions_female": "Perbarui instruksi {{name}}",
     "titleRole": "Ubah peran {{name}}",
@@ -10363,7 +10308,80 @@
       "text": "Agen tetap bekerja tanpanya."
     }
   },
+  "aiHub": {
+    "tab": "Akun AI",
+    "usageTab": "Penggunaan",
+    "accounts": "Akun",
+    "accountsHint": "Setiap paket dan kunci API yang bisa dipakai agen untuk berpikir, siapa pun yang menghubungkannya.",
+    "apiKey": "Kunci API",
+    "of": "milik {{name}}",
+    "moreSpeed": "Kecepatan dan jendela konteks",
+    "whoThinks": "Siapa yang berpikir",
+    "bulk": {
+      "sub": "Pilih AI-nya, lalu agen yang memakainya."
+    },
+    "choice": {
+      "workspace": "Milik ruang kerja",
+      "none": "Pilih akun",
+      "search": "Cari menurut nama, AI, paket, atau pemilik",
+      "noMatch": "Tidak ada akun yang cocok.",
+      "noModel": "Tidak ada model yang cocok.",
+      "groups": {
+        "yours": "Milikmu",
+        "others": "Milik tim",
+        "keys": "Milik ruang kerja"
+      }
+    },
+    "order": {
+      "title": "Urutan pemakaian",
+      "tip": "Akun mana yang dipakai agen lebih dulu",
+      "sub": "Saat mencapai batas, agen pindah ke akun berikutnya.",
+      "group": "{{maker}} · {{computer}}",
+      "signedOut": "Keluar · dilewati",
+      "skipped": "Dilewati",
+      "fallback": "Lanjut dengan kunci API saat semua paket mencapai batas",
+      "fallbackHint": "Mati: agen menunggu paket pertama diperbarui. Nyala: agen lanjut dengan kunci API ruang kerja, yang dibayar per pemakaian. Misi tidak pernah."
+    },
+    "detail": {
+      "limits": "Batas",
+      "noLimits": "Batas belum terbaca.",
+      "permissions": "Izin",
+      "saved": "Izin disimpan.",
+      "more": "Lainnya untuk {{name}}",
+      "manage": "Kelola",
+      "manageLine": "Ganti nama, masuk lagi, hapus",
+      "manageHint": "Siapa yang boleh mengganti nama akun ini, masuk lagi, menghapusnya, dan mengubah izin ini.",
+      "use": "Pakai di agen",
+      "useLine": "Pilih di Siapa yang berpikir",
+      "useHint": "Agen milik siapa yang boleh berpikir dengan akun ini.",
+      "reply": "Layani semua",
+      "replyLine": "Dengan siapa agen berbicara",
+      "replyHint": "Siapa yang dilayani agen di akun ini selain pemiliknya sendiri.",
+      "claudeTerms": "Menurut ketentuan Claude, paket pribadi milik satu orang. Membaginya adalah wilayah abu-abu.",
+      "pickRoles": "Orang yang memegang peran ini.",
+      "pickPeople": "Selain pemilik akun.",
+      "searchRoles": "Cari peran",
+      "searchPeople": "Cari orang",
+      "nobody": "Tidak ada yang bisa dipilih."
+    },
+    "modes": {
+      "owner": "Hanya kamu",
+      "ownerOf": "Hanya {{name}}",
+      "admins": "Kamu dan admin",
+      "adminsOf": "{{name}} dan admin",
+      "roles": "Peran…",
+      "people": "Orang…",
+      "everyone": "Semua",
+      "replyOwner": "Hanya pemilik agen"
+    }
+  },
   "aiAccounts": {
+    "useReason": {
+      "signed_out": "Sudah keluar",
+      "owner_left": "{{owner}} sudah keluar dari workspace",
+      "owner_only": "Hanya {{owner}} yang memakainya",
+      "not_allowed": "Tidak dibuka untuk agenmu"
+    },
     "unnamed": "Akun tanpa nama",
     "rename": {
       "action": "Ganti nama {{label}}",
@@ -12305,7 +12323,6 @@
     "count_other": "{{count}} item",
     "searchHint": "Pintasan untuk mencari",
     "who": "Dibuat oleh",
-    "everyone": "Semua",
     "kindMany": {
       "document": "Dokumen",
       "table": "Tabel",
@@ -12323,8 +12340,10 @@
     "view": "Tampilan",
     "viewGrid": "Kisi",
     "viewList": "Daftar",
-    "arrange": "Atur",
-    "arrangeValue": "Atur: {{group}}",
+    "display": "Tampilan",
+    "displayValue": "Tampilan: {{view}} · {{group}}",
+    "filterButton": "Saring",
+    "filterValue": "{{filter}}: {{value}}",
     "groupBy": "Kelompokkan menurut",
     "group": {
       "date": "Tanggal",
@@ -12765,7 +12784,6 @@
     "added": "{{repo}} masuk ke daftar saat kamu menyimpan."
   },
   "connectors": {
-    "title": "Konektor",
     "store": {
       "featured": "Unggulan",
       "suggested": "Disarankan",
@@ -12804,6 +12822,7 @@
       "addressPassword": "Alamat dan kata sandi",
       "composio": "Lewat Composio"
     },
+    "title": "Konektor",
     "add": "Tambah konektor",
     "personal": {
       "note": "Hanya kamu yang membuka koneksi ini. Agenmu hanya menggunakannya saat kamu minta.",
@@ -15245,6 +15264,12 @@
     "teamProposal": {
       "undoExpired": "Sudah lebih dari sehari sejak tim ini dibuat, jadi tidak bisa dibatalkan di sini. Arsipkan agennya di halaman masing-masing."
     },
+    "proposal": {
+      "changed": "Ini berubah setelah diterapkan: sesuaikan secara manual.",
+      "notApplied": "Perubahan ini tidak diterapkan, jadi tidak ada yang perlu diurungkan.",
+      "notUndoable": "Agen yang sudah dihapus tidak bisa kembali.",
+      "notAllowed": "Hanya orang yang boleh membuat perubahan ini yang bisa mengurungkannya."
+    },
     "agentProposal": {
       "decided": "Seseorang sudah memutuskan usulan ini.",
       "expired": "Usulan ini kedaluwarsa: tidak ada yang memutuskannya dalam sehari.",
@@ -15495,6 +15520,7 @@
     "account": {
       "notRestorable": "Akun ini sudah tidak bisa dipulihkan.",
       "notOwner": "Hanya orang yang menghubungkan akun atau paket ini yang bisa melakukan ini.",
+      "permissionForbidden": "Hanya pemilik akun, admin, atau orang yang boleh mengelolanya yang bisa mengubah ini.",
       "orderForbidden": "Hanya orang yang menghubungkan akun ini atau Admin yang bisa mengubah posisinya dalam urutan."
     },
     "channel": {

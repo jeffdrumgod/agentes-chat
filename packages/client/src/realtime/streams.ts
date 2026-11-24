@@ -1,4 +1,5 @@
 import type { ActiveRun, BrowserProfileWait, ChannelEvent, Message, RunStatus } from "../api/types";
+import { PERMISSION_TOOL } from "../lib/activity";
 import { type CliLine, type CliProgress, cliLineOf, cliProgressOf, mergeCliProgress } from "../lib/cli-tools";
 import { isMediaAfterReply } from "../lib/media";
 import { NO_AI } from "../lib/no-ai";
@@ -628,8 +629,12 @@ function applyEvent(state: StreamsState, event: StreamEvent): StreamsState {
         serviceIcon: event.serviceIcon ?? null,
         toolDetail: event.detail ?? null,
         ...(newCall ? { code: event.code ?? null, output: [] } : {}),
-        // A new call is the step now: its own words, or none (the call's verb says it).
-        ...(newCall ? { step: event.said ? { said: event.said } : undefined } : {}),
+        // A new call is the step now: its own words, or none (the call's verb says it). The computer's permission
+        // check before a command is no step of its own: the command it lets through was told a moment before
+        // (`agent.step`) and stays the step while it runs, or the bar would say "thinking" for as long as it takes.
+        ...(newCall && !(event.tool === PERMISSION_TOOL && !event.said && current?.step)
+          ? { step: event.said ? { said: event.said } : undefined }
+          : {}),
       });
     }
     case "agent.step": {

@@ -20,6 +20,24 @@ export interface Health {
   edition: Edition;
 }
 
+/**
+ * An app's own speed, for its server (`POST /api/app/client-vitals`): what it measured since its last report, all in
+ * milliseconds but the heap (bytes) and the counts.
+ */
+export interface ClientVitalsReport {
+  platform: "ios" | "android" | "web";
+  /** From the app's start to the launch splash leaving. */
+  coldStartMs?: number;
+  /** From the app's start to its first list drawn with rows. */
+  firstRowsMs?: number;
+  jsLagP95Ms?: number;
+  jsLagMaxMs?: number;
+  heapBytes?: number;
+  /** Reads (GETs) in the 10 s after the app came back to the front. */
+  getsPerReturn?: number;
+  reconnects?: number;
+}
+
 /** The usage report's switch, for the installation's owner (`GET /api/app/telemetry`). */
 export interface ServerTelemetry {
   /** The owner's switch. */
@@ -2598,7 +2616,11 @@ export interface Memory {
   from?: { messageId: string; channelId: string; threadId: string | null; dm: boolean; at: string } | null;
 }
 
-export type ProposalStatus = "pending" | "accepted" | "refused";
+/**
+ * `pending`: the agent's review hasn't weighed it yet (ADR 0219); `refused`: left out; `undone`: applied, then put
+ * back.
+ */
+export type ProposalStatus = "pending" | "accepted" | "refused" | "undone";
 
 /** An app a proposal turns on or off for an agent, as `request_permission` names it (`label` in English). */
 export interface ProposalAccessLine {
@@ -2702,6 +2724,19 @@ export interface Proposal {
   decider: { type: "user"; userId: string; name: string } | { type: "admins" } | { type: "account_owner" };
   createdAt: string;
   decidedBy: { userId: string; name: string } | null;
+  /** The agent whose review applied it or left it out (ADR 0219); null when a person did. */
+  decidedByAgent: { agentId: string; name: string } | null;
+  /**
+   * The review's line, in the language of the text it changes: why it was applied or left out; null when a person
+   * decided.
+   */
+  review: string | null;
+  /** Decided by the review, not a person (`decidedByAgent` is null for a workspace-wide lesson). */
+  reviewed: boolean;
+  /** Applied, and the viewer may put it back (`proposals.undo`). */
+  undoable: boolean;
+  undoneBy: { userId: string; name: string } | null;
+  undoneAt: string | null;
   decidedAt: string | null;
 }
 
@@ -4182,6 +4217,13 @@ export interface ArtifactRef {
   /** A picture's size (pixels), when the server knew it: its card has its box before the file's details load. */
   width?: number;
   height?: number;
+  /**
+   * An uploaded file's name, type and bytes (servers from 2026-11 on): a picture or a video shows from these alone,
+   * with no request for the file's details first.
+   */
+  name?: string;
+  contentType?: string;
+  size?: number;
 }
 
 export interface ArtifactFilters {
@@ -6491,6 +6533,11 @@ export interface MachineAccount {
   /** Who it thinks for (ADR 0059 §3): everyone in the workspace, or only its owner (absent: an older server). */
   serves?: PlanServes;
   /**
+   * In an agent's "Quem pensa" (`GET …/brain`): it may think for that agent, its owner being in "Usar em agentes"
+   * (absent: an older server, which says it with `serves`).
+   */
+  usable?: boolean;
+  /**
    * Its place in the order of use of its computer's accounts of its kind (ADR 0041 §6), 0 first; null: after the
    * placed ones, oldest first (absent: an older server).
    */
@@ -6523,6 +6570,81 @@ export type PlanServes = "everyone" | "owner";
 export interface AiAccounts {
   accounts: (MachineAccount & { machineId: string; computer: string })[];
   computers: AiComputer[];
+  /** "Contas de IA" as one view (absent: an older server). */
+  hub?: AiHub;
+}
+
+/**
+ * Who besides its owner holds one of an AI account's permissions: nobody (`owner`), administrators (`admins`), the
+ * holders of some roles (`roles`), some people (`people`) or everyone. In the apps: Só você, Você e administradores,
+ * Cargos…, Pessoas…, Todos.
+ */
+export type AccountAudienceMode = "owner" | "admins" | "roles" | "people" | "everyone";
+
+export interface AccountAudience {
+  mode: AccountAudienceMode;
+  /** With `people`. */
+  userIds: string[];
+  /** With `roles`. */
+  roleIds: string[];
+}
+
+/**
+ * An AI account's permissions. `manage` ("Gerenciar": rename, sign in again, remove), `use` ("Usar em agentes": whose
+ * agents, by the agent's owner, and whose Lodi may think with it) and `reply` ("Atender todos": whom an agent on it
+ * answers besides the agent's own owner; `owner` there reads "Só o dono do agente").
+ */
+export interface AccountPermissions {
+  manage: AccountAudience;
+  use: AccountAudience;
+  reply: AccountAudience;
+}
+
+/** Why the viewer's agents can't think with an account: dimmed in the picker with this reason. */
+export type AccountUseReason = "signed_out" | "owner_left" | "owner_only" | "not_allowed";
+
+/** What the viewer may do with an AI account. */
+export interface AccountRights {
+  /** Rename it, remove it, choose `use`. */
+  canManage: boolean;
+  /** Choose `manage`: its owner. */
+  canSetManage: boolean;
+  /** The viewer's agents and Lodi may think with it; else `useReason`. */
+  canUse: boolean;
+  useReason?: AccountUseReason;
+  /** Choose `reply`: its owner or an administrator. */
+  canReplyAll: boolean;
+}
+
+/** A plan account in "Contas de IA", whoever connected it. */
+export interface AiHubAccount extends MachineAccount {
+  machineId: string;
+  computer: string;
+  permissions: AccountPermissions;
+  rights: AccountRights;
+}
+
+/** A workspace API key in "Contas de IA": that it exists, for everyone; who uses it only for whoever manages keys. */
+export interface AiHubKey {
+  id: string;
+  provider: string;
+  label: string;
+  keyHint: string;
+  isDefault: boolean;
+  usedBy?: { id: string; name: string }[];
+  endpoint?: Credential["endpoint"];
+}
+
+/** `GET …/ai-accounts`'s `hub`: every account, the keys, the order of use and the API-key switch. */
+export interface AiHub {
+  accounts: AiHubAccount[];
+  keys: AiHubKey[];
+  order: AccountOrderGroup[];
+  /** "Continuar com a chave de API quando todos os planos estiverem no limite" (off by default). */
+  keyFallback: boolean;
+  canManageKeys: boolean;
+  /** Turns `keyFallback` on or off and moves anyone's account in the order. */
+  canConfigure: boolean;
 }
 
 export interface AiComputer {
@@ -7194,6 +7316,12 @@ export type NotificationKind =
   | "change_request"
   | "proposal_waiting"
   /**
+   * ADR 0219: an agent applied a change it judged worth making to an agent this person looks after (or the workspace's
+   * context): one row a day while unread, `count`, `latest.title` the newest change, `source.agentId`/`label` the agent
+   * it changed, `source.proposalId`, the applying agent as actor. Inbox only.
+   */
+  | "proposal_applied"
+  /**
    * ADR 0141: a person's monthly AI limit, `source.userId` the person, `latest.statusTo`: `warning` (80%, the
    * person), `reached` (who decides; `reached_notify` to the person when the limit only notifies), `request` (who
    * decides, waiting, with `raiseToUsd`), `raised` or `refused` (the person). The person's own carry a percent only.
@@ -7634,11 +7762,40 @@ export interface ThreadFollow {
 }
 
 /**
- * Unread marks on my own topic: a message in a conversation I'm in (no content: the lists read again), and my
- * reads and mutes from any device.
+ * A new message as the conversation lists show it (`channel.activity`): whether it counts as unread and, when it may
+ * be a list's last line, that line (`Channel.lastMessage`'s `preview`, `DirectMessage.lastMessage`'s `body`).
+ */
+export interface ActivityLine {
+  id: string;
+  createdAt: string;
+  /** It counts as unread: not a quiet notice, nor an agent's sticker after its own reply. */
+  counts: boolean;
+  /** A channel's top-level message or any of a DM's; absent for a routine's call (its answer is the line). */
+  last?: {
+    authorType: AuthorType;
+    authorId: string | null;
+    preview: string;
+    body: string;
+    meta: PreviewMeta | null;
+    mediaKind: MediaKind | null;
+  };
+}
+
+/**
+ * Unread marks on my own topic: a message in a conversation I'm in (with its list line, `message`, the lists patch
+ * their row; without, from an older server or for a confidential message, they read again), and my reads and mutes
+ * from any device.
  */
 export type UnreadEvent =
-  | { type: "channel.activity"; channelId: string; threadId: string | null; dm?: boolean }
+  | {
+      type: "channel.activity";
+      channelId: string;
+      threadId: string | null;
+      dm?: boolean;
+      message?: ActivityLine;
+      /** With `message`: it mentions me. */
+      mentioned?: boolean;
+    }
   | { type: "channel.read"; channelId: string; userId: string; lastReadAt: string }
   | { type: "channel.muted"; channelId: string; muted: boolean }
   | { type: "thread.read"; threadId: string; channelId: string; lastReadAt: string }

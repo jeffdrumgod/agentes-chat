@@ -12,7 +12,7 @@ import { connectedNames, connectionLine, openConnection, openStore, pick, search
 import { createFakeApi, OPENROUTER_KEY, OPENROUTER_MODELS, ORG_ID, seedState } from "./fake-api";
 import { shownText } from "./hint";
 import { pick as pickOption } from "./new-agent-flow";
-import { openDetails, shareRow } from "./plan-rows";
+import { openDetails, shareRow, usageTab } from "./plan-rows";
 import { renderApp, screen, settle, showIn } from "./render";
 
 afterEach(() => cleanup());
@@ -548,8 +548,9 @@ describe("Configurações do workspace", () => {
       router.navigate({ to: "/org/$orgId/settings/$section", params: { orgId: ORG_ID, section: "usage" } }),
     );
     await settle(4);
-    // The plan accounts, each a row that opens to its windows with every agent's part, then the API per agent
+    // On Uso, the plan accounts, each a row that opens to its windows with every agent's part, then the API per agent
     // (ADR 0063).
+    await usageTab();
     const plans = screen().getByRole("region", { name: "Contas" });
     const head = within(plans).getByRole("button", { name: /^A conta que os seus agentes dividem/ });
     // Closed: its name, plan and owner, and one meter, the fullest window. One computer: it isn't named.
@@ -691,6 +692,8 @@ describe("Configurações do workspace", () => {
     cleanup();
     // IA e uso: the plans in percentages, never the workspace's keys, money or report.
     await go(state, "settings/usage");
+    expect(screen().queryByRole("region", { name: "Chaves de provedor" })).toBeNull();
+    await usageTab();
     const plans = screen().getByRole("region", { name: "Contas" });
     expect(within(plans).getByRole("meter", { name: "5 horas" }).getAttribute("aria-valuenow")).toBe("62");
     expect(screen().queryByRole("region", { name: "Chaves de provedor" })).toBeNull();
@@ -738,6 +741,7 @@ describe("Configurações do workspace", () => {
 
   test("AI and usage: the plans' estimate is their title's ⓘ, no card has a subtitle or footer; no plans, one line", async () => {
     await go(seedState(), "settings/usage");
+    await usageTab();
     const plans = screen().getByRole("region", { name: "Contas" });
     expect(hintOf("Contas", plans)).toMatchObject({
       text: "Os planos só dizem quanto a conta inteira usou. A parte de cada agente é uma estimativa, pelo que cada um gastou nela.",
@@ -751,6 +755,7 @@ describe("Configurações do workspace", () => {
     api.orgs.planUsage = async () => ({ month: "2026-10", money: true, accounts: [], api: [] });
     await renderApp(`/org/${ORG_ID}/settings/usage`, { api });
     await settle(5);
+    await usageTab();
     const empty = screen().getByRole("region", { name: "Contas" });
     expect(shownText(empty)).toBe(
       "ContasUse o plano de IA que você já pagaConecte um plano e acompanhe aqui o quanto cada agente usa dele.Conectar uma IA",
@@ -787,6 +792,7 @@ describe("a plan account's agents (IA e uso › Contas)", () => {
   test("the bar split in each agent's color, then one list biggest share first, then when it renews and the month", async () => {
     await renderApp(`/org/${ORG_ID}/settings/usage`, { api: crowded() });
     await settle(5);
+    await usageTab();
     const plans = screen().getByRole("region", { name: "Contas" });
     await click(within(plans).getByRole("button", { name: /^A conta que os seus agentes dividem/ }));
     await act(async () => openDetails(plans));

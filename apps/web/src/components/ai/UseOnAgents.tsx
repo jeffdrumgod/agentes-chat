@@ -1,62 +1,84 @@
 import type { Agent, AgentSetup, CommandApproval } from "@agenteschat/client";
-import { useAgents, useModels, useSetupPreview } from "@agenteschat/client";
-import { autonomyName, changes, setupResultLine, sortedResults, takers } from "@agenteschat/client/lib/agent-setup";
-import { setupPlanOpens } from "@agenteschat/client/lib/audience";
+import { keys, useAgents, useAiChoice, useApi, useModels, useSetupPreview } from "@agenteschat/client";
+import {
+  autonomyName,
+  changes,
+  setupOutcome,
+  setupResultLine,
+  sortedResults,
+  takers,
+} from "@agenteschat/client/lib/agent-setup";
+import { type AiChoice, aiChoiceSetup } from "@agenteschat/client/lib/ai-choice";
 import { brainLine } from "@agenteschat/client/lib/brain";
 import { firstName } from "@agenteschat/client/lib/format";
 import { isAuto } from "@agenteschat/client/lib/providers";
 import { Button, Checkbox, Dialog, DialogFooter, DialogSearchList, Locked, Switch } from "@agenteschat/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AgentAvatar } from "@/components/AgentAvatar";
 import { LoadingLine } from "@/components/Loading";
 import { useOrg } from "@/components/org-context";
 import { useDirectory } from "@/hooks/useDirectory";
-import { useAgentEdit } from "../context";
+import { useToast } from "@/lib/toast";
+import { AiChoiceFields, rowName, rowOfChoice } from "./AiChoice";
 
 /**
- * "Usar em outros agentes" (ADR 0094): every other agent with what the setup would do to it (the server's preview),
- * those that can take it first, "Todos" on top for all of them, and "Levar a autonomia" over them, which leaves each
- * agent's own when off. "Usar" saves it on the agents picked; this agent's own is already saved.
+ * "Usar em outros agentes" (ADR 0094), the one way to give several agents one AI: from an agent's "Mais opções" (its
+ * own setup), from a coding plan's key ("Usar em todos os agentes") or a reply's stand-in model. The AI on top is the
+ * one picker, starting on `initial`; under it every agent with what the setup would do to it (the server's preview),
+ * those that can take it first, "Todos" over them. `exclude`: the agent it comes from, whose own is already saved.
  */
-export function SetupCopyDialog({
-  setup,
-  setupText,
+export function UseOnAgentsDialog({
+  initial,
+  extra,
+  exclude,
   autonomy,
-  withAutonomy,
-  onWithAutonomy,
-  busy,
+  allPicked = false,
   onClose,
-  onUse,
 }: {
-  setup: AgentSetup;
-  setupText: string;
-  /** This agent's saved Autonomia. */
-  autonomy: CommandApproval | undefined;
-  withAutonomy: boolean;
-  onWithAutonomy: (on: boolean) => void;
-  busy: boolean;
+  initial: AiChoice;
+  /** What else the agent it comes from carries (its speed, its context window). */
+  extra?: Pick<AgentSetup, "speed" | "contextTokens">;
+  exclude?: string;
+  /** The agent it comes from's Autonomia: "Levar a autonomia" over the list, on by default. */
+  autonomy?: CommandApproval | undefined;
+  /** Every agent that can take it starts picked. */
+  allPicked?: boolean;
   onClose: () => void;
-  /** `opens`: the agents picked whose owner's plan it opens to more people (`setupPlanOpens`). */
-  onUse: (agentIds: string[], opens: { agent: string; owner: string }[]) => void;
 }) {
   const { t } = useTranslation();
   const { org } = useOrg();
-  const { agent } = useAgentEdit();
+  const api = useApi();
+  const qc = useQueryClient();
+  const toast = useToast();
   const agents = useAgents(org.id);
   const models = useModels();
   const dir = useDirectory(org.id);
-  const others = (agents.data ?? []).filter((a) => a.id !== agent.id);
-  // This agent first, as its own setup is what the others take: a sign-in made for one agent is its own then.
-  const preview = useSetupPreview(org.id, setup, [agent.id, ...others.map((a) => a.id)]);
-  const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
-  const [q, setQ] = useState("");
-  const query = q.trim().toLowerCase();
-  const results = sortedResults((preview.data ?? []).filter((r) => r.agentId !== agent.id));
+  const others = (agents.data ?? []).filter((a) => a.id !== exclude);
+  const ids = others.map((a) => a.id);
+  const state = useAiChoice(org.id, { kind: "agents", agentIds: ids });
+  const [choice, setChoice] = useState<AiChoice>(initial);
+  const [withAutonomy, setWithAutonomy] = useState(true);
+  const setup: AgentSetup = {
+    ...aiChoiceSetup(choice),
+    ...extra,
+    ...(withAutonomy && autonomy ? { autonomy } : {}),
+  };
+  // The agent it comes from first, as its own setup is what the others take: a sign-in made for it is its own then.
+  const preview = useSetupPreview(org.id, setup, exclude ? [exclude, ...ids] : ids);
+  const results = sortedResults((preview.data ?? []).filter((r) => r.agentId !== exclude));
   const can = takers(results);
-  const chosen = can.filter((id) => picked.has(id));
+  const [picked, setPicked] = useState<ReadonlySet<string> | null>(null);
+  const chosenSet = picked ?? new Set(allPicked ? can : []);
+  const chosen = can.filter((id) => chosenSet.has(id));
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const query = q.trim().toLowerCase();
   const byId = new Map(others.map((a) => [a.id, a]));
   const shown = results.filter((r) => !query || byId.get(r.agentId)?.name.toLowerCase().includes(query));
+  const row = rowOfChoice(state.rows, choice);
+  const aiName = row ? rowName(t, row) : "";
   const nowOf = (a: Agent) =>
     a.brain && a.brain.kind !== "model"
       ? brainLine(t, a.brain, "").text
@@ -67,23 +89,56 @@ export function SetupCopyDialog({
     const name = a.ownerUserId ? dir.memberById.get(a.ownerUserId)?.name : undefined;
     return name ? firstName(name) : undefined;
   };
-  const toggle = (id: string, on: boolean) =>
-    setPicked((p) => {
-      const next = new Set(p);
-      if (on) next.add(id);
-      else next.delete(id);
-      return next;
-    });
+  const toggle = (id: string, on: boolean) => {
+    const next = new Set(chosenSet);
+    if (on) next.add(id);
+    else next.delete(id);
+    setPicked(next);
+  };
+  const use = async () => {
+    setBusy(true);
+    try {
+      const done = await api.agents.applySetup(org.id, { setup, agentIds: chosen });
+      const outcome = setupOutcome(done, chosen.length);
+      if (outcome.done > 0) toast.show(t("agentPage.work.brain.copy.done", { count: outcome.done, setup: aiName }));
+      if (outcome.autonomyOnly > 0)
+        toast.show(t("agentPage.work.brain.copy.autonomyOnly", { count: outcome.autonomyOnly }));
+      if (outcome.missed > 0) toast.show(t("agentPage.work.brain.copy.missed", { count: outcome.missed }), "error");
+      for (const key of [
+        keys.agents(org.id),
+        keys.agentPages(org.id),
+        keys.aiStatus(org.id),
+        keys.aiAccounts(org.id),
+        [...keys.missions(org.id), "eligible"],
+      ])
+        void qc.invalidateQueries({ queryKey: key });
+      onClose();
+    } catch {
+      toast.show(t("agentPage.work.failed"), "error");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <Dialog
       open
-      onOpenChange={(o) => !o && onClose()}
+      onOpenChange={(o) => !o && !busy && onClose()}
       title={t("agentPage.work.brain.copy.title")}
-      description={t("agentPage.work.brain.copy.sub", { setup: setupText })}
+      description={t("aiHub.bulk.sub")}
       closeLabel={t("common.close")}
       className="agp-copydialog"
     >
       <Locked when={busy}>
+        <div className="ac-dialog__tools">
+          <AiChoiceFields
+            state={state}
+            value={choice}
+            onChange={(next) => {
+              setChoice(next);
+              setPicked(null);
+            }}
+          />
+        </div>
         {autonomy && (
           <div className="ac-dialog__tools">
             <label htmlFor="setup-autonomy" className="agp-copydialog__all">
@@ -93,7 +148,7 @@ export function SetupCopyDialog({
                   {t("agentPage.work.brain.copy.withAutonomyLine", { value: autonomyName(t, autonomy) })}
                 </span>
               </span>
-              <Switch id="setup-autonomy" checked={withAutonomy} disabled={busy} onCheckedChange={onWithAutonomy} />
+              <Switch id="setup-autonomy" checked={withAutonomy} disabled={busy} onCheckedChange={setWithAutonomy} />
             </label>
           </div>
         )}
@@ -143,7 +198,7 @@ export function SetupCopyDialog({
                 <label key={a.id} htmlFor={id} className="scope-row" data-off={off || undefined}>
                   <Checkbox
                     id={id}
-                    checked={!off && picked.has(a.id)}
+                    checked={!off && chosenSet.has(a.id)}
                     disabled={off}
                     onCheckedChange={(on) => toggle(a.id, on)}
                   />
@@ -159,23 +214,10 @@ export function SetupCopyDialog({
         )}
       </Locked>
       <DialogFooter bar>
-        <Button onClick={onClose}>{t("common.cancel")}</Button>
-        <Button
-          variant="primary"
-          disabled={chosen.length === 0}
-          loading={busy}
-          onClick={() =>
-            onUse(
-              chosen,
-              setupPlanOpens(
-                results,
-                chosen,
-                (id) => byId.get(id),
-                (id) => dir.memberById.get(id)?.name ?? t("channel.unknownPerson"),
-              ),
-            )
-          }
-        >
+        <Button disabled={busy} onClick={onClose}>
+          {t("common.cancel")}
+        </Button>
+        <Button variant="primary" disabled={chosen.length === 0 || busy} loading={busy} onClick={() => void use()}>
           {chosen.length === 0
             ? t("agentPage.work.brain.copy.pick")
             : t("agentPage.work.brain.copy.use", { count: chosen.length })}

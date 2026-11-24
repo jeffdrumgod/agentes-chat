@@ -456,7 +456,6 @@ function RowBody({
   const question = isAgent ? questionOf(meta) : null;
   // An agent asks a person for a secret for its computer (ADR 0027).
   const secret = isAgent ? secretRequestOf(meta) : null;
-  // An agent proposes a change to the workspace's context or to an agent's instructions: decided right here.
   // The agent needs a person in its browser (ADR 0040): the request, live.
   const handoff = isAgent ? browserHandoffOf(meta) : null;
   // A card its run posts on the way (Connect, a proposal, an approval, a question, a secret, a handoff), from inside a

@@ -2247,7 +2247,7 @@
     "moreWhat": {
       "waiting": "Tutto ciò che aspetta una tua risposta",
       "approvals": "Cosa ti chiedono di consentire gli agenti",
-      "proposals": "Cosa propongono di cambiare gli agenti",
+      "proposals": "Cosa hanno cambiato gli agenti, e perché",
       "threads": "Conversazioni che si diramano, e missioni",
       "issues": "Il lavoro del team, per persone e agenti",
       "wiki": "Ciò che sa il team, scritto per tutti",
@@ -2367,7 +2367,7 @@
     "summary_other": "{{people}} membri · {{agents}} agenti",
     "waiting": "Posta in arrivo",
     "approvals": "Approvazioni",
-    "proposals": "Proposte di miglioramento",
+    "proposals": "Miglioramenti degli agenti",
     "issues": "Attività",
     "missionsWaiting_one": "{{count}} missione ti aspetta",
     "missionsWaiting_many": "{{count}} missioni ti aspettano",
@@ -2414,9 +2414,6 @@
     "pendingApprovals_one": "{{count}} approvazione in sospeso",
     "pendingApprovals_many": "{{count}} approvazioni in sospeso",
     "pendingApprovals_other": "{{count}} approvazioni in sospeso",
-    "pendingProposals_one": "{{count}} proposta ti aspetta",
-    "pendingProposals_many": "{{count}} proposte ti aspettano",
-    "pendingProposals_other": "{{count}} proposte ti aspettano",
     "home": "Home",
     "notifications": "Notifiche",
     "unreadMark": "Non letto",
@@ -3177,7 +3174,7 @@
       "team": "Organizza e cambia tutto il team con schede che una persona applica: agenti, persone e impostazioni del workspace",
       "routines": "Avvia ed elimina le routine di qualsiasi agente che puoi gestire",
       "asYou": "Nella tua conversazione, legge il Drive, la wiki e le attività che puoi vedere",
-      "mentions": "Risponde a una @menzione in qualsiasi canale senza esserne membro"
+      "mentions": "Risponde a una @menzione in qualsiasi canale senza esserne membro, e ai messaggi per cui è la scelta migliore"
     },
     "card": {
       "settings": "{{name}} · Impostazioni",
@@ -3202,24 +3199,7 @@
       "to": "a",
       "editFirst": "Modifica prima",
       "superseded": "Sostituita dalla proposta più recente",
-      "onlyCreators": "Solo gli admin creano agenti",
-      "only": {
-        "model": "Solo gli admin cambiano il modello di un agente",
-        "effort": "Solo gli admin cambiano l’impegno di un agente",
-        "budget": "Solo gli admin cambiano il budget di un agente",
-        "owner": "Solo gli admin cambiano il responsabile di un agente",
-        "archive": "Solo gli admin archiviano un agente",
-        "delete": "Solo gli admin eliminano un agente",
-        "audience": "Solo gli admin e il responsabile cambiano chi gli parla",
-        "channels": "Solo gli admin e il responsabile cambiano i suoi canali",
-        "skill": "Solo chi può modificare un agente ne cambia le skill",
-        "ai_account": "Solo il proprietario dell’account lo assegna",
-        "name": "Solo gli admin rinominano un agente",
-        "look": "Solo gli admin e il responsabile cambiano il suo aspetto",
-        "group": "Solo gli admin spostano un agente di reparto",
-        "reports_to": "Solo gli admin cambiano a chi risponde un agente",
-        "many": "Solo gli admin fanno queste modifiche"
-      }
+      "onlyCreators": "Solo gli admin creano agenti"
     },
     "field": {
       "model": "Modello",
@@ -3262,14 +3242,6 @@
       "deleteTitle_one": "Eliminare {{count}} agente per sempre?",
       "deleteTitle_many": "Eliminare {{count}} agenti per sempre?",
       "deleteTitle_other": "Eliminare {{count}} agenti per sempre?",
-      "archiveAll": "Archivia tutti",
-      "deleteAll": "Elimina tutti",
-      "archiveSome_one": "Archivia {{count}}",
-      "archiveSome_many": "Archivia {{count}}",
-      "archiveSome_other": "Archivia {{count}}",
-      "deleteSome_one": "Elimina {{count}}",
-      "deleteSome_many": "Elimina {{count}}",
-      "deleteSome_other": "Elimina {{count}}",
       "deleteHelp": "Istruzioni, memoria e routine se ne vanno per sempre. I messaggi restano."
     },
     "people": {
@@ -4327,8 +4299,7 @@
   "inlineProposal": {
     "group": "Modifica proposta da {{name}}",
     "groupMany": "Proposta di modifica di {{name}} per {{count}} agenti",
-    "edit": "Modifica",
-    "open": "Apri in Proposte"
+    "open": "Apri in Miglioramenti degli agenti"
   },
   "newChannel": {
     "open": "Crea canale",
@@ -5310,7 +5281,6 @@
       }
     },
     "asks": "<b>{{agent}}</b> chiede l'approvazione",
-    "waitingYou": "Ti aspetta",
     "approve": {
       "merge": "Approva il merge",
       "deploy": "Approva il deploy",
@@ -5627,6 +5597,15 @@
       "joinOutside": "<b>{{name}}</b> chiede di entrare come collaboratore esterno per <b>{{outsideOf}}</b>, senza occupare un posto",
       "changeRequest": "<b>{{name}}</b> chiede una modifica a <b>{{agent}}</b>",
       "proposalWaiting": "Proposte di miglioramento di <b>{{names}}</b>",
+      "proposalApplied_one": "<b>{{name}}</b> ha applicato un miglioramento",
+      "proposalApplied_many": "<b>{{name}}</b> ha applicato {{count}} miglioramenti",
+      "proposalApplied_other": "<b>{{name}}</b> ha applicato {{count}} miglioramenti",
+      "proposalAppliedMany_one": "<b>{{names}}</b> hanno applicato un miglioramento",
+      "proposalAppliedMany_many": "<b>{{names}}</b> hanno applicato {{count}} miglioramenti",
+      "proposalAppliedMany_other": "<b>{{names}}</b> hanno applicato {{count}} miglioramenti",
+      "proposalAppliedAuto_one": "Un miglioramento è stato applicato automaticamente",
+      "proposalAppliedAuto_many": "{{count}} miglioramenti sono stati applicati automaticamente",
+      "proposalAppliedAuto_other": "{{count}} miglioramenti sono stati applicati automaticamente",
       "changeRequestAgent": "<b>{{name}}</b> chiede un nuovo agente: <b>{{agent}}</b>",
       "changeRequestAction": "<b>{{name}}</b> chiede una modifica nello spazio di lavoro",
       "approvalCover": "<b>{{name}}</b> ti ha scelto in Chi approva per me",
@@ -5765,7 +5744,6 @@
     "noneHere": "Per ora niente qui.",
     "noneDone": "Niente segnato come completato negli ultimi 30 giorni.",
     "noneRequests": "Nessuna richiesta decisa per ora.",
-    "proposes": "propone un miglioramento",
     "more": "Mostra altro"
   },
   "approvals": {
@@ -6365,6 +6343,7 @@
       "overview": "Panoramica",
       "instructions": "Istruzioni",
       "access": "Strumenti e accesso",
+      "skills": "Skill",
       "memory": "Memoria",
       "files": "File",
       "usage": "Utilizzo",
@@ -6501,9 +6480,6 @@
       "approvalsYou": "Approva o rifiuta in Approvazioni o nella chat",
       "approvalsWait": "In attesa del proprietario o di un admin",
       "seeApprovals": "Vedi richieste",
-      "proposes": "{{name}} propone di cambiare le sue istruzioni",
-      "proposes_female": "{{name}} propone di cambiare le sue istruzioni",
-      "review": "Rivedi",
       "does": "Cosa fa {{name}}",
       "does_female": "Cosa fa {{name}}",
       "readAll": "Leggi tutto",
@@ -6536,10 +6512,7 @@
       "showDiff": "Vedi cosa è cambiato",
       "hideDiff": "Nascondi cosa è cambiato",
       "diff": "Cosa è cambiato nelle istruzioni",
-      "add": "Aggiungi",
-      "proposals_one": "{{count}} modifica proposta",
-      "proposals_many": "{{count}} modifiche proposte",
-      "proposals_other": "{{count}} modifiche proposte"
+      "add": "Aggiungi"
     },
     "access": {
       "search": "Cerca un connettore o un'area",
@@ -6574,18 +6547,9 @@
       "lessons": "Lezioni",
       "fromTeam": "imparate dal team",
       "fromTeamRightHand": "imparate da te",
-      "proposals": "Proposte",
-      "waiting": "in attesa di una decisione",
-      "noneWaiting": "nessuna in attesa",
-      "waitingCount_one": "{{count}} proposta in attesa",
-      "waitingCount_many": "{{count}} proposte in attesa",
-      "waitingCount_other": "{{count}} proposte in attesa",
+      "improvements": "Miglioramenti",
+      "improvementsApplied": "applicati",
       "full": "Apri tutta la memoria",
-      "accepted": "Modifica accettata. Le istruzioni sono state aggiornate.",
-      "refused": "Proposta rifiutata. {{name}} ha preso nota del motivo.",
-      "refused_female": "Proposta rifiutata. {{name}} ha preso nota del motivo.",
-      "decides": "Decide {{who}}.",
-      "adminDecides": "Decide un admin.",
       "learned": "Cosa ha imparato",
       "learnedEmpty": "Correzioni, preferenze e modi di lavorare che scopre compaiono qui.",
       "learnedEmptyTitle": "Impara da ogni correzione",
@@ -6827,9 +6791,6 @@
     "subtitle": "Cosa ha imparato {{name}} dalle conversazioni e dalle correzioni del team.",
     "subtitle_female": "Cosa ha imparato {{name}} dalle conversazioni e dalle correzioni del team.",
     "subtitlePersonal": "Cosa ha imparato {{name}} dalle tue conversazioni e correzioni.",
-    "proposals_one": "{{count}} proposta di miglioramento",
-    "proposals_many": "{{count}} proposte di miglioramento",
-    "proposals_other": "{{count}} proposte di miglioramento",
     "tabsLabel": "Tipo",
     "tabs": {
       "known": "Fatti e decisioni",
@@ -6859,9 +6820,6 @@
     "unverifiedTitle": "Lo hanno detto solo gli agenti. Entra nel contesto come indizio segnalato.",
     "pinned": "Sempre nel contesto",
     "lowTrust": "Fonte esterna, non attendibile",
-    "confirm": "Conferma",
-    "confirmTitle": "Di’ che è giusto: gli agenti la usano come affidabile.",
-    "confirmed": "Confermata",
     "used_one": "usato {{count}} volta",
     "used_many": "usato {{count}} volte",
     "used_other": "usato {{count}} volte",
@@ -6893,7 +6851,7 @@
     }
   },
   "proposals": {
-    "title": "Proposte di miglioramento",
+    "title": "Miglioramenti degli agenti",
     "whyCode": {
       "refused": "Una persona ha rifiutato: {{text}}",
       "corrected": "Una persona ha corretto: {{text}}",
@@ -6903,9 +6861,9 @@
       "budget": "Si è fermato questa settimana al budget mensile.",
       "noChannel": "Non è in nessun canale."
     },
-    "subtitle": "Le modifiche proposte dagli agenti. Niente cambia finché qualcuno non accetta.",
-    "subtitlePersonal": "Le modifiche proposte dai tuoi agenti. Niente cambia finché non accetti.",
-    "list": "Proposte",
+    "subtitle": "Cosa hanno cambiato gli agenti nel team, e perché. Puoi annullarlo.",
+    "subtitlePersonal": "Cosa hanno cambiato i tuoi agenti, e perché. Puoi annullarlo.",
+    "list": "Miglioramenti",
     "proposes": "<b>{{agent}}</b> propone · {{target}}",
     "proposesMany": "<b>{{agent}}</b> propone · istruzioni di {{count}} agenti",
     "proposesManyChanges": "<b>{{agent}}</b> propone · modifiche a {{count}} agenti",
@@ -6920,64 +6878,33 @@
     "roleLine": "Ruolo: {{from}} → {{to}}",
     "accessOn": "Attiva: {{app}}",
     "accessOff": "Disattiva: {{app}}",
-    "include": "Includi {{name}}",
-    "acceptAll": "Accetta per tutti",
-    "acceptSome": "Accetta per {{count}}",
-    "all": {
-      "label": "Decidi tutte le proposte",
-      "accept": "Accetta tutte",
-      "refuse": "Rifiuta tutte",
-      "acceptAsk_one": "Accettare la proposta? Vale subito.",
-      "acceptAsk_many": "Accettare le {{count}} proposte? Ognuna vale subito.",
-      "acceptAsk_other": "Accettare le {{count}} proposte? Ognuna vale subito.",
-      "refuseAsk_one": "Rifiutare la proposta? L'agente non la proporrà più.",
-      "refuseAsk_many": "Rifiutare le {{count}} proposte? Gli agenti non le proporranno più.",
-      "refuseAsk_other": "Rifiutare le {{count}} proposte? Gli agenti non le proporranno più.",
-      "acceptGo_one": "Accetta",
-      "acceptGo_many": "Accetta le {{count}}",
-      "acceptGo_other": "Accetta le {{count}}",
-      "refuseGo_one": "Rifiuta",
-      "refuseGo_many": "Rifiuta le {{count}}",
-      "refuseGo_other": "Rifiuta le {{count}}"
-    },
-    "staleSome_one": "Una non è stata accettata: il suo testo è cambiato dopo la proposta.",
-    "staleSome_many": "{{count}} non sono state accettate: il loro testo è cambiato dopo la proposta.",
-    "staleSome_other": "{{count}} non sono state accettate: il loro testo è cambiato dopo la proposta.",
-    "staleSomeAgent_one": "Una non è stata accettata: l'agente è cambiato dopo la proposta.",
-    "staleSomeAgent_many": "{{count}} non sono state accettate: gli agenti sono cambiati dopo la proposta.",
-    "staleSomeAgent_other": "{{count}} non sono state accettate: gli agenti sono cambiati dopo la proposta.",
-    "waitingFor": "In attesa di {{name}}",
+    "reviewing": "In valutazione…",
+    "appliedByAgent": "Applicato da {{name}}",
+    "appliedByAgent_female": "Applicato da {{name}}",
+    "appliedAuto": "Applicato automaticamente",
+    "leftOutBy": "Scartato da {{name}}",
+    "leftOutBy_female": "Scartato da {{name}}",
+    "leftOut": "Scartato",
+    "undoneBy": "Annullato da {{name}}",
+    "undoneByYou": "Annullato da te",
+    "undo": "Annulla",
+    "appliedSome": "{{done}} di {{total}} applicati",
     "waitingAdmin": "In attesa di un admin",
     "stale": "Superata",
-    "staleError": "Questa proposta è superata: il testo è cambiato dopo che è stata fatta. L'elenco è stato aggiornato.",
-    "staleNote": "Il testo è cambiato dopo questa proposta, quindi non si può più accettare.",
-    "staleErrorAgent": "Questa proposta è superata: l'agente è cambiato dopo che è stata fatta. L'elenco è stato aggiornato.",
-    "staleNoteAgent": "L'agente è cambiato dopo questa proposta, quindi non si può più accettare.",
+    "staleNote": "Il testo è cambiato dopo questa proposta, quindi non si può più applicare.",
+    "staleNoteAgent": "L'agente è cambiato dopo questa proposta, quindi non si può più applicare.",
     "accepted": "Accettata",
     "refused": "Rifiutata",
-    "acceptedSome": "{{done}} di {{total}} accettate",
-    "acceptedBy": "Accettata da {{name}} · {{when}}",
-    "refusedBy": "Rifiutata da {{name}} · {{when}}",
-    "acceptedByYou": "Accettata da te · {{when}}",
-    "refusedByYou": "Rifiutata da te · {{when}}",
     "why": "Perché",
     "change": "Modifica a {{target}}",
     "changeLabel": "Modifica proposta",
-    "editFirst": "Modifica prima di accettare",
-    "viewDiff": "Vedi differenze",
-    "finalText": "Testo finale delle istruzioni",
-    "finalTextContext": "Testo finale del contesto",
-    "accept": "Accetta modifica",
-    "acceptEdited": "Accetta con modifiche",
-    "refuse": "Rifiuta",
-    "refuseNote": "Rifiutando, insegni a {{name}} a non proporlo di nuovo.",
     "added": "Aggiunto: ",
     "removed": "Rimosso: ",
     "sameLines_one": "{{count}} riga invariata",
     "sameLines_many": "{{count}} righe invariate",
     "sameLines_other": "{{count}} righe invariate",
-    "empty": "Quando qualcuno chiede una modifica a un agente, o una lezione si ripete, la proposta compare qui.",
-    "emptyTitle": "Niente da rivedere",
+    "empty": "Quando un agente migliora le sue istruzioni o quelle di un collega, la modifica compare qui, con Annulla.",
+    "emptyTitle": "Ancora nessuna modifica",
     "titleInstructions": "Aggiorna le istruzioni di {{name}}",
     "titleRole": "Cambia il ruolo di {{name}}",
     "titleAccess": "Cambia gli accessi di {{name}}",
@@ -11178,7 +11105,80 @@
       "text": "Gli agenti continuano a lavorare anche senza."
     }
   },
+  "aiHub": {
+    "tab": "Account IA",
+    "usageTab": "Utilizzo",
+    "accounts": "Account",
+    "accountsHint": "Ogni piano e chiave API con cui gli agenti possono pensare, chiunque l'abbia collegato.",
+    "apiKey": "Chiave API",
+    "of": "di {{name}}",
+    "moreSpeed": "Velocità e finestra di contesto",
+    "whoThinks": "Chi pensa",
+    "bulk": {
+      "sub": "Scegli l'IA e poi gli agenti che la usano."
+    },
+    "choice": {
+      "workspace": "Quella dello spazio di lavoro",
+      "none": "Scegli un account",
+      "search": "Cerca per nome, IA, piano o proprietario",
+      "noMatch": "Nessun account corrisponde.",
+      "noModel": "Nessun modello corrisponde.",
+      "groups": {
+        "yours": "Tuoi",
+        "others": "Del team",
+        "keys": "Dello spazio di lavoro"
+      }
+    },
+    "order": {
+      "title": "Ordine di utilizzo",
+      "tip": "Quale account usano prima gli agenti",
+      "sub": "Al limite, gli agenti passano all'account successivo.",
+      "group": "{{maker}} · {{computer}}",
+      "signedOut": "Disconnesso · saltato",
+      "skipped": "Saltato",
+      "fallback": "Continuare con la chiave API quando tutti i piani sono al limite",
+      "fallbackHint": "Spento: gli agenti aspettano il rinnovo del primo piano. Acceso: continuano con la chiave API dello spazio di lavoro, pagata a consumo. Mai per una missione."
+    },
+    "detail": {
+      "limits": "Limiti",
+      "noLimits": "Limiti non ancora letti.",
+      "permissions": "Autorizzazioni",
+      "saved": "Autorizzazioni salvate.",
+      "more": "Altro per {{name}}",
+      "manage": "Gestire",
+      "manageLine": "Rinominare, accedere di nuovo, rimuovere",
+      "manageHint": "Chi può rinominare questo account, accedervi di nuovo, rimuoverlo e cambiare queste autorizzazioni.",
+      "use": "Usare negli agenti",
+      "useLine": "Sceglierlo in Chi pensa",
+      "useHint": "Gli agenti di chi possono pensare con questo account.",
+      "reply": "Rispondere a tutti",
+      "replyLine": "Con chi parlano gli agenti",
+      "replyHint": "A chi risponde un agente su questo account oltre al suo proprietario.",
+      "claudeTerms": "Secondo i termini di Claude, un piano personale è di una persona. Condividerlo è una zona grigia.",
+      "pickRoles": "Le persone che hanno questi ruoli.",
+      "pickPeople": "Oltre al proprietario dell'account.",
+      "searchRoles": "Cerca ruoli",
+      "searchPeople": "Cerca persone",
+      "nobody": "Nessuno da scegliere."
+    },
+    "modes": {
+      "owner": "Solo tu",
+      "ownerOf": "Solo {{name}}",
+      "admins": "Tu e gli admin",
+      "adminsOf": "{{name}} e gli admin",
+      "roles": "Ruoli…",
+      "people": "Persone…",
+      "everyone": "Tutti",
+      "replyOwner": "Solo il proprietario dell'agente"
+    }
+  },
   "aiAccounts": {
+    "useReason": {
+      "signed_out": "Disconnesso",
+      "owner_left": "{{owner}} ha lasciato il workspace",
+      "owner_only": "Lo usa solo {{owner}}",
+      "not_allowed": "Non aperto ai tuoi agenti"
+    },
     "unnamed": "Account senza nome",
     "rename": {
       "action": "Rinomina {{label}}",
@@ -13288,7 +13288,6 @@
     "count_other": "{{count}} elementi",
     "searchHint": "Scorciatoia per cercare",
     "who": "Creato da",
-    "everyone": "Tutti",
     "kindMany": {
       "document": "Documenti",
       "table": "Tabelle",
@@ -13306,8 +13305,10 @@
     "view": "Vista",
     "viewGrid": "Griglia",
     "viewList": "Elenco",
-    "arrange": "Disponi",
-    "arrangeValue": "Disponi: {{group}}",
+    "display": "Visualizzazione",
+    "displayValue": "Visualizzazione: {{view}} · {{group}}",
+    "filterButton": "Filtro",
+    "filterValue": "{{filter}}: {{value}}",
     "groupBy": "Raggruppa per",
     "group": {
       "date": "Data",
@@ -13776,7 +13777,6 @@
     "added": "{{repo}} entra nell'elenco quando salvi."
   },
   "connectors": {
-    "title": "Connettori",
     "store": {
       "featured": "In evidenza",
       "suggested": "Suggerito",
@@ -13823,6 +13823,7 @@
       "addressPassword": "Indirizzo e password",
       "composio": "Tramite Composio"
     },
+    "title": "Connettori",
     "add": "Aggiungi connettore",
     "personal": {
       "note": "Solo tu apri queste connessioni. I tuoi agenti le usano solo quando glielo chiedi.",
@@ -16348,6 +16349,12 @@
     "teamProposal": {
       "undoExpired": "È passato più di un giorno da quando questo team è stato creato, quindi non si può annullare qui. Archivia gli agenti dalle loro pagine."
     },
+    "proposal": {
+      "changed": "È cambiato dopo essere stato applicato: sistemalo a mano.",
+      "notApplied": "Questa modifica non è stata applicata, quindi non c'è niente da annullare.",
+      "notUndoable": "Un agente eliminato non può tornare.",
+      "notAllowed": "Solo chi può fare questa modifica può annullarla."
+    },
     "agentProposal": {
       "decided": "Qualcuno ha già deciso su questa proposta.",
       "expired": "Questa proposta è scaduta: nessuno l'ha decisa entro un giorno.",
@@ -16600,6 +16607,7 @@
     "account": {
       "notRestorable": "Questo account non si può più ripristinare.",
       "notOwner": "Solo chi ha collegato questo account o piano può farlo.",
+      "permissionForbidden": "Solo il proprietario dell'account, un admin o chi può gestirlo può cambiarlo.",
       "orderForbidden": "Solo chi ha collegato questo account o un admin può cambiarne il posto nell'ordine."
     },
     "channel": {
