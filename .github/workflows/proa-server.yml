@@ -1,0 +1,152 @@
+# Proa server image, built from a proa/X.Y.Z tag with the brand applied and pushed to this repository's own package
+# (ghcr.io/<owner>/proa: :X.Y.Z, and :latest for the newest tag), for linux/amd64 and linux/arm64 on native runners.
+# Servers pull it instead of building on a Mac (scripts/proa/build-server.sh stays as the local way).
+#
+# The brand is applied as for the desktop (brand/build.sh --target none: the server's defaults, names and art), then the
+# repository's own Dockerfile builds the branded tree. Repository variables BRAND_APP_ID and BRAND_DESKTOP_ID hold the
+# app ids (brand/profiles/proa/brand.env.example); BRAND_REPO is this repository.
+name: Proa server
+
+on:
+  push:
+    tags: ["proa/*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build (proa/X.Y.Z)"
+        type: string
+        required: true
+      latest:
+        description: "Also tag the image :latest"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: proa-server-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Image (${{ matrix.slug }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            slug: amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            slug: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Version from the tag
+        id: v
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          VERSION="${TAG#proa/}"
+          [[ "$TAG" == proa/* && "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::$TAG is not proa/X.Y.Z"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${OWNER,,}/proa" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: refs/tags/${{ steps.v.outputs.tag }}
+
+      - name: The tag's commit
+        id: rev
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Apply the brand
+        shell: bash
+        env:
+          BRAND_VERSION: ${{ steps.v.outputs.version }}
+          BRAND_APP_ID: ${{ vars.BRAND_APP_ID }}
+          BRAND_DESKTOP_ID: ${{ vars.BRAND_DESKTOP_ID }}
+        run: brand/build.sh --profile brand/profiles/proa --out "$RUNNER_TEMP/proa" --target none
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ runner.temp }}/proa
+          platforms: ${{ matrix.platform }}
+          labels: |
+            org.opencontainers.image.title=Proa
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.url=https://github.com/${{ github.repository }}/tree/${{ steps.v.outputs.tag }}
+            org.opencontainers.image.revision=${{ steps.rev.outputs.sha }}
+            org.opencontainers.image.version=${{ steps.v.outputs.version }}
+            org.opencontainers.image.licenses=AGPL-3.0-only
+          outputs: type=image,name=${{ steps.v.outputs.image }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=proa-${{ matrix.slug }}
+          cache-to: type=gha,scope=proa-${{ matrix.slug }},mode=max
+
+      - name: Keep the digest
+        shell: bash
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: mkdir -p "$RUNNER_TEMP/digests" && touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: proa-digest-${{ matrix.slug }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Tag the image
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: proa-digest-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/digests
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: One tag for both platforms
+        shell: bash
+        working-directory: ${{ runner.temp }}/digests
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+          OWNER: ${{ github.repository_owner }}
+          LATEST: ${{ github.event_name == 'push' || inputs.latest }}
+        run: |
+          image="ghcr.io/${OWNER,,}/proa"
+          version="${TAG#proa/}"
+          tags=(-t "$image:$version")
+          [ "$LATEST" = true ] && tags+=(-t "$image:latest")
+          docker buildx imagetools create "${tags[@]}" $(printf "$image@sha256:%s " *)
+          docker buildx imagetools inspect "$image:$version"
