@@ -201,6 +201,17 @@ describe("Notificações", () => {
     expect(title.nextElementSibling?.textContent).toBe("2 não lidas");
   });
 
+  test("the title never wraps to keep the filter beside it: the filter goes under it, on a phone too, at its own width", async () => {
+    const css = (await Bun.file(new URL("../src/pages/notifications.css", import.meta.url).pathname).text()).replace(
+      /\/\*[\s\S]*?\*\//g,
+      "",
+    );
+    // The header's row wraps as every page's does (the kit's rule), with nothing here holding it on one line.
+    expect(css).not.toMatch(/\.ib-head \.ac-pagehead__(row|text) \{/);
+    expect(css).not.toMatch(/\.nt \.ac-pagehead__actions \{/);
+    expect(css).toMatch(/\.ib-head \.ac-pagehead__actions \{[^}]*flex-basis: auto;/);
+  });
+
   test("what waits on top with the first of it open beside the list, the rest by day, the sidebar's entry and the tab title", async () => {
     const { state, router } = await go();
     const title = screen().getByRole("heading", { level: 1, name: "Caixa de entrada" });

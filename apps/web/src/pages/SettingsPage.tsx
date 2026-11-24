@@ -335,17 +335,20 @@ function Settings({
   return (
     <div className="settings page-split">
       <nav className="settings__nav" data-scroll-restoration-id="settings-nav" aria-label={t("settings.nav")}>
-        <div className="settings__head">
-          <h1 className="settings__title">{t("settings.title")}</h1>
-          {/* Whose settings: the workspace's, by its mark and name; a personal workspace's are the person's own and
-              name no workspace (ADR 0159). */}
-          {!personal && (
-            <span className="settings__org ac-iconline">
-              <OrgMark logo={org.logo} size={18} />
-              <span>{org.name}</span>
-            </span>
-          )}
-        </div>
+        {/* The pages' own header, as the inbox's list has. Whose settings: the workspace's, by its mark and name; a
+            personal workspace's are the person's own and name no workspace (ADR 0159). */}
+        <PageHeader
+          className="settings__head"
+          title={t("settings.title")}
+          meta={
+            personal ? undefined : (
+              <span className="settings__org ac-iconline">
+                <OrgMark logo={org.logo} size={18} />
+                <span>{org.name}</span>
+              </span>
+            )
+          }
+        />
         <div className="settings__groups" ref={strip}>
           <div className="settings__group">
             <ul>{nav.main.map(link)}</ul>

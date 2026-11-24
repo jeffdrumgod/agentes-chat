@@ -4442,24 +4442,13 @@ html:not([data-pointer]) .sidebar__org-button:focus-visible {
   flex-direction: column;
   gap: var(--space-4);
 }
+/* The pages' header (`PageHeader`), its words in line with the links' icons. */
 .settings__head {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
   padding: 0 10px;
-}
-.settings__title {
-  margin: 0;
-  font-size: 20px;
-  line-height: 26px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
 }
 /* The workspace's name wraps under the mark, which stays on its first line: a long one never widens the nav. */
 .settings__org {
   min-width: 0;
-  color: var(--ink-muted);
-  font-size: 13px;
 }
 .settings__org > span {
   min-width: 0;
