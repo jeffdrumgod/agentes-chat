@@ -925,6 +925,8 @@ export function Sidebar() {
       <div
         className="sidebar__scroll"
         ref={navRef}
+        // Its lists show together once the channels, the agents and the DMs are in: no section pushes the next down.
+        data-pending={channels.isLoading || dir.loading || dms.isLoading || undefined}
         onKeyDown={(e) => spaceEvent(e) && sidebarMenu.onKeyDown(e)}
         onContextMenu={(e) => spaceEvent(e) && sidebarMenu.onContextMenu(e)}
       >

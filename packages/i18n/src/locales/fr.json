@@ -54,6 +54,13 @@
     "offline": "Vous êtes hors ligne. Vérifiez votre connexion et réessayez.",
     "unreachable": "Impossible de joindre agentes.chat pour le moment. Réessayez dans un instant."
   },
+  "reconnect": {
+    "device": "Reconnexion… Pas d'internet sur cet appareil.",
+    "server": "Reconnexion… Le serveur est injoignable ou redémarre.",
+    "signedOut": "Vous êtes déconnecté.",
+    "retry": "Réessayer maintenant",
+    "signIn": "Se connecter"
+  },
   "roles": {
     "owner": "Propriétaire",
     "admin": "Admin",

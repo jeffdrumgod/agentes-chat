@@ -69,6 +69,13 @@ export const ptBR = {
     offline: "Você está sem internet. Confira a conexão e tente de novo.",
     unreachable: "Sem conexão com o agentes.chat agora. Tente de novo em instantes.",
   },
+  reconnect: {
+    device: "Reconectando… Sem internet neste aparelho.",
+    server: "Reconectando… O servidor não responde ou está reiniciando.",
+    signedOut: "Sua sessão terminou.",
+    retry: "Tentar agora",
+    signIn: "Entrar",
+  },
   roles: {
     owner: "Dono",
     admin: "Admin",

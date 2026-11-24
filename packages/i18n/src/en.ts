@@ -68,6 +68,14 @@ export const en = {
     offline: "You're offline. Check your connection and try again.",
     unreachable: "Can't reach agentes.chat right now. Try again in a moment.",
   },
+  /** The pill a dropped live connection shows after two quiet minutes: its cause and one way out. */
+  reconnect: {
+    device: "Reconnecting… No internet on this device.",
+    server: "Reconnecting… The server is unreachable or restarting.",
+    signedOut: "You're signed out.",
+    retry: "Try again now",
+    signIn: "Sign in",
+  },
   roles: {
     owner: "Owner",
     admin: "Admin",

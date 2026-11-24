@@ -628,6 +628,11 @@ html:not([data-pointer]) .consult-pair__row:focus-visible {
   flex-direction: column;
   gap: 16px;
 }
+/* Until the channels, the agents and the DMs are all in (Sidebar.tsx): laid out but unseen, then shown together. The
+   tools on top stay (nothing above them moves). */
+.sidebar__scroll[data-pending] > :not([data-section="tools"]:first-child) {
+  visibility: hidden;
+}
 .sidebar__scroll {
   position: relative;
   flex: 1 1 auto;
@@ -15964,5 +15969,50 @@ html:not([data-pointer]) .store-back:focus-visible {
   .store-page__title h3 {
     font-size: 24px;
     line-height: 30px;
+  }
+}
+
+/* A live connection down for two minutes: a small pill over the top of the work area, its cause and one way out. */
+.reconnect-pill {
+  position: fixed;
+  top: var(--space-3);
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-3);
+  max-width: calc(100vw - 2 * var(--space-4));
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  /* Round on one line, still round-cornered when the words take two on a phone. */
+  border-radius: 20px;
+  background: var(--glass-solid);
+  box-shadow: var(--e2);
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.reconnect-pill__text {
+  display: flex;
+  /* Too narrow for the words beside the button (a small phone): the button goes under them, at the end. */
+  flex: 1 1 16em;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.reconnect-pill__text > :last-child {
+  min-width: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reconnect-pill {
+    animation: reconnect-pill-in 0.2s var(--out) both;
+  }
+}
+@keyframes reconnect-pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
   }
 }

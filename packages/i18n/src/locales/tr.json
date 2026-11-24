@@ -54,6 +54,13 @@
     "offline": "Çevrimdışısınız. Bağlantınızı kontrol edip tekrar deneyin.",
     "unreachable": "agentes.chat'e şu anda ulaşılamıyor. Birazdan tekrar deneyin."
   },
+  "reconnect": {
+    "device": "Yeniden bağlanıyor… Bu cihazda internet yok.",
+    "server": "Yeniden bağlanıyor… Sunucuya ulaşılamıyor ya da yeniden başlatılıyor.",
+    "signedOut": "Oturumunuz kapandı.",
+    "retry": "Şimdi yeniden dene",
+    "signIn": "Giriş yap"
+  },
   "roles": {
     "owner": "Sahip",
     "admin": "Yönetici",

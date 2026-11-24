@@ -25,6 +25,7 @@ import {
   agentStateOfRun,
   browserHandoffOf,
   browserTrailOf,
+  cardsInto,
   codeSuggestionOf,
   consultsIn,
   desktopTrailOf,
@@ -519,6 +520,8 @@ export interface ChannelChrome {
    * and first cards, ADR 0137, which say it themselves).
    */
   intro?: ReactNode;
+  /** What the intro draws from (or who it is) is still loading: the conversation waits as its skeleton, then shows whole. */
+  introPending?: boolean;
   /** The composer's label and placeholder ("Responder na thread"). */
   composerLabel?: string;
   /** In place of the composer (an archived thread's read-only note). */
@@ -903,6 +906,11 @@ function ChannelView({
   const pushAsk = usePushAsk(thread || !isMember ? undefined : topLevel);
   // Read from the server (a thread's root the channel held stands in until then: its replies are still unknown).
   const serverRead = messages.isSuccess && !messages.isPlaceholderData;
+  // A thread whose replies are still loading: only their skeleton shows, never the root the channel holds above it,
+  // which the replies would push out of view. It opens on them, at its end, in one paint.
+  const repliesPending = Boolean(thread && messages.isPlaceholderData && thread.replyCount > 0);
+  // An agent's DM whose setup checklist still reads its data: shown with the messages once it can draw as it stays.
+  const introPending = Boolean(!thread && chrome?.introPending);
   // The channel's threads: closed lines, context marks, markers (not in a thread view or while adjusting).
   const listsThreads = readable && !thread;
   const openThreads = useChannelThreads(org.id, channel.id, "all", listsThreads);
@@ -1357,7 +1365,7 @@ function ChannelView({
     }
     setOlderState("loading");
     api.chat
-      .messages(org.id, channel.id, { before: oldest.createdAt, limit })
+      .messages(org.id, channel.id, { before: oldest.createdAt, limit, onCards: cardsInto(qc, org.id) })
       .then((page) => {
         // Keep what's on screen where it is: remember the distance from the bottom.
         const el = scroller.current;
@@ -1387,7 +1395,7 @@ function ChannelView({
     if (!gap || newerLoading || !newest) return;
     setNewerLoading(true);
     api.chat
-      .messages(org.id, channel.id, { after: newest.createdAt, limit: OLDER_PAGE })
+      .messages(org.id, channel.id, { after: newest.createdAt, limit: OLDER_PAGE, onCards: cardsInto(qc, org.id) })
       .then((page) => {
         const known = new Set(older.map((m) => m.id));
         const start = channelMessages.data?.[0]?.createdAt;
@@ -2183,7 +2191,7 @@ function ChannelView({
     if (around?.id === focusTarget) return;
     setAround({ id: focusTarget, done: false });
     api.chat
-      .messages(org.id, channel.id, { around: focusTarget, limit: FOCUS_PAGE })
+      .messages(org.id, channel.id, { around: focusTarget, limit: FOCUS_PAGE, onCards: cardsInto(qc, org.id) })
       .then((page) => {
         showAround(page);
         setAround({ id: focusTarget, done: true });
@@ -2902,8 +2910,8 @@ function ChannelView({
                             {/* Pushes short channels down, next to the composer. */}
                             <div className="channel__spacer" aria-hidden="true" />
                             {chrome?.top}
-                            {chrome?.intro}
-                            {messages.isLoading && <LoadingConversation />}
+                            {!introPending && chrome?.intro}
+                            {(messages.isLoading || introPending) && <LoadingConversation />}
                             {messages.isError && !messages.data && (
                               <ErrorState error={messages.error} onRetry={() => void messages.refetch()} />
                             )}
@@ -2972,8 +2980,9 @@ function ChannelView({
                             ) : (
                               <>
                                 <Timeline
-                                  items={timeline}
-                                  ready={serverRead}
+                                  items={repliesPending || introPending ? NO_ROWS : timeline}
+                                  // Held rows aren't its first load: counted then, they would all enter as new ones.
+                                  ready={serverRead && !repliesPending && !introPending}
                                   slots={gap ? NO_SLOTS : slots}
                                   runKeys={runKeys.current}
                                   divider={divider}
@@ -2986,9 +2995,8 @@ function ChannelView({
                                   progressive={opensAtEnd}
                                   openThreadId={panel?.id ?? null}
                                 />
-                                {/* A thread's root is on screen from the channel: only its replies are loading. */}
-                                {thread && messages.isPlaceholderData && thread.replyCount > 0 && (
-                                  <LoadingConversation count={Math.min(thread.replyCount, 6)} />
+                                {repliesPending && (
+                                  <LoadingConversation count={Math.min((thread?.replyCount ?? 0) + 1, 6)} />
                                 )}
                                 {!thread && (
                                   <ArchivedThreadsNote
@@ -3346,6 +3354,7 @@ function ChannelView({
                         channel={channel}
                         people={channelPeople}
                         agents={channelAgents}
+                        pending={!members.data || dir.loading}
                         {...(addsMembers ? { onAdd: addMembers } : {})}
                       />
                     )
@@ -3756,6 +3765,7 @@ const HELD_RECENT_MS = 12 * 60 * 60_000;
 const NO_LABELS = new Map<string, string>();
 const NO_MARKS: ReadonlySet<string> = new Set();
 const NO_SLOTS: RunSlot[] = [];
+const NO_ROWS: ReturnType<typeof buildTimeline> = [];
 
 /** The live run as a message, while it has none (the block's header comes from the run): from when it started. */
 function liveMessageOf(r: LiveRun): MessageType {

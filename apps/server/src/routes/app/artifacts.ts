@@ -314,7 +314,7 @@ const Folder = z
 const FolderParams = OrgParams.extend({ folderId: z.uuid() });
 const FolderName = z.string().trim().min(1).max(120);
 
-const Poll = z
+export const Poll = z
   .object({
     id: z.string(),
     closesAt: z.string(),
@@ -324,7 +324,7 @@ const Poll = z
   })
   .openapi("Poll");
 
-const BlockState = z
+export const BlockState = z
   .object({
     id: z.string(),
     version: z.number(),
@@ -342,7 +342,7 @@ const BlockState = z
   })
   .openapi("BlockState");
 
-const Choices = z
+export const Choices = z
   .object({
     id: z.string(),
     answer: z
@@ -363,7 +363,7 @@ const Choices = z
   })
   .openapi("Choices");
 
-const ArtifactDetail = Artifact.extend({
+export const ArtifactDetail = Artifact.extend({
   shownVersion: z.number(),
   content: Content,
   versioned: z.boolean().openapi({

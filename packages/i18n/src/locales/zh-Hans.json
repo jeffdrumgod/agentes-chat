@@ -54,6 +54,13 @@
     "offline": "你已离线，请检查网络连接后重试。",
     "unreachable": "暂时无法连接 agentes.chat，请稍后再试。"
   },
+  "reconnect": {
+    "device": "正在重新连接… 此设备没有网络连接。",
+    "server": "正在重新连接… 服务器无法访问或正在重启。",
+    "signedOut": "你已退出登录。",
+    "retry": "立即重试",
+    "signIn": "登录"
+  },
   "roles": {
     "owner": "所有者",
     "admin": "管理员",

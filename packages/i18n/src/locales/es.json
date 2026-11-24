@@ -54,6 +54,13 @@
     "offline": "No tienes conexión. Revísala e intenta de nuevo.",
     "unreachable": "No se puede conectar con agentes.chat ahora. Intenta de nuevo en un momento."
   },
+  "reconnect": {
+    "device": "Reconectando… Sin internet en este dispositivo.",
+    "server": "Reconectando… El servidor no responde o se está reiniciando.",
+    "signedOut": "Tu sesión terminó.",
+    "retry": "Reintentar ahora",
+    "signIn": "Iniciar sesión"
+  },
   "roles": {
     "owner": "Propietario",
     "admin": "Admin",

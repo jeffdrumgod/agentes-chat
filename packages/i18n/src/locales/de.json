@@ -54,6 +54,13 @@
     "offline": "Du bist offline. Prüf deine Verbindung und versuch es noch einmal.",
     "unreachable": "agentes.chat ist gerade nicht erreichbar. Versuch es gleich noch einmal."
   },
+  "reconnect": {
+    "device": "Neu verbinden… Kein Internet auf diesem Gerät.",
+    "server": "Neu verbinden… Der Server ist nicht erreichbar oder startet neu.",
+    "signedOut": "Du bist abgemeldet.",
+    "retry": "Jetzt erneut versuchen",
+    "signIn": "Anmelden"
+  },
   "roles": {
     "owner": "Inhaber",
     "admin": "Admin",

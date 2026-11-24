@@ -54,6 +54,13 @@
     "offline": "Kamu sedang offline. Periksa koneksimu dan coba lagi.",
     "unreachable": "agentes.chat tidak bisa dijangkau sekarang. Coba lagi sebentar lagi."
   },
+  "reconnect": {
+    "device": "Menghubungkan ulang… Tidak ada internet di perangkat ini.",
+    "server": "Menghubungkan ulang… Server tidak terjangkau atau sedang dimulai ulang.",
+    "signedOut": "Anda sudah keluar.",
+    "retry": "Coba lagi sekarang",
+    "signIn": "Masuk"
+  },
   "roles": {
     "owner": "Pemilik",
     "admin": "Admin",

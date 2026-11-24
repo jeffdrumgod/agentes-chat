@@ -7,8 +7,10 @@ import {
   useAiStatus,
   useApi,
   useCatalog,
+  useChannels,
   useConfirmSetup,
   useCredentials,
+  useDms,
   useModels,
   usePlatformKey,
   useRoles,
@@ -135,6 +137,26 @@ export function useSetupSteps(agent: Agent | undefined): AgentSetupStep[] {
     : [];
   // Alone in a personal workspace there are no group conversations in sight either: no "where" (ADR 0164).
   return solo ? steps.filter((s) => s !== "who" && s !== "where") : steps;
+}
+
+/**
+ * Whether what the checklist reads has come (or failed), read as its agent's DM opens: the DM holds its conversation
+ * until then, so the checklist draws once, done or not, instead of turning over above the messages.
+ */
+export function useSetupSettled(agent: Agent | undefined): boolean {
+  const { org } = useOrg();
+  const dir = useDirectory(org.id);
+  const steps = useSetupSteps(agent);
+  const on = agent !== undefined && steps.length > 0;
+  const status = useAiStatus(org.id, on);
+  const detail = useAgentDetail(org.id, agent?.id ?? "", on);
+  const channels = useChannels(org.id);
+  const dms = useDms(org.id);
+  const apps = on && agent !== undefined && managesAgent(agent) && steps.includes("apps");
+  const access = useAgentAccess(org.id, agent?.id ?? "", apps);
+  if (!on) return true;
+  const read = [status, detail, channels, dms, ...(apps ? [access] : [])];
+  return !dir.loading && read.every((q) => !q.isPending);
 }
 
 /**

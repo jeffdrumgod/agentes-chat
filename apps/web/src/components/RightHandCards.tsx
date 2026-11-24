@@ -543,7 +543,7 @@ export function OpenPageCardView({ card }: { card: OpenPageCard }) {
  * The right hand's card of a change in the workspace (`workspace_action`): what it does in the app's own words (never
  * only the agent's), applied as whoever clicks with the permissions its screen checks; Descartar for the person it was
  * for or whoever may. Who can't reads who may, and the person it was for sends it to them. Decided, one line with who
- * did it and, while it lasts, Desfazer on its receipt.
+ * did it and when.
  */
 export function WorkspaceActionCardView({
   where,
@@ -554,14 +554,13 @@ export function WorkspaceActionCardView({
   where: { messageId: string; channelId: string };
   agentId: string | null;
   card: WorkspaceActionCard;
-  /** The card message's receipts: its Desfazer once applied. */
+  /** The card message's receipts: whether it was undone. */
   actions?: AgentAction[];
 }) {
   const { t, i18n } = useTranslation();
   const { org, me } = useOrg();
   const dir = useDirectory(org.id);
   const decide = useDecideActionCard(org.id, { ...where, action: card.params.action });
-  const undo = useAgentActions(org.id, where.channelId).undo;
   const toast = useToast();
   const failed = (e: unknown) => toast.show(errorText(t, e), "error");
   const label = t("rightHand.action.title");
@@ -579,11 +578,10 @@ export function WorkspaceActionCardView({
   const mine = card.forUserId === me.user.id;
   // Whoever applies it for someone else reads who asked, in the conversation and in their inbox.
   const asker = mine ? undefined : dir.memberById.get(card.forUserId)?.name;
-  // Decided: the same card, and who did it, when and Desfazer where the buttons were.
+  // Decided: the same card, and who did it and when where the buttons were.
   let answer: RequestAnswer | undefined;
   if (card.state !== "pending") {
     const receipt = actions?.find((a) => a.kind === "workspace.changed");
-    const undoable = receipt && !receipt.undoneAt && Date.parse(receipt.undoableUntil) > Date.now();
     const byMe = card.decidedByUserId === me.user.id;
     const name = dir.memberById.get(card.decidedByUserId ?? "")?.name ?? "";
     const who =
@@ -598,16 +596,6 @@ export function WorkspaceActionCardView({
       done: card.state === "applied" && !receipt?.undoneAt,
       text: receipt?.undoneAt ? `${who} · ${t("rightHand.card.undone")}` : who,
       time: card.decidedAt ? formatTime(i18n.language, card.decidedAt) : undefined,
-      action: undoable && (
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={undo.isPending}
-          onClick={() => undo.mutate(receipt.id, { onError: failed })}
-        >
-          {t("rightHand.card.undo")}
-        </Button>
-      ),
     };
   }
   const decision = may ? (

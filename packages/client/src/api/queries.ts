@@ -180,6 +180,7 @@ import type {
   Member,
   Memory,
   Message,
+  MessageCards,
   MessagePin,
   ModelTier,
   MoveAgentsInput,
@@ -1726,7 +1727,7 @@ export const messagesQuery = (api: ApiClient, orgId: string, channelId: string) 
     queryFn: async ({ client, queryKey }) => {
       const start = client.getQueryData<Message[]>(queryKey);
       return withLocalCopies(
-        await api.chat.messages(orgId, channelId, { limit: MESSAGES_PAGE }),
+        await api.chat.messages(orgId, channelId, { limit: MESSAGES_PAGE, onCards: cardsInto(client, orgId) }),
         client.getQueryData<Message[]>(queryKey),
         outbox.has,
         start,
@@ -1735,6 +1736,25 @@ export const messagesQuery = (api: ApiClient, orgId: string, channelId: string) 
     staleTime: 30_000,
     gcTime: 30 * 60_000,
   });
+
+/**
+ * A page's cards (`include=cards`) into the caches their cards read (`useArtifact`, `usePoll`, `useChoices`,
+ * `useSharedBlock`): they draw whole with the messages, never a placeholder that changes size after. A card shown at
+ * its head is kept under the head's key too, which is what a ref with no version reads.
+ */
+export function seedCards(qc: QueryClient, orgId: string, cards: MessageCards) {
+  for (const a of cards.artifacts) {
+    qc.setQueryData(keys.artifact(orgId, a.id, a.shownVersion), a);
+    if (a.shownVersion === a.version) qc.setQueryData(keys.artifact(orgId, a.id), a);
+  }
+  for (const p of cards.polls) qc.setQueryData(keys.poll(orgId, p.id), p);
+  for (const c of cards.choices) qc.setQueryData(keys.choices(orgId, c.id), c);
+  for (const b of cards.blocks)
+    qc.setQueryData<BlockState>(keys.blockState(orgId, b.id, b.version), (old) => newerBlockState(old, b));
+}
+
+/** `onCards` for a page read: its cards into the caches. */
+export const cardsInto = (qc: QueryClient, orgId: string) => (cards: MessageCards) => seedCards(qc, orgId, cards);
 
 export const useMessages = (orgId: string, channelId: string, enabled = true) => {
   const api = useApi();
@@ -2081,7 +2101,11 @@ export async function catchUpChannel(
   const held = recent ? idsInLists(qc, prefix) : null;
   const read = (rootId: string | null, page: number) => {
     const ask = (limit: number) =>
-      api.chat.messages(orgId, channelId, rootId ? { threadId: rootId, limit } : { limit });
+      api.chat.messages(orgId, channelId, {
+        ...(rootId ? { threadId: rootId } : {}),
+        limit,
+        onCards: cardsInto(qc, orgId),
+      });
     if (!recent || !held) return ask(page);
     return ask(recent).then((latest) => {
       // A thread's read starts with its root whatever the limit: only its replies tell how far back it reached.
@@ -4159,12 +4183,13 @@ export function useRemoveCredentialCopies(orgId: string) {
   });
 }
 
-export const useAgentDetail = (orgId: string, agentId: string) => {
+export const useAgentDetail = (orgId: string, agentId: string, enabled = true) => {
   const api = useApi();
   return useQuery({
     queryKey: keys.agentDetail(orgId, agentId),
     queryFn: () => api.agents.detail(orgId, agentId),
     staleTime: 15_000,
+    enabled,
   });
 };
 
@@ -7153,7 +7178,11 @@ export const threadMessagesQuery = (api: ApiClient, orgId: string, channelId: st
     queryKey: keys.thread(orgId, channelId, rootId),
     queryFn: async ({ client, queryKey }) => {
       const start = client.getQueryData<Message[]>(queryKey);
-      const read = await api.chat.messages(orgId, channelId, { threadId: rootId, limit: THREAD_PAGE });
+      const read = await api.chat.messages(orgId, channelId, {
+        threadId: rootId,
+        limit: THREAD_PAGE,
+        onCards: cardsInto(client, orgId),
+      });
       return withLocalCopies(read, client.getQueryData<Message[]>(queryKey), outbox.has, start);
     },
     staleTime: 30_000,

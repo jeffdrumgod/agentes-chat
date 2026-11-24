@@ -166,6 +166,7 @@ import type {
   Memory,
   Message,
   MessageCard,
+  MessageCards,
   MessagePin,
   Mission,
   MissionBrain,
@@ -1188,10 +1189,11 @@ export function createHttpApi(options: TransportOptions = {}): HttpApi {
         })) ?? null,
       messages: async (orgId, channelId, options = {}) => {
         const path = `${org(orgId)}/channels/${enc(channelId)}/messages`;
-        const { threadId, before, after, around, limit } = options;
-        const query = { threadId, before, after, around, limit };
-        const { messages } = await request<{ messages: Message[] }>(path, { query });
+        const { threadId, before, after, around, limit, onCards } = options;
+        const query = { threadId, before, after, around, limit, include: onCards ? "cards" : undefined };
+        const { messages, cards } = await request<{ messages: Message[]; cards?: MessageCards }>(path, { query });
         steerStore.seed(channelId, messages);
+        if (cards) onCards?.(cards);
         return messages;
       },
       post: async (orgId, channelId, input) => {

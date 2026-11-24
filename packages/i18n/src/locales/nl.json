@@ -54,6 +54,13 @@
     "offline": "Je bent offline. Controleer je verbinding en probeer het opnieuw.",
     "unreachable": "agentes.chat is nu niet bereikbaar. Probeer het zo opnieuw."
   },
+  "reconnect": {
+    "device": "Opnieuw verbinden… Geen internet op dit apparaat.",
+    "server": "Opnieuw verbinden… De server is onbereikbaar of start opnieuw op.",
+    "signedOut": "Je bent uitgelogd.",
+    "retry": "Nu opnieuw proberen",
+    "signIn": "Inloggen"
+  },
   "roles": {
     "owner": "Eigenaar",
     "admin": "Beheerder",

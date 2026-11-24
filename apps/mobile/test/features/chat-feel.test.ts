@@ -163,7 +163,9 @@ describe("older pages", () => {
   });
 
   test("going to a message reads the page around it at any distance; a failed read says so, a 404 says it's gone", () => {
-    expect(chat).toContain(".messages(orgId, channelId, { around: seek, limit: SEEK_PAGE })");
+    expect(chat).toContain(
+      ".messages(orgId, channelId, { around: seek, limit: SEEK_PAGE, onCards: cardsInto(qc, orgId) })",
+    );
     expect(chat).toContain("const gone = error === undefined || (error instanceof ApiError && error.status === 404);");
     expect(chat).toContain('toast({ title: gone ? t("channel.jumpMissing") : t("common.loadFailed"), icon: "x" });');
     // Away from the latest page: newer pages as the person scrolls down, never pinned to that end.

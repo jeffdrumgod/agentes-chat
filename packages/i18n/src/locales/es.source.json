@@ -152,6 +152,21 @@
   "common.unreachable": {
     "value": "Can't reach agentes.chat right now. Try again in a moment."
   },
+  "reconnect.device": {
+    "value": "Reconnecting… No internet on this device."
+  },
+  "reconnect.server": {
+    "value": "Reconnecting… The server is unreachable or restarting."
+  },
+  "reconnect.signedOut": {
+    "value": "You're signed out."
+  },
+  "reconnect.retry": {
+    "value": "Try again now"
+  },
+  "reconnect.signIn": {
+    "value": "Sign in"
+  },
   "roles.owner": {
     "value": "Owner"
   },

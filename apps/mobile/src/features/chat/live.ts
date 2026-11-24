@@ -663,14 +663,14 @@ export function useChatLive(orgId: string, channelId: string, enabled: boolean, 
       applyToCache(qc, orgId, channelId, event, meRef.current);
       applyMembershipEvent(qc, orgId, event);
       // A file's cards (a deleted one says so) and an agent's memory list, as on the web.
-      applyConversationEvent(qc, orgId, event);
+      applyConversationEvent(qc, orgId, event, api);
     });
     // Left: shown again, it reads what it missed, as on the web. Back from the background, `onSubscribed` above does.
     return () => {
       off();
       close();
     };
-  }, [connection, enabled, orgId, channelId, qc, dispatch]);
+  }, [connection, enabled, orgId, channelId, qc, dispatch, api]);
 
   // Safety net, as on the web: a "pensando…" the server never confirmed doesn't spin forever; the
   // conversation resyncs instead (checked every 5 s while there is one).
