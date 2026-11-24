@@ -256,6 +256,60 @@
       ],
       "pattern": "agentes\\.([A-Za-z0-9-]+)\\.ts\\.net",
       "replace": "proa.$1.ts.net"
+    },
+    {
+      "why": "desktop downloads: Proa's releases are tagged proa/AA.M.N (the same tag as the apps), not desktop-v*",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "export const DESKTOP_TAG_PREFIX = \"desktop-v\";",
+      "replace": "export const DESKTOP_TAG_PREFIX = \"proa/\";"
+    },
+    {
+      "why": "desktop downloads: the Mac build as the Proa desktop workflow names it (fixed name, for the README's latest link)",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "export const dmgName = (version: string) => `agentes_${version}_universal.dmg`;",
+      "replace": "export const dmgName = (_version: string) => \"Proa-macOS.dmg\";"
+    },
+    {
+      "why": "desktop downloads: no updater bundle (the updater is off, local/updater-off)",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "export const updaterName = (version: string) => `agentes_${version}_universal.app.tar.gz`;",
+      "replace": "export const updaterName = (_version: string) => \"Proa-macOS.app.tar.gz\";"
+    },
+    {
+      "why": "desktop downloads: the Windows installers as the Proa desktop workflow names them",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "const installer = `agentes_${version}_${target === \"windows\" ? \"x64\" : \"arm64\"}-setup.exe`;",
+      "replace": "const installer = `Proa-Windows-${target === \"windows\" ? \"x64\" : \"arm64\"}-setup.exe`;"
+    },
+    {
+      "why": "desktop downloads: the Linux deb and AppImage as the Proa desktop workflow names them",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "return { download: `agentes_${version}_${arch}.deb`, updater: `agentes_${version}_${arch}.AppImage` };",
+      "replace": "return { download: `Proa-Linux-${arch}.deb`, updater: `Proa-Linux-${target === \"linux\" ? \"x64\" : \"arm64\"}.AppImage` };"
+    },
+    {
+      "why": "desktop downloads: Proa's repository is public, so the token is optional (sent only when set)",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "authorization: `Bearer ${options.token}`,",
+      "replace": "...(options.token ? { authorization: `Bearer ${options.token}` } : {}),"
+    },
+    {
+      "why": "desktop downloads: read without a token (public repository)",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "if (!options.token) return null;",
+      "replace": "if (!options.repo) return null;"
+    },
+    {
+      "why": "desktop downloads: download without a token (public repository)",
+      "file": "apps/server/src/routes/desktop.ts",
+      "find": "if (!options.token || !SEMVER.test(version) || !FILE_NAME.test(file)) return null;",
+      "replace": "if (!SEMVER.test(version) || !FILE_NAME.test(file)) return null;"
+    },
+    {
+      "why": "phone apps: the Google Play button opens Proa's Android app, not upstream's",
+      "file": "apps/web/src/lib/phone-apps.ts",
+      "find": "const GOOGLE_PLAY = \"https://play.google.com/store/apps/details?id=chat.agentes.app\";",
+      "replace": "const GOOGLE_PLAY = \"https://play.google.com/store/apps/details?id=${BRAND_APP_ID}\";"
     }
   ]
 }
