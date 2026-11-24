@@ -1175,7 +1175,9 @@ for (const [target, o] of Object.entries(brand.overrides ?? {})) {
   // An override kept under a test's own name is a test file of the repo: `bun test apps/mobile/test` (CI) takes its
   // argument as a path filter and runs it from the profile, where its imports don't resolve. Name it `*.override-test.*`.
   if (/(\.|_)(test|spec)(\.|_)/.test(basename(o.file))) {
-    fail(`override: ${o.file} has a test file's name; rename it to *.override-test.* (bun test would run it from the profile)`);
+    fail(
+      `override: ${o.file} has a test file's name; rename it to *.override-test.* (bun test would run it from the profile)`,
+    );
     continue;
   }
   if (!existsSync(join(SRC, target))) {
