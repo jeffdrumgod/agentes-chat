@@ -2,7 +2,7 @@
 # (ghcr.io/<owner>/proa: :X.Y.Z, and :latest for the newest tag), for linux/amd64 and linux/arm64 on native runners.
 # Servers pull it instead of building on a Mac (scripts/proa/build-server.sh stays as the local way).
 #
-# The brand is applied as for the desktop (brand/build.sh --target none: the server's defaults, names and art), then the
+# The brand is applied with its artwork (brand/build.sh --target server: defaults, names, favicon, app icons, email art), then the
 # repository's own Dockerfile builds the branded tree. Repository variables BRAND_APP_ID and BRAND_DESKTOP_ID hold the
 # app ids (brand/profiles/proa/brand.env.example); BRAND_REPO is this repository.
 name: Proa server
@@ -77,7 +77,7 @@ jobs:
           BRAND_VERSION: ${{ steps.v.outputs.version }}
           BRAND_APP_ID: ${{ vars.BRAND_APP_ID }}
           BRAND_DESKTOP_ID: ${{ vars.BRAND_DESKTOP_ID }}
-        run: brand/build.sh --profile brand/profiles/proa --out "$RUNNER_TEMP/proa" --target none
+        run: brand/build.sh --profile brand/profiles/proa --out "$RUNNER_TEMP/proa" --target server
 
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 

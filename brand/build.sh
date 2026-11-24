@@ -2,9 +2,11 @@
 # Builds a branded copy of this repository. Files in this checkout are never edited: the profile is applied to a
 # fresh copy in --out, then the copy is built and scanned for leftovers of the upstream brand. See brand/README.md.
 #
-#   brand/build.sh --profile brand/profiles/<name> --out <dir> [--target web|desktop|mobile|none] [--dirty] [--env <file>]
+#   brand/build.sh --profile brand/profiles/<name> --out <dir> [--target web|desktop|mobile|server|none] [--dirty] [--env <file>]
 #
-#   --target  what to build after applying the profile (default: web, which builds the web app and the server)
+#   --target  what to build after applying the profile (default: web, which builds the web app and the server). server:
+#             the profile's artwork drawn and copied, nothing built (the Dockerfile builds the image from --out).
+#             none: the profile applied, no artwork drawn (the favicon, app icons and email art stay the upstream's)
 #   --dirty   copy the working tree (tracked + untracked, not ignored) instead of the committed HEAD
 #   --env     the values brand.json reads as ${NAME} (default: the profile's brand.env, kept out of git; see brand.env.example)
 set -euo pipefail
@@ -81,6 +83,10 @@ case "$TARGET" in
     bun "$ROOT/brand/scan.ts" apps/desktop/dist --kept .brand/report.json --report .brand/scan-desktop.json
     bun "$ROOT/brand/scan.ts" apps/desktop/src-tauri/src --source --kept .brand/report.json --report .brand/scan-rust.json
     echo "brand: front built. Native app: cd $OUT/apps/desktop && bun run tauri build (signing is up to you)"
+    ;;
+  server)
+    bun "$ROOT/brand/scan.ts" apps/web/public --kept .brand/report.json --report .brand/scan-server.json
+    echo "brand: source ready with the profile's artwork. Image: docker build $OUT (node_modules stay out, .dockerignore)"
     ;;
   mobile)
     bun "$ROOT/brand/scan.ts" apps/mobile --source --kept .brand/report.json --report .brand/scan-mobile.json
