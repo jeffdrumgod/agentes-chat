@@ -115,7 +115,7 @@
     },
     "packages/ui/src/sky/engine.ts": {
       "file": "override/packages/ui/src/sky/engine.ts",
-      "upstreamSha256": "55b5959a08acf2448e7f3f2464d18d15744ed587aa0f779900027c1ba870d90f"
+      "upstreamSha256": "d1f747bfa7bd93698fd55a9ee6239fa89d4819bb7df7cd68f1145bdc5283d39b"
     },
     "packages/ui/src/sky/burst.ts": {
       "file": "override/packages/ui/src/sky/burst.ts",
