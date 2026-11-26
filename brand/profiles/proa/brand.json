@@ -382,6 +382,198 @@
       "file": "apps/desktop/src-tauri/src/problem_report.rs",
       "find": "/// Where reports go: the app process's `PROBLEM_REPORT_URL` when set (`off` turns sending off), else agentes.chat's.\nfn target() -> Option<String> {\n    match std::env::var(\"PROBLEM_REPORT_URL\") {\n        Ok(url) if url.trim() == \"off\" => None,\n        Ok(url) if url.trim().is_empty() => Some(DEFAULT_URL.into()),\n        Ok(url) => Some(url),\n        Err(_) => Some(DEFAULT_URL.into()),\n    }\n}\n",
       "replace": "/// Where reports go: the app process's `PROBLEM_REPORT_URL` when it is an address; unset, empty or `off`, nowhere\n/// (this build sends no report by default, so the panel offers Copy only).\nfn target() -> Option<String> {\n    match std::env::var(\"PROBLEM_REPORT_URL\") {\n        Ok(url) if url.trim() == \"off\" || url.trim().is_empty() => None,\n        Ok(url) => Some(url),\n        Err(_) => None,\n    }\n}\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, English",
+      "file": "packages/i18n/src/en.ts",
+      "find": "    /** Under Let it join, in a workspace with its own computer. */\n    shareInternetJoin:\n      \"The agents will also open websites through this computer's internet, so sites see your location. You can turn it off on its page.\",\n",
+      "replace": "    /** In a workspace with its own computer: this build lends no internet (ADR 0237), said where the switch was. */\n    shareInternetJoin: \"In Proa, this computer doesn't lend its internet to agents.\",\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, Portuguese",
+      "file": "packages/i18n/src/pt-BR.ts",
+      "find": "    shareInternetJoin:\n      \"Os agentes também vão abrir sites pela internet deste computador, então os sites veem a sua localização. Você pode desligar na página dele.\",\n",
+      "replace": "    shareInternetJoin: \"Na Proa, este computador não empresta a internet aos agentes.\",\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, de",
+      "file": "packages/i18n/src/locales/de.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"In Proa leiht dieser Computer den Agenten seine Internetverbindung nicht.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, es",
+      "file": "packages/i18n/src/locales/es.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"En Proa, esta computadora no les presta su internet a los agentes.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, fr",
+      "file": "packages/i18n/src/locales/fr.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"Dans Proa, cet ordinateur ne prête pas sa connexion internet aux agents.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, id",
+      "file": "packages/i18n/src/locales/id.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"Di Proa, komputer ini tidak meminjamkan internetnya ke agen.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, it",
+      "file": "packages/i18n/src/locales/it.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"In Proa, questo computer non presta la sua connessione internet agli agenti.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, ja",
+      "file": "packages/i18n/src/locales/ja.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"Proa では、このコンピューターのインターネットをエージェントに貸しません。\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, ko",
+      "file": "packages/i18n/src/locales/ko.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"Proa에서는 이 컴퓨터의 인터넷을 에이전트에게 빌려주지 않아요.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, nl",
+      "file": "packages/i18n/src/locales/nl.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"In Proa leent deze computer zijn internet niet uit aan de agents.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, pl",
+      "file": "packages/i18n/src/locales/pl.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"W Proa ten komputer nie udostępnia agentom swojego internetu.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, ru",
+      "file": "packages/i18n/src/locales/ru.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"В Proa этот компьютер не делится своим интернетом с агентами.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, tr",
+      "file": "packages/i18n/src/locales/tr.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"Proa'da bu bilgisayar internetini ajanlara ödünç vermez.\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the line, zh-Hans",
+      "file": "packages/i18n/src/locales/zh-Hans.json",
+      "pattern": "\"shareInternetJoin\": \"(?:[^\"\\\\\\n]|\\\\.)*\"",
+      "replace": "\"shareInternetJoin\": \"在 Proa 中，这台电脑不会把网络借给智能体。\""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the desktop's row, no switch",
+      "file": "apps/desktop/src/windows/InternetRow.tsx",
+      "find": "import type { ComputerDevice } from \"@agenteschat/client\";\nimport { errorText } from \"@agenteschat/client/lib/errors\";\nimport { Icon, Switch } from \"@agenteschat/ui\";\nimport { useEffect, useState } from \"react\";\nimport { useTranslation } from \"react-i18next\";\nimport { useHost } from \"../app\";\nimport { siteApi } from \"../control/devices\";\nimport { hintFor, PrefRow } from \"../ui/settings\";\n\n/**\n * \"Agents use this computer's internet\" (ADR 0237): the workspace's own computer opens websites through this one's\n * connection while it is on. Its owner turns it on; on, it says so in a line that stays in sight. Nothing in a\n * workspace without its own computer (`shareInternet` null).\n */\nexport function InternetRow({\n  server,\n  orgId,\n  computer,\n  onChanged,\n}: {\n  server: string;\n  orgId: string;\n  computer: ComputerDevice;\n  onChanged?: () => Promise<void> | void;\n}) {\n  const { t, i18n } = useTranslation();\n  const host = useHost();\n  const [on, setOn] = useState(computer.shareInternet?.on ?? false);\n  const [saving, setSaving] = useState(false);\n  const [failed, setFailed] = useState<string | null>(null);\n  useEffect(() => setOn(computer.shareInternet?.on ?? false), [computer.shareInternet?.on]);\n  if (!computer.shareInternet) return null;\n  const id = `internet-${computer.id}`;\n  const title = t(\"desktop.pair.internet\");\n  const owner = computer.mayManage;\n  const save = async (next: boolean) => {\n    setSaving(true);\n    setFailed(null);\n    try {\n      await siteApi(host, server).devices.updateComputer(orgId, computer.id, { shareInternet: next });\n      setOn(next);\n      await onChanged?.();\n    } catch (err) {\n      setFailed(errorText(t, err, i18n.language));\n    } finally {\n      setSaving(false);\n    }\n  };\n  return (\n    <PrefRow\n      lead={\n        <span className=\"dk-logo\">\n          <Icon name=\"globe\" size={16} />\n        </span>\n      }\n      htmlFor={id}\n      title={title}\n      hint={hintFor(t, title, t(\"desktop.pair.internetHint\"))}\n      desc={failed ?? (on ? t(\"desktop.pair.internetOn\") : t(\"desktop.pair.internetOff\"))}\n      end={\n        <Switch\n          id={id}\n          aria-describedby={`${id}-hint`}\n          checked={on}\n          disabled={saving || !owner}\n          onCheckedChange={(next) => void save(next)}\n        />\n      }\n    />\n  );\n}\n\n",
+      "replace": "import type { ComputerDevice } from \"@agenteschat/client\";\nimport { Icon } from \"@agenteschat/ui\";\nimport { useEffect, useState } from \"react\";\nimport { useTranslation } from \"react-i18next\";\nimport { useHost } from \"../app\";\nimport { siteApi } from \"../control/devices\";\nimport { PrefRow } from \"../ui/settings\";\n\n/**\n * \"Agents use this computer's internet\" (ADR 0237): this build lends none (its runner answers every `egress.dial`\n * with `no_slot`), so the row has no switch and one line says so (`devices.shareInternetJoin`, `@agenteschat/i18n`).\n * Nothing in a workspace without its own computer (`shareInternet` null).\n */\nexport function InternetRow({\n  computer,\n}: {\n  server: string;\n  orgId: string;\n  computer: ComputerDevice;\n  onChanged?: () => Promise<void> | void;\n}) {\n  const { t } = useTranslation();\n  if (!computer.shareInternet) return null;\n  return (\n    <PrefRow\n      lead={\n        <span className=\"dk-logo\">\n          <Icon name=\"globe\" size={16} />\n        </span>\n      }\n      desc={t(\"devices.shareInternetJoin\")}\n    />\n  );\n}\n\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the computer's page imports",
+      "file": "apps/web/src/components/devices/DevicePage.tsx",
+      "find": "  iphoneOverWifi,\n  lendingDevice,\n  mayChangeTasks,\n",
+      "replace": "  iphoneOverWifi,\n  mayChangeTasks,\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the computer's page imports, the status line",
+      "file": "apps/web/src/components/devices/DevicePage.tsx",
+      "find": "  RUNNER_UPDATE_COMMAND,\n  shareInternetText,\n  statusLook,\n",
+      "replace": "  RUNNER_UPDATE_COMMAND,\n  statusLook,\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the computer's page, nothing to pick",
+      "file": "apps/web/src/components/devices/DevicePage.tsx",
+      "find": "  const lending = lendingDevice(devices.data?.devices);\n  const internet = d.shareInternet;\n  // Someone else's lends now: its owner may pick this one instead (on again moves it first).\n  const mayPick = internet?.on === true && !internet.inUse && lending !== null && owner;\n",
+      "replace": "  const internet = d.shareInternet;\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the computer's page, one line and no switch",
+      "file": "apps/web/src/components/devices/DevicePage.tsx",
+      "find": "          {/* Its owner lends its internet to the workspace's computer; an admin may only stop it (ADR 0237). */}\n          {internet && (d.mayManage || internet.on) && (\n            <PrefRow\n              id=\"dv-pc-internet\"\n              icon=\"globe\"\n              label={t(\"devices.shareInternet\")}\n              hint={t(\"devices.shareInternetHint\")}\n              status={shareInternetText(t, d, lending)}\n              {...(mayPick\n                ? {\n                    // Beside a button the row's words are no label: the switch names itself.\n                    actions: (\n                      <>\n                        <Button size=\"sm\" onClick={() => save({ id: d.id, shareInternet: true })}>\n                          {t(\"devices.shareInternetPick\")}\n                        </Button>\n                        <Switch\n                          id=\"dv-pc-internet-switch\"\n                          aria-label={t(\"devices.shareInternet\")}\n                          checked\n                          onCheckedChange={(on) => save({ id: d.id, shareInternet: on })}\n                        />\n                      </>\n                    ),\n                  }\n                : {\n                    control: (\n                      <Switch\n                        id=\"dv-pc-internet-switch\"\n                        checked={internet.on}\n                        disabled={!d.mayManage || (!owner && !internet.on)}\n                        onCheckedChange={(on) => save({ id: d.id, shareInternet: on })}\n                      />\n                    ),\n                  })}\n            />\n          )}\n",
+      "replace": "          {/* This build lends no internet (ADR 0237: its runner refuses every egress.dial): one line, no switch. */}\n          {internet && <PrefRow id=\"dv-pc-internet\" icon=\"globe\" label={t(\"devices.shareInternetJoin\")} />}\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): connecting a computer, nothing to choose",
+      "file": "apps/web/src/pages/ConnectPage.tsx",
+      "find": "  /** Its internet for the workspace's own computer (ADR 0237): on unless the person turns it off here. */\n  const [lend, setLend] = useState(true);\n",
+      "replace": ""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): connecting a computer, nothing to save",
+      "file": "apps/web/src/pages/ConnectPage.tsx",
+      "find": "                      ...(lends && !lend ? { shareInternet: false } : {}),\n",
+      "replace": ""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): connecting a computer, one line and no switch",
+      "file": "apps/web/src/pages/ConnectPage.tsx",
+      "find": "              {lends && (\n                <PrefRow\n                  id=\"connect-internet\"\n                  icon=\"globe\"\n                  label={t(\"devices.shareInternet\")}\n                  hint={t(\"devices.shareInternetHint\")}\n                  control={<Switch checked={lend} onCheckedChange={setLend} />}\n                />\n              )}\n",
+      "replace": "              {lends && <PrefRow id=\"connect-internet\" icon=\"globe\" label={t(\"devices.shareInternetJoin\")} />}\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page, one line and no switch",
+      "file": "apps/mobile/src/features/devices/ComputerSection.tsx",
+      "find": "            {/* Its owner lends its internet to the workspace's computer; an admin may only stop it (ADR 0237). */}\n            {d.shareInternet && (d.mayManage || sharing) ? (\n              <GroupedRow\n                label={t(\"devices.shareInternet\")}\n                labelLines={2}\n                hint={{\n                  name: t(\"common.about\", { label: t(\"devices.shareInternet\") }),\n                  text: t(\"devices.shareInternetHint\"),\n                }}\n                sub={shareInternetText(t, d, lending) ?? undefined}\n                toggle={sharing}\n                disabled={!d.mayManage || (!mine && !sharing)}\n                onPress={() => share.mutate(!sharing, { onError: shareFailed })}\n                {...(mayPick\n                  ? {\n                      below: (\n                        <Button\n                          size=\"sm\"\n                          variant=\"secondary\"\n                          label={t(\"devices.shareInternetPick\")}\n                          onPress={() => share.mutate(true, { onError: shareFailed })}\n                        />\n                      ),\n                    }\n                  : {})}\n              />\n            ) : null}\n",
+      "replace": "            {/* This build lends no internet (ADR 0237: its runner refuses every egress.dial): one line, no switch. */}\n            {d.shareInternet ? <GroupedRow label={t(\"devices.shareInternetJoin\")} labelLines={3} /> : null}\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page imports",
+      "file": "apps/mobile/src/features/devices/ComputerSection.tsx",
+      "find": "import {\n  lendingDevice,\n  mayChangeTasks,\n  shareInternetText,\n  taskChoices,\n  tasksAutoText,\n} from \"@agenteschat/client/lib/devices\";\n",
+      "replace": "import { mayChangeTasks, taskChoices, tasksAutoText } from \"@agenteschat/client/lib/devices\";\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page, no switch to save",
+      "file": "apps/mobile/src/features/devices/ComputerSection.tsx",
+      "find": "  const share = useDeviceMutation((api, orgId, on: boolean) =>\n    api.devices.updateComputer(orgId, d.id, { shareInternet: on }),\n  );\n  const lending = lendingDevice(useDevices().data?.devices);\n",
+      "replace": ""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page, nothing to pick",
+      "file": "apps/mobile/src/features/devices/ComputerSection.tsx",
+      "find": "  const sharing = (share.isPending ? share.variables : undefined) ?? d.shareInternet?.on ?? false;\n  const mine = d.ownerUserId === meId;\n  // Someone else's lends now: its owner may pick this one instead (on again moves it first).\n  const mayPick = sharing && !share.isPending && !d.shareInternet?.inUse && lending !== null && mine;\n  const shareFailed = (err: unknown) => toast({ title: errorText(t, err), icon: \"x\" });\n",
+      "replace": ""
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the server offers no relay, import",
+      "file": "packages/engine/src/machine-hub.ts",
+      "find": "  EGRESS_SHARE_PROTOCOL,\n  type ErrorReporter,\n",
+      "replace": "  type ErrorReporter,\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the server offers no relay to the workspace's computer",
+      "file": "packages/engine/src/machine-hub.ts",
+      "find": "      ...(machine.kind === \"managed\" && frame.protocol >= EGRESS_SHARE_PROTOCOL ? { egressRelay: true } : {}),\n",
+      "replace": "      // No `egressRelay` (ADR 0237): this build lends no internet, so the workspace's computer never asks for it.\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the web test of the computer's page, its name",
+      "file": "apps/web/test/devices.test.tsx",
+      "find": "  test(\"agents use this computer's internet: on, says which computer they use now, picks this one, turns off\", async () => {\n    const { state } = await open(",
+      "replace": "  test(\"agents use this computer's internet: none lent in this build, one line and no switch\", async () => {\n    await open("
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the web test of the computer's page, its checks",
+      "file": "apps/web/test/devices.test.tsx",
+      "find": "    expect(screen().getByText(\"Agents use Ana's iMac now\")).toBeTruthy();\n    await click(screen().getByRole(\"button\", { name: \"Use this one\" }));\n    await settle(4);\n    const internet = screen().getByRole(\"switch\", { name: \"Agents use this computer's internet\" });\n    expect(internet.getAttribute(\"aria-checked\")).toBe(\"true\");\n    await click(internet);\n    await settle(4);\n    expect(calls(state, \"devices.updateComputer\").map((c) => c.args.at(-1))).toEqual([\n      { shareInternet: true },\n      { shareInternet: false },\n    ]);\n    (globalThis as { geometrySnapshot?: () => void }).geometrySnapshot?.();\n  });\n\n",
+      "replace": "    expect(screen().getByText(\"In Proa, this computer doesn't lend its internet to agents.\")).toBeTruthy();\n    expect(screen().queryByRole(\"switch\", { name: \"Agents use this computer's internet\" })).toBeNull();\n    expect(screen().queryByText(\"Agents use Ana's iMac now\")).toBeNull();\n    expect(screen().queryByRole(\"button\", { name: \"Use this one\" })).toBeNull();\n    (globalThis as { geometrySnapshot?: () => void }).geometrySnapshot?.();\n  });\n\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the web test of someone else's computer",
+      "file": "apps/web/test/devices.test.tsx",
+      "find": "    const internet = screen().getByRole(\"switch\", { name: \"Agents use this computer's internet\" });\n    expect(internet.getAttribute(\"aria-checked\")).toBe(\"false\");\n    expect(internet.hasAttribute(\"disabled\")).toBe(true);\n",
+      "replace": "    expect(screen().getByText(\"In Proa, this computer doesn't lend its internet to agents.\")).toBeTruthy();\n    expect(screen().queryByRole(\"switch\", { name: \"Agents use this computer's internet\" })).toBeNull();\n"
+    },
+    {
+      "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone test of the computer's page",
+      "file": "apps/mobile/test/features/egress-share.test.ts",
+      "find": "  // Shown where there is something to lend to, and to whoever may change it or while it is on.\n  expect(computer).toContain(\"d.shareInternet && (d.mayManage || sharing)\");\n  expect(computer).toContain('label={t(\"devices.shareInternet\")}');\n  expect(computer).toContain(\"sub={shareInternetText(t, d, lending) ?? undefined}\");\n  // Its owner turns it on; an admin may only turn it off.\n  expect(computer).toContain(\"disabled={!d.mayManage || (!mine && !sharing)}\");\n  // The pending value shows at once; on again picks it first, its owner's alone.\n  expect(computer).toContain(\"(share.isPending ? share.variables : undefined) ?? d.shareInternet?.on ?? false\");\n  expect(computer).toContain('label={t(\"devices.shareInternetPick\")}');\n  expect(computer).toContain(\"lending !== null && mine\");\n",
+      "replace": "  // This build lends none: where there is something to lend to, one line and no switch.\n  expect(computer).toContain(\n    '{d.shareInternet ? <GroupedRow label={t(\"devices.shareInternetJoin\")} labelLines={3} /> : null}',\n  );\n  expect(computer).not.toContain('label={t(\"devices.shareInternet\")}');\n"
     }
   ]
 }
