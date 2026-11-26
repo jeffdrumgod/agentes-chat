@@ -395,6 +395,48 @@ export const ptBR: Words = {
       why: () => "Você recebeu este e-mail porque está neste workspace no agentes.chat.",
     },
   },
+  computerDown: {
+    subject: "Um computador não está respondendo",
+    preheader: "O trabalho dos seus agentes nele está esperando.",
+    headline: "Um computador não está respondendo",
+    body: (name, org, away) => [
+      { b: name },
+      " na ",
+      { b: org },
+      ` não responde há ${away}. O trabalho que precisa dele espera e continua quando ele voltar.`,
+    ],
+    runs: "Pedidos a agentes esperando",
+    calls: "Chamadas de webhook esperando",
+    note: "Para continuar agora, mova os agentes dele para outro computador na página dele.",
+    button: "Abrir o computador",
+    why: (org) => `Você recebeu este e-mail porque gerencia os computadores da ${org} no agentes.chat.`,
+    back: {
+      subject: "Um computador voltou",
+      preheader: "O trabalho que esperava por ele continua agora.",
+      headline: "O computador voltou",
+      runs: "Pedidos a agentes que esperaram",
+      calls: "Chamadas de webhook que esperaram",
+      body: (name, org, away) => [
+        { b: name },
+        " na ",
+        { b: org },
+        ` voltou depois de ${away}. O trabalho que esperava por ele continua agora.`,
+      ],
+    },
+    personal: {
+      body: (name, _org, away) => [
+        { b: name },
+        ` não responde há ${away}. O trabalho que precisa dele espera e continua quando ele voltar.`,
+      ],
+      why: () => "Você recebeu este e-mail porque gerencia os computadores do seu workspace pessoal no agentes.chat.",
+      back: {
+        body: (name, _org, away) => [
+          { b: name },
+          ` voltou depois de ${away}. O trabalho que esperava por ele continua agora.`,
+        ],
+      },
+    },
+  },
   appConnected: {
     subject: "Um app foi conectado à sua conta do agentes.chat",
     preheader: "Ele pode ler e mandar tarefas aos agentes em seu nome em um workspace.",
@@ -602,6 +644,27 @@ export const ptBR: Words = {
       small: "Vincule de novo em Configurações se foi você.",
       why: (surface) => `Você recebeu este e-mail porque ${surface} estava vinculado à sua conta do agentes.chat.`,
       picture: "Seu assistente, não mais no seu celular",
+    },
+    pinReset: {
+      subject: (surface) => `Escolha seu PIN do ${surface}`,
+      preheader: "Escolha o PIN que aprova ações pelo seu app de chat.",
+      headline: (surface) => `Escolha seu PIN do ${surface}`,
+      body: (surface) =>
+        `Pediram um link para escolher o PIN que você usa para aprovar ações pelo ${surface}. Se foi você, escolha-o na página que este botão abre.`,
+      button: "Escolher meu PIN",
+      small: "O link funciona uma vez, por uma hora. Se não foi você, ignore este e-mail. Nada muda.",
+      why: (surface) => `Você recebeu este e-mail porque ${surface} está vinculado à sua conta do agentes.chat.`,
+    },
+    pinLocked: {
+      subject: (surface) => `Seu PIN do ${surface} está bloqueado`,
+      preheader: "Três PINs errados seguidos. Aprovar pelo seu app de chat está pausado por enquanto.",
+      headline: (surface) => `Seu PIN do ${surface} está bloqueado`,
+      body: (surface, time) =>
+        `Alguém digitou um PIN errado três vezes seguidas para aprovar uma ação pelo ${surface}. Aprovar pelo ${surface} está pausado por ${time}.`,
+      lockedFor: ["15 minutos", "1 hora", "24 horas"],
+      small: (surface) =>
+        `Se foi você, tente de novo mais tarde. Se não foi, desvincule o ${surface} nas suas configurações de notificações, para que ninguém aprove por ele.`,
+      button: "Abrir configurações de notificações",
     },
   },
   supportReply: {

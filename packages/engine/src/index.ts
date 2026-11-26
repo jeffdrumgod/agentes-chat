@@ -58,16 +58,20 @@ export * from "./capabilities";
 export * from "./card-via";
 export * from "./catch-up";
 export * from "./catch-up-triage";
-export * from "./channel-categories";
 export * from "./channel-deletion";
+export * from "./channel-joins";
+export * from "./channel-lead";
 export * from "./channel-permissions";
+export * from "./channel-sectors";
 export * from "./channels";
 export * from "./chat-prefs";
 export * from "./chat-tools";
 export * from "./claude-auth-policy";
+export * from "./cli-fetch";
 export * from "./code-sessions";
 export * from "./code-suggestions";
 export * from "./codes";
+export * from "./computer-down";
 export * from "./computer-queue";
 export * from "./confidential";
 export * from "./confidential-prune";
@@ -132,6 +136,7 @@ export * from "./dms";
 export * from "./docx";
 export * from "./drive-folders";
 export * from "./early-access";
+export * from "./egress-share";
 export * from "./email";
 export * from "./email-change";
 export * from "./email-codes";
@@ -147,6 +152,17 @@ export * from "./file-pulls";
 export * from "./file-reader";
 export * from "./follow-through";
 export * from "./follows";
+export {
+  catalogFilePath,
+  catalogStaticFiles,
+  catalogWebFaces,
+  fontsVersion,
+  hasFontFiles,
+  setFontsDir,
+  TextMeasurer,
+  type WebFace,
+} from "./fonts/library";
+export { FONT_MAX_BYTES, FontError, fontMediaType, readFont, sniffFont } from "./fonts/sfnt";
 export { percentile } from "./format";
 export * from "./gateway";
 export * from "./gif-key";
@@ -171,6 +187,7 @@ export * from "./host-computer";
 export * from "./hosts";
 export * from "./id-refs";
 export * from "./imports";
+export * from "./integrations";
 export * from "./intent-line";
 export * from "./invite-choices";
 export * from "./invite-requests";
@@ -333,6 +350,7 @@ export * from "./settings-proposals";
 export * from "./setup-checklist";
 export * from "./setup-tools";
 export * from "./sidebar-items";
+export * from "./skill-library";
 export * from "./skill-tools";
 export * from "./skill-updates";
 export * from "./skills";
@@ -347,6 +365,8 @@ export * from "./surfaces/config";
 export * from "./surfaces/deliveries";
 export * from "./surfaces/inbound";
 export * from "./surfaces/links";
+export * from "./surfaces/nudge";
+export * from "./surfaces/pages";
 export * from "./surfaces/turn";
 export * from "./talker";
 export * from "./task-access";
@@ -373,6 +393,7 @@ export * from "./tools/schema-compat";
 export * from "./tools/scopes";
 export * from "./tools/types";
 export * from "./ttf";
+export * from "./typing-warm";
 export * from "./untrusted";
 export * from "./uploads";
 export * from "./usage";

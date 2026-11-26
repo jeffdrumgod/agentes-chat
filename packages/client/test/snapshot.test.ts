@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { MutationObserver, onlineManager, QueryClient } from "@tanstack/react-query";
+import { MutationObserver, onlineManager, QueryClient, QueryObserver } from "@tanstack/react-query";
 import type { Me, Message, SnapshotStorage } from "../src/index";
 import { createSnapshot, keys, MISSIONS_WAITING_COUNT, SNAPSHOT_MAX_AGE_MS, SNAPSHOT_VERSION } from "../src/index";
 import { recentConversations } from "../src/lib/recent";
@@ -301,4 +301,36 @@ test("leaving with nothing new since the last save writes nothing; leaving after
   // Not following the cache any more: a flush writes, as it can't know.
   await snapshot.flush();
   expect(writes).toBe(3);
+});
+
+test("restored snapshot queries show immediately and still revalidate on mount inside staleTime", async () => {
+  const qc = new QueryClient();
+  const store = memory();
+  const staleAgent = { id: "a1", brain: { kind: "claude_code", model: "Opus 5.5" } };
+  const freshAgent = { id: "a1", brain: { kind: "claude_code", model: "Fable 5.2" } };
+  qc.setQueryData(keys.me, me("u1"));
+  qc.setQueryData(keys.agents("o1"), [staleAgent]);
+  await createSnapshot(qc, store).flush();
+
+  const next = new QueryClient();
+  expect(await createSnapshot(next, store).restore()).toBe(true);
+  // Instant paint from the snapshot, marked stale so mounted queries revalidate right away.
+  expect(next.getQueryData(keys.agents("o1"))).toEqual([staleAgent]);
+  expect(next.getQueryState(keys.agents("o1"))?.isInvalidated).toBe(true);
+
+  let fetches = 0;
+  const obs = new QueryObserver(next, {
+    queryKey: keys.agents("o1"),
+    queryFn: async () => {
+      fetches++;
+      return [freshAgent];
+    },
+    staleTime: 30_000,
+  });
+  const unsub = obs.subscribe(() => {});
+  await new Promise((r) => setTimeout(r, 20));
+  unsub();
+
+  expect(fetches).toBe(1);
+  expect(next.getQueryData(keys.agents("o1"))).toEqual([freshAgent]);
 });

@@ -135,6 +135,7 @@ export const desktopPtBR = {
     allowedOne: "{{folder}} liberada para {{agent}}",
     allowedAll: "{{folder}} liberada para todos os agentes",
     denied: "Recusado. {{agent}} avisa no chat.",
+    answerFailed: "Não deu para responder a este pedido: {{message}}",
     notifTitle: "{{agent}} quer usar a pasta {{folder}}",
     allowedTitle: "{{name}} ligou {{tool}} pelo agentes.chat",
     allowedBody: "Se não foi você, desfaça aqui.",
@@ -250,7 +251,7 @@ export const desktopPtBR = {
     getTailscale: "Baixar o Tailscale",
     usage: "Enviar estatísticas de uso anônimas ao agentes.chat",
     usageText:
-      "Contagens como pessoas, agentes, tamanho das máquinas, tokens de IA usados e o volume de dados que os navegadores dos agentes enviam e recebem. Nunca mensagens, arquivos, nomes ou sites.",
+      "Contagens como pessoas, agentes, tamanho das máquinas, tokens de IA usados, o volume de dados que os navegadores dos agentes enviam e recebem e com que rapidez os apps abrem e respondem. Nunca mensagens, arquivos, nomes ou sites.",
     start: "Começar",
     setting: "Preparando tudo",
     rest: "Quando você fechar o app, seus agentes descansam. Eles voltam assim que você abrir de novo.",
@@ -495,6 +496,11 @@ export const desktopPtBR = {
     waiting: "Esperando {{by}} deixar entrar…",
     done: "Conectado a {{org}}",
     share: "Deixar o workspace todo usar",
+    internet: "Agentes usam a internet deste computador",
+    internetOn: "Os sites que os agentes abrem veem a sua localização",
+    internetOff: "Desligado: os agentes usam a conexão de sempre",
+    internetHint:
+      "Os agentes do workspace abrem sites pela conexão deste computador. Só sites, até 5 GB por dia, e nunca nada da sua própria rede. Enquanto este computador estiver offline, eles usam a conexão de sempre.",
     shareOff: "Só você por enquanto",
     shareHint: "Os agentes de todos em {{org}} podem rodar tarefas nele, com o seu usuário.",
     addFolders: "Adicionar pastas",
@@ -843,6 +849,7 @@ export const desktopPtBR = {
       brainMaxDesc:
         "Quantas ficam abertas em cada workspace. Mais conversas abertas respondem mais rápido, mas usam mais memória.",
       brainIdle: "Fechar conversa parada depois de",
+      mixed: "Diferente em cada workspace: {{values}}. Uma mudança aqui vale para todos.",
       folder: "Pasta dos agentes",
       folderDesc: "Uma pasta por workspace, com uma pasta para cada agente.",
     },

@@ -15,7 +15,7 @@ import {
 } from "@agenteschat/client";
 import { ErrorBoundary } from "@agenteschat/client/lib/error-boundary";
 import { errorText } from "@agenteschat/client/lib/errors";
-import { holdSkies, holdSkiesWhileAway, installTitleTips, trackInput } from "@agenteschat/ui";
+import { holdSkies, installTitleTips, trackInput, watchSight } from "@agenteschat/ui";
 import { AppProviders, type AppServices } from "./app/providers";
 import { createQueryClient } from "./app/query-client";
 import { backToSignIn } from "./app/unauthorized";
@@ -53,6 +53,7 @@ import { snapshotStore } from "./lib/snapshot-store";
 import { installSounds } from "./lib/sounds";
 import { STORAGE_KEYS, sessionStore } from "./lib/storage";
 import { createToastStore } from "./lib/toast";
+import { startVitals } from "./lib/vitals";
 import { withWebPushSignOut } from "./lib/web-push";
 import { routeTree } from "./routeTree.gen";
 
@@ -112,8 +113,9 @@ if (platform) {
   if (renderer) document.documentElement.dataset.desktopRenderer = renderer;
   if (renderer === "cpu") holdSkies();
 }
-// Nobody looking (hidden, in the background, or no input for a while): the skies stand still, at no cost.
-holdSkiesWhileAway();
+// Nobody looking (hidden, in the background with the pointer elsewhere, or no input for a while): skies, agents and
+// the stylesheets' loops stand still (`data-sight`, ADR 0228).
+watchSight();
 // Focus rings only while the keys move the focus (`data-pointer` on <html>, read by the stylesheet).
 trackInput();
 // Every `title` and icon-only control says its words in the product's tooltip, not the browser's.
@@ -131,6 +133,9 @@ const queryClient = createQueryClient({
   onMutationError: (message) => toasts.show(message, "error"),
   describeError: (error) => errorText(i18n.t, error, i18n.language),
 });
+
+// How fast the app runs here, for its server (nobody's id): the opening, stalls, the heap, the reads after a return.
+startVitals(api, queryClient);
 
 // The answer above is the cache's: the sign-in guards don't ask again.
 void queryClient.prefetchQuery({ ...authConfigQuery(api), queryFn: () => authConfig });

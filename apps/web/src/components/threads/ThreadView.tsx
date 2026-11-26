@@ -5,9 +5,21 @@ import { formatTime, joinNames, relativeTime } from "@agenteschat/client/lib/for
 import { textOrMedia } from "@agenteschat/client/lib/media";
 import { quoteExcerpt } from "@agenteschat/client/lib/reply";
 import { threadTitle, timeSpan } from "@agenteschat/client/lib/threads";
-import { AvatarStack, Button, Chip, cx, Icon, Menu, MenuItem, MenuSeparator } from "@agenteschat/ui";
+import { appAuthor } from "@agenteschat/client/lib/via";
+import {
+  AppMark,
+  AvatarStack,
+  Button,
+  Chip,
+  cx,
+  Icon,
+  InlineName,
+  Menu,
+  MenuItem,
+  MenuSeparator,
+} from "@agenteschat/ui";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActorAvatar } from "@/components/AgentAvatar";
 import { useActors } from "@/components/actors";
@@ -64,19 +76,13 @@ function ThreadTitle({ thread }: { thread: ThreadInfo }) {
   const toast = useToast();
   const mutation = useThreadMutation(org.id);
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState("");
   // The new title while the server saves it (no flash of the old one).
   const [saving, setSaving] = useState<string | null>(null);
-  const input = useRef<HTMLInputElement>(null);
   const title = threadTitle(thread);
   const canEdit = thread.canManage && thread.state !== "archived";
-  useEffect(() => {
-    if (editing) input.current?.select();
-  }, [editing]);
-  const commit = () => {
-    setEditing(false);
-    const next = value.replace(/\s+/g, " ").trim();
-    if (!next || next === title) return;
+  const commit = (typed: string) => {
+    const next = typed.replace(/\s+/g, " ");
+    if (next === title) return;
     setSaving(next);
     mutation.mutate(
       { type: "update", thread, patch: { title: next } },
@@ -89,27 +95,13 @@ function ThreadTitle({ thread }: { thread: ThreadInfo }) {
   };
   if (editing) {
     return (
-      <input
-        ref={input}
+      <InlineName
         className="thread-title__input"
-        data-esc-own=""
-        value={value}
+        value={title}
         maxLength={200}
         aria-label={t("threads.view.titleLabel")}
-        autoComplete="off"
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            commit();
-          }
-          if (e.key === "Escape") {
-            e.preventDefault();
-            e.stopPropagation();
-            setEditing(false);
-          }
-        }}
+        onSave={commit}
+        onDone={() => setEditing(false)}
       />
     );
   }
@@ -119,10 +111,7 @@ function ThreadTitle({ thread }: { thread: ThreadInfo }) {
       type="button"
       className="thread-title__button"
       title={t("threads.view.rename")}
-      onClick={() => {
-        setValue(title);
-        setEditing(true);
-      }}
+      onClick={() => setEditing(true)}
     >
       {saving ?? title}
     </button>
@@ -158,7 +147,7 @@ export function ThreadHeader({
   const channelParams = { orgId: org.id, channelId: thread.channelId };
   const where = useThreadWhere(thread);
   const archived = thread.state === "archived";
-  const people = thread.participants.flatMap((p) => (p.id ? [{ type: p.type, id: p.id }] : []));
+  const people = thread.participants.flatMap((p) => (p.id && p.type !== "app" ? [{ type: p.type, id: p.id }] : []));
   const more = t("threads.view.more");
   return (
     <header className={onClose ? "channel__header thread-head thread-head--panel" : "channel__header thread-head"}>
@@ -381,7 +370,7 @@ export function ContextBlock({ thread }: { thread: ThreadInfo }) {
         <div className="thread-context__body" id={`thread-context-${thread.id}`}>
           {range.isLoading && <p className="thread-context__note">{t("common.loading")}</p>}
           {list.map((m) => {
-            const name = dir.authorName(m.author);
+            const name = dir.authorName(m.author, m.meta);
             return (
               <Link
                 key={m.id}
@@ -391,7 +380,9 @@ export function ContextBlock({ thread }: { thread: ThreadInfo }) {
                 search={{ m: m.id }}
               >
                 <span className="thread-context__who">
-                  {m.author.id ? (
+                  {m.author.type === "app" ? (
+                    <AppMark color={appAuthor(m.meta)?.color ?? "graphite"} name={name} size={18} />
+                  ) : m.author.id ? (
                     <ActorAvatar actor={{ type: m.author.type, id: m.author.id }} name={name} size="xs" />
                   ) : null}
                 </span>

@@ -131,6 +131,8 @@ export const desktopEn = {
     allowedOne: "{{folder}} allowed for {{agent}}",
     allowedAll: "{{folder}} allowed for all agents",
     denied: "Declined. {{agent}} lets them know in the chat.",
+    /** The computer's own reason, in English (a folder that no longer exists, a system folder, too many folders). */
+    answerFailed: "Couldn't answer this request: {{message}}",
     notifTitle: "{{agent}} wants to use the folder {{folder}}",
     allowedTitle: "{{name}} turned on {{tool}} from agentes.chat",
     allowedBody: "If it wasn't you, undo it here.",
@@ -252,7 +254,7 @@ export const desktopEn = {
     getTailscale: "Get Tailscale",
     usage: "Send anonymous usage statistics to agentes.chat",
     usageText:
-      "Counts such as people, agents, machine sizes, AI tokens used and how much data the agents' browsers send and receive. Never messages, files, names or sites.",
+      "Counts such as people, agents, machine sizes, AI tokens used, how much data the agents' browsers send and receive, and how fast the apps open and run. Never messages, files, names or sites.",
     start: "Start",
     setting: "Getting everything ready",
     /** Under the form, beside a sleeping agent: what closing the app does. */
@@ -511,6 +513,12 @@ export const desktopEn = {
     done: "Connected to {{org}}",
     /** Once it's in: one switch, off, that lets the whole workspace use it (Preferences › This Mac holds the rest). */
     share: "Let the whole workspace use it",
+    /** A workspace with its own computer opens websites through this one's internet (ADR 0237); on by default. */
+    internet: "Agents use this computer's internet",
+    internetOn: "Websites the agents open see your location",
+    internetOff: "Off: agents use their usual connection",
+    internetHint:
+      "The workspace's agents open websites through this computer's connection. Only websites, up to 5 GB a day, and never anything on your own network. While this computer is offline, they use their usual connection.",
     shareOff: "Only you for now",
     shareHint: "Everyone's agents in {{org}} can run tasks on it, as your user.",
     addFolders: "Add folders",
@@ -873,6 +881,8 @@ export const desktopEn = {
       brainMax: "Open conversations",
       brainMaxDesc: "How many stay open in each workspace. More of them answer faster but use more memory.",
       brainIdle: "Close an idle conversation after",
+      /** Under a limit whose number differs between the workspaces this computer works for. `values`: "Acme 3, Beta 12". */
+      mixed: "Not the same everywhere: {{values}}. A change here sets all of them.",
       folder: "Agents' folder",
       folderDesc: "One folder per workspace, with a folder for each agent.",
     },

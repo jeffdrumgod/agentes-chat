@@ -87,13 +87,12 @@ import {
   PERSONAL_AGENT_TABS,
   revertKey,
   type Saved,
-  SKILLS_AREA,
   shownAgentTab,
   thisMonth,
   type Viewer,
 } from "@/lib/agent-edit";
 import { fullLook, lookOf } from "@/lib/look";
-import { handleAfterRename, handleProblemText, readBudget, takenHandles } from "@/lib/new-agent";
+import { handleAfterRename, handleProblemText, readBudget, takenHandles, workspaceBudgetText } from "@/lib/new-agent";
 import { agentPanelSearch } from "@/lib/open-param";
 import { useToast } from "@/lib/toast";
 import { AccessTab } from "./agent/AccessTab";
@@ -244,6 +243,8 @@ function AgentProfile({
   const [deleting, setDeleting] = useState(false);
   /** The dialog of the sentence under the name that is open (who thinks, where it works, the browser). */
   const [work, setWork] = useState<WorkDialog | null>(null);
+  // The screen "Quem pensa" opens on again from the Connect it closed for ("Adicionar conta").
+  const [reopenAt, setReopenAt] = useState<BrainScreen>();
   /** The repositories picker: open, with a repository to add ("Liberar"). */
   const [picking, setPicking] = useState<{ add?: string } | null>(null);
   const top = useRef<HTMLDivElement>(null);
@@ -352,9 +353,7 @@ function AgentProfile({
     );
   const budgetText = (amount: number | null) =>
     amount === null
-      ? settings.data?.defaultAgentBudgetUsd === undefined
-        ? t("agentPage.budgetDefault")
-        : t("agentPage.budgetDefaultAmount", { amount: usd(t, i18n.language, settings.data.defaultAgentBudgetUsd) })
+      ? workspaceBudgetText(t, i18n.language, settings.data?.defaultAgentBudgetUsd)
       : t("agentPage.perMonth", { amount: usd(t, i18n.language, amount) });
   const keyText = (k: string) =>
     keyOptions(t, credentials.data ?? [], settings.data?.defaultCredentialId ?? null).find((o) => o.value === k)
@@ -377,8 +376,8 @@ function AgentProfile({
       // The right hand's page has no Advanced: all of what it may use is on one tab.
       !rightHand &&
       (field === "skills" || (field === "levels" && resourceById.get(resource ?? "")?.kind !== "connector"));
-    // The level of the skills' own area is on the Skills tab, with the skills.
-    const onSkills = field === "skills" || (field === "levels" && resource === SKILLS_AREA);
+    // What it knows is on the Skills tab; the skills' own level is with the other areas.
+    const onSkills = field === "skills";
     const base = {
       key,
       field,
@@ -948,12 +947,16 @@ function AgentProfile({
 
       <WorkDialogs
         open={work}
-        brainAt={section === "brain" ? brainAt : undefined}
+        brainAt={reopenAt ?? (section === "brain" ? brainAt : undefined)}
         onClose={() => {
           setWork(null);
+          setReopenAt(undefined);
           if (section === "brain") onNavigate(tab);
         }}
-        onReopen={() => setWork("brain")}
+        onReopen={(at) => {
+          setReopenAt(at);
+          setWork("brain");
+        }}
       />
 
       <Dialog

@@ -245,6 +245,10 @@ const Settings = z
     welcomePeople: z.boolean().openapi({
       description: "The right hand greets each person who joins the workspace, once. On by default.",
     }),
+    rightHandLearns: z.boolean().openapi({
+      description:
+        "The right hand learns from conversations on its own, kept where it was said (each person can also turn it off for themselves, `learnOff` in `…/team-week`). Turning it off reveals nobody's memories. On by default.",
+    }),
     approvalsLevel: ApprovalsLevel.openapi({
       description:
         "What every agent without its own choice asks before acting (ADR 0173). `risky` by default. Set with `PUT …/approvals-level`.",
@@ -336,6 +340,15 @@ const InvitationWithStatus = z
     channelIds: z.array(z.string()).openapi({ description: "Channels it adds them to, besides #general (ADR 0090)." }),
     agentIds: z.array(z.string()).openapi({ description: "Agents they start with (ADR 0184), pinned on joining." }),
     status: z.enum(["pending", "expired"]),
+    undelivered: z
+      .enum(["suppressed", "rejected"])
+      .nullable()
+      .openapi({
+        description:
+          "Its last email could never be delivered: `suppressed`, the mail provider stopped mailing the address after an " +
+          "earlier bounce (sending it again asks the provider to mail it again first); `rejected`, the address was " +
+          "refused. Null while nothing says so.",
+      }),
     expiresAt: z.string(),
     createdAt: z.string(),
     invitedBy: z.string().nullable().openapi({ description: "Who sent it (their name)." }),
@@ -439,12 +452,12 @@ const Run = z
       .object({
         from: z.object({ id: z.uuid(), name: z.string() }),
         to: z.object({ id: z.uuid(), name: z.string() }),
-        cause: z.enum(["limit", "line", "extra"]),
+        cause: z.enum(["limit", "line", "extra", "busy"]),
       })
       .nullable()
       .openapi({
         description:
-          "It went on with another account than its agent's own: the first it left, the last it moved to, and why (its plan's limit, the pause line of long work, or the paid extra usage it would go into). Said in its details, never in the chat.",
+          "It went on with another account than its agent's own: the first it left, the last it moved to, and why (its plan's limit, the pause line of long work, the paid extra usage it would go into, or every run the account takes at once already thinking on it). Said in its details, never in the chat.",
       }),
   })
   .openapi("Run");
@@ -562,6 +575,10 @@ const ManagedTask = z
         resetsAt: z.string().nullable(),
         since: z.string().nullable(),
         canContinue: z.boolean(),
+        moving: z
+          .boolean()
+          .optional()
+          .openapi({ description: "Its computer is away moving to another server: it comes back by itself." }),
       })
       .nullable()
       .openapi({
@@ -708,6 +725,7 @@ export function managementRoutes(deps: AppDeps) {
             mode: z.enum(WORKSPACE_MODES).optional().openapi({ description: "`team` or `personal` (ADR 0159)." }),
             teamWatch: z.boolean().optional(),
             welcomePeople: z.boolean().optional(),
+            rightHandLearns: z.boolean().optional(),
           }),
         ),
       },
@@ -1276,6 +1294,7 @@ export function managementRoutes(deps: AppDeps) {
             channelIds: i.channelIds,
             agentIds: i.agentIds,
             status: i.status,
+            undelivered: i.undelivered,
             expiresAt: i.expiresAt.toISOString(),
             createdAt: i.createdAt.toISOString(),
             invitedBy: i.invitedBy,
@@ -1414,7 +1433,7 @@ export function managementRoutes(deps: AppDeps) {
     }),
     async (c) => {
       const { orgId, invitationId } = c.req.valid("param");
-      const { invitation, token } = await resendInvitation(
+      const { invitation, token, unsuppress } = await resendInvitation(
         db,
         c.get("user").id,
         orgId,
@@ -1431,6 +1450,7 @@ export function managementRoutes(deps: AppDeps) {
         url: inviteUrl(base, token),
         inviterId: c.get("user").id,
         secret: config.AGENTES_SECRET,
+        unsuppress,
       });
       deps.wakeWorkers?.();
       return c.json({ url: inviteUrl(base, token), expiresAt: invitation.expiresAt.toISOString() }, 200);

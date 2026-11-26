@@ -68,6 +68,7 @@ import {
   enableSvgRasterizer,
   ensureRightHands,
   type GifKey,
+  hasFontFiles,
   isAgentesCloud,
   isBlockedAddress,
   laneLimits,
@@ -84,6 +85,7 @@ import {
   retireMillionSendMailboxes,
   STARTUP_RAMP_MS,
   SURFACE_PREFIX,
+  setFontsDir,
   setMessageLinkBase,
   setRestrictionNotices,
   setScreenJudgments,
@@ -384,6 +386,7 @@ async function boot(
     createModelProviders({
       endpointFetch: allowsPrivateEndpoints(config) ? undefined : publicHttpsFetch(),
       version: release,
+      progressNotes: config.MODEL_PROGRESS_NOTES,
     }),
   );
   if (overridden.length > 0) log.info("adapters overridden by modules", { overridden });
@@ -573,6 +576,9 @@ async function boot(
     }),
   };
   log.info("job slots", { start: slots, upTo: outbox.limits ?? "fixed", memoryBytes, role: config.SERVER_ROLE });
+  // The fonts live files use (ADR 0220): served, measured with and embedded; without them, system fonts.
+  setFontsDir(config.FONTS_DIR ? resolve(config.FONTS_DIR) : null);
+  if (config.FONTS_DIR && !hasFontFiles()) log.warn("fonts", { dir: config.FONTS_DIR, found: false });
   // SVG pictures drawn as PNGs for exports and models (ADR 0196 §8); without it they are left out of those.
   if (!(await enableSvgRasterizer())) log.warn("svg pictures", { drawn: false, because: "resvg didn't load" });
   const workers = startWorkers({
@@ -689,6 +695,7 @@ async function boot(
     overloaded,
     streams: createStreamSockets({ db: database.db, auth, config, broker: engine.streams }),
     live: liveSockets,
+    onTyping: engine.warmWhileTyping,
   });
   const publicUrl = new URL(config.PUBLIC_URL);
   const ownHosts = ownHostsOnly

@@ -123,6 +123,16 @@ describe("agents it asked first: quoted at the top of the reply, as a reply quot
     expect(source("cards.tsx")).not.toContain("Consultation");
   });
 
+  test("another agent's request in this agent's DM is the same quote, its words in the arrows' place, no state while out", () => {
+    const line = source("EventLine.tsx");
+    expect(line).toContain("const handed = handOffOf(message.meta);");
+    expect(line).toMatch(/alone\s+handed\s+askedIn=\{handed\.askedIn\}/);
+    const quote = source("ConsultGroup.tsx");
+    expect(quote).toContain('t("chat.consultPair.askedHere", { context: agentGrammar(to).context })');
+    expect(quote).toContain('t("chat.consultPair.askedIn", { channel: `#');
+    expect(quote).toContain("handed && live ? { ...found, word: null, seconds: null, tone: null } : found");
+  });
+
   test("an answer far below its question is the same quote on its own, never a line of words or a pill", () => {
     const line = source("EventLine.tsx");
     expect(line).toContain("items={[fold.consultation]}");
@@ -442,7 +452,7 @@ describe("the secret card on the phone", () => {
     expect(failed.indexOf("secretRefusalKey(err)")).toBeLessThan(failed.indexOf("api.secrets.get(orgId, r.id)"));
     expect(failed).toContain("secretClosedBy(err, r, fresh)");
     expect(failed).toContain("done(closed)");
-    expect(failed).toContain('t(fresh ? "secret.changed" : "secret.failed")');
+    expect(failed).toContain('t(fresh ? "secret.changed" : "secret.failed", { agent: agentName })');
     expect(card).toContain('if (!pending) setValue("");');
     expect(card).toContain('t("secret.seeNewer")');
   });

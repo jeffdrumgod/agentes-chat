@@ -38,6 +38,7 @@ import {
 } from "./browser-bind-check";
 import { ensureBrowserBindPolicy, prepareAgents } from "./browser-bind-policy";
 import { browserPortsForUid } from "./browser-ports";
+import { scriptCheck } from "./command-gate";
 import { computerNow } from "./computer-now";
 import {
   accessToStore,
@@ -64,7 +65,13 @@ import { runControl } from "./control";
 import { configFromGrant, deviceInfo, prepareWorkspace, previousMachineFor, RunnerDaemon } from "./daemon";
 import { DesktopManager } from "./desktop";
 import { runDesktopBrowser } from "./desktop-browser";
-import { DesktopSessions, type DesktopSessionsOptions, runnerUser, systemDesktopUser } from "./desktop-session";
+import {
+  DesktopSessions,
+  type DesktopSessionsOptions,
+  runnerUser,
+  systemDesktopUser,
+  taskRoomNow,
+} from "./desktop-session";
 import { localSources, runDoctor } from "./doctor";
 import { RUNNER_VERSION } from "./errors";
 import { setStoredGate, withGates } from "./gate";
@@ -189,8 +196,8 @@ On the server's own computer each organization has its own connection in <home>/
 take --org <id | name> to pick one when it serves several.
 Config: <home>/config.json, mode 600. For background tasks, optional "maxConcurrentTasks" (default: one
 per 1.5 GiB of memory past 4 GiB, at least 3, at most 20; also in the app's computer page) and "taskMaxSeconds"
-(default 14400). For agents thinking with Claude Code, optional "brainIdleMinutes" (default 20 on Linux,
-3 elsewhere) and "brainMaxProcesses" (default 2 on Linux, 1 elsewhere). Changes apply while it runs.
+(default 14400). For agents thinking with Claude Code, optional "brainIdleMinutes" (default 60 on Linux,
+30 elsewhere) and "brainMaxProcesses" (default 8 on Linux, 1 elsewhere). Changes apply while it runs.
 Background tasks keep running when the runner restarts. Their logs are in tasks/.
 Commands run as the user that runs the runner. Consider a dedicated OS user.`;
 
@@ -501,7 +508,14 @@ async function start(): Promise<number> {
   }
   // Before anything starts a CLI: a service's PATH is the installing shell's (the daemon adds them again per look).
   if (process.platform !== "win32" && config.mode !== "system") addUsualDirs();
-  const daemon = new RunnerDaemon({ home, mode: "start", log, print: (line) => console.log(line), agyCopy: true });
+  const daemon = new RunnerDaemon({
+    home,
+    mode: "start",
+    log,
+    print: (line) => console.log(line),
+    cliCopies: true,
+    taskRoom: taskRoomNow,
+  });
   const stop = () => void daemon.stop();
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
@@ -578,7 +592,7 @@ async function app(): Promise<number> {
       input: process.stdin,
       output: process.stdout,
       locked: lock.ok ? null : lock.holder,
-      daemon: { log: write, logFile, refreshPath: () => adoptLoginPath() },
+      daemon: { log: write, logFile, refreshPath: () => adoptLoginPath(), taskRoom: taskRoomNow },
       signal: ac.signal,
     });
   } finally {
@@ -1595,6 +1609,9 @@ async function main(argv: string[]): Promise<number> {
       runTaskWrapper(path.resolve(sub));
       return new Promise<number>(() => {});
     }
+    case "script-check":
+      // A long script's check, for the runner that started it (command-gate.ts).
+      return scriptCheck(process.stdin, process.stdout);
     case "migrate":
       // Reads another app's agents on this computer into a file for the import page; it needs no connection.
       return runMigrate({

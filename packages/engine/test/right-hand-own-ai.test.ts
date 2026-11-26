@@ -9,6 +9,7 @@ import {
   executeRoutineRun,
   getAgentBrain,
   insertMessage,
+  listAiAccounts,
   listMachineAccounts,
   MACHINE_CONTROL_TOPIC,
   type MachineStatus,
@@ -154,6 +155,43 @@ test("a member gives their own DM with Lodi their plan; everyone else keeps the 
   await setAgentBrain(deps, bia.id, fx.org.id, lodi.id, { scope: "mine", brain: "model" });
   expect((await runIn(bia.id)).kind).toBe("model");
   expect((await fx.db.select().from(schema.rightHandBrains)).map((r) => r.userId)).toEqual([caio.id]);
+});
+
+test("Lodi thinks with ChatGPT on a Windows computer where nothing holds Codex's commands: its turns run none", async () => {
+  const { fx, deps, machineId, bia, lodi } = await world();
+  const GPT = "0193eeee-0000-4000-8000-0000000000b2";
+  await fx.db
+    .update(schema.machines)
+    .set({
+      os: "windows",
+      protocol: MACHINE_PROTOCOL_VERSION,
+      executors: { codex: { version: "codex-cli 0.172.0", sandbox: "none" }, detectedAt: new Date().toISOString() },
+    })
+    .where(eq(schema.machines.id, machineId));
+  await fx.db.insert(schema.machineAccounts).values({
+    id: GPT,
+    orgId: fx.org.id,
+    machineId,
+    kind: "codex",
+    label: GPT,
+    status: "active",
+    createdBy: bia.id,
+    shared: true,
+  });
+  const view = await setAgentBrain(deps, bia.id, fx.org.id, lodi.id, { scope: "mine", brain: "codex", account: GPT });
+  expect(view).toMatchObject({ scope: "mine", brain: "codex", account: GPT, computer: { machineId } });
+  const codex = view.options.find((o) => o.kind === "codex");
+  expect(codex).toMatchObject({ available: true });
+  expect(codex).not.toHaveProperty("reason");
+  // A ChatGPT sign-in there still thinks for Lodi: the AI accounts page takes one.
+  const ai = await listAiAccounts(deps, bia.id, fx.org.id);
+  expect(ai.computers.find((c) => c.machineId === machineId)?.brains.codex).toBe(true);
+  // Any other agent there runs commands: Codex is refused for it, with why.
+  await fx.db.update(schema.agents).set({ machineId }).where(eq(schema.agents.id, fx.agent.id));
+  const refused = await setAgentBrain(deps, fx.owner.id, fx.org.id, fx.agent.id, { brain: "codex" }).catch(
+    (e: { code?: string; params?: unknown }) => e,
+  );
+  expect(refused).toMatchObject({ code: "brain.unavailable", params: { reason: "windows_sandbox" } });
 });
 
 test("with no key in the workspace, a person with no AI of their own thinks with a plan that serves them: the first of the order of use with room", async () => {
@@ -782,4 +820,23 @@ test("a person's own Lodi thinks with the plan their own computer is signed in t
   // `account: null` alone still goes back to the workspace's.
   await setAgentBrain(deps, bia.id, fx.org.id, lodi.id, { scope: "mine", account: null });
   expect((await runIn(bia.id)).kind).toBe("model");
+});
+
+test("a model or effort alone keeps a person's own Lodi on their computer's own sign-in", async () => {
+  const { fx, deps, machineId, bia, lodi, runIn } = await world();
+  await fx.db.update(schema.machines).set({ pairedByUserId: bia.id }).where(eq(schema.machines.id, machineId));
+  await setAgentBrain(deps, bia.id, fx.org.id, lodi.id, { scope: "mine", brain: "claude_code", account: null });
+  // As older apps save a pick: the model, or the effort, and nothing else.
+  expect(await setAgentBrain(deps, bia.id, fx.org.id, lodi.id, { scope: "mine", model: "opus" })).toMatchObject({
+    brain: "claude_code",
+    model: "opus",
+    account: null,
+    computer: { machineId },
+  });
+  expect(await setAgentBrain(deps, bia.id, fx.org.id, lodi.id, { scope: "mine", effort: "high" })).toMatchObject({
+    model: "opus",
+    effort: "high",
+    account: null,
+  });
+  expect(await runIn(bia.id)).toMatchObject({ kind: "claude_code", session: { machineId } });
 });

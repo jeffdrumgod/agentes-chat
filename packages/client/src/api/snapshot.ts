@@ -269,7 +269,12 @@ export function createSnapshot(qc: QueryClient, storage: SnapshotStorage, option
         return false;
       }
       owner = snapshot.owner;
-      hydrate(qc, snapshot.state);
+      // Show what was saved right away, then revalidate every restored query against the server on mount regardless of
+      // its `staleTime` (a change saved right before a reload, or elsewhere, must never sit behind a fresh snapshot).
+      hydrate(qc, {
+        ...snapshot.state,
+        queries: snapshot.state.queries.map((q) => ({ ...q, state: { ...q.state, isInvalidated: true } })),
+      });
       return true;
     },
 

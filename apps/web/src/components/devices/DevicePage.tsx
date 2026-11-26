@@ -5,15 +5,19 @@ import {
   findPhone,
   iosOf,
   iphoneOverWifi,
+  lendingDevice,
   mayChangeTasks,
   osName,
   personInControl,
   phoneLink,
   phoneSystem,
+  RUNNER_UPDATE_COMMAND,
+  shareInternetText,
   statusLook,
   statusSentence,
   taskChoices,
   taskLimitLine,
+  tasksAutoText,
 } from "@agenteschat/client/lib/devices";
 import { errorText } from "@agenteschat/client/lib/errors";
 import { clockAt } from "@agenteschat/client/lib/format";
@@ -43,6 +47,7 @@ import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ErrorState, LoadingList } from "@/components/Loading";
 import { MachineAccessCards, MachineAgents, MachineFactsExtra, MachinePage } from "@/components/Machines";
+import { CommandBlock } from "@/components/machine-bits";
 import { PrefRow } from "@/components/NoticePrefs";
 import { useOrg } from "@/components/org-context";
 import { OrgMark } from "@/components/ProfilePhoto";
@@ -316,6 +321,11 @@ function ComputerPage({ machineId }: { machineId: string }) {
         : d.status;
   const owner = d.ownerUserId === me.user.id;
   const admin = can(org, "configure");
+  const lending = lendingDevice(devices.data?.devices);
+  const internet = d.shareInternet;
+  // Someone else's lends now: its owner may pick this one instead (on again moves it first).
+  const mayPick = internet?.on === true && !internet.inUse && lending !== null && owner;
+  const helpOff = devices.data?.devicesHelp === false;
   const tasksEditable = mayChangeTasks(d, me.user.id, admin);
   const pausedFromApps = status.kind === "paused" ? pausedByText(t, i18n.language, machine?.paused, me.user.id) : null;
   const pausable = machine?.canManage && machine.online ? machine : null;
@@ -346,7 +356,8 @@ function ComputerPage({ machineId }: { machineId: string }) {
   const extra = Boolean(
     machine &&
       ((machine.workspace && machine.mode !== "system") ||
-        (machine.kind === "managed" && (machine.networkTransition || (machine.online && machine.egress?.ip)))),
+        (machine.kind === "managed" &&
+          (machine.networkTransition || (machine.online && (machine.egress?.ip || machine.egressVia))))),
   );
   return (
     <>
@@ -397,6 +408,12 @@ function ComputerPage({ machineId }: { machineId: string }) {
           text={pausedFromApps ?? (status.kind === "busy" ? taskLimitLine(t, d, tasksEditable) : null)}
         />
         {pausable && !pausable.remotePause && <span className="small muted">{t("machines.remotePause.outdated")}</span>}
+        {machine?.canManage && machine.update && (
+          <>
+            <span className="small muted">{t(`machines.runnerBehind.${machine.update}`, { computer: d.name })}</span>
+            {machine.update === "command" && <CommandBlock command={RUNNER_UPDATE_COMMAND} />}
+          </>
+        )}
         <Facts facts={facts} />
         {status.kind === "paused" && !pausedFromApps && <span className="small muted">{t("machines.pausedHint")}</span>}
         {more.length > 0 || extra || d.systemMode ? (
@@ -427,8 +444,35 @@ function ComputerPage({ machineId }: { machineId: string }) {
             hint={t("devices.who.computerHint")}
             onChange={(audience: DeviceAudience) => save({ id: d.id, audience })}
           />
+          {/* Tasks start on room there: what's running and what still fits, and the owner's Push harder. */}
+          {d.taskRoom && (
+            <PrefRow
+              id="dv-pc-tasks"
+              icon="layers"
+              label={t("devices.maxTasks")}
+              hint={t("devices.tasksAutoHint")}
+              status={tasksAutoText(t, d)}
+            />
+          )}
+          {d.taskRoom && tasksEditable && d.machineKind === "connected" && (
+            <PrefRow
+              id="dv-pc-push"
+              icon="power"
+              label={t("devices.pushHarder")}
+              hint={t("devices.pushHarderHint")}
+              control={
+                <Switch
+                  id="dv-pc-push-switch"
+                  checked={d.taskRoom.pushHarder}
+                  // The computer applies it: offline, nothing would.
+                  disabled={status.kind === "offline"}
+                  onCheckedChange={(on) => save({ id: d.id, pushHarder: on })}
+                />
+              }
+            />
+          )}
           {/* Only once the computer says its limit: a guess here would be a setting that changes nothing. */}
-          {d.maxTasks !== null && (
+          {!d.taskRoom && d.maxTasks !== null && (
             <PrefRow
               id="dv-pc-tasks"
               icon="layers"
@@ -449,27 +493,80 @@ function ComputerPage({ machineId }: { machineId: string }) {
               }
             />
           )}
-          {/* Spill-over: its owner turns these on; an admin may only turn them off. A server install never takes it. */}
-          {d.mayManage &&
-            d.machineKind === "connected" &&
-            !d.systemMode &&
-            (["own", "others"] as const).map((key) => (
-              <PrefRow
-                key={key}
-                id={`dv-pc-spill-${key}`}
-                icon={key === "own" ? "bolt" : "audiencePeople"}
-                label={t(key === "own" ? "devices.spillOwn" : "devices.spillOthers")}
-                hint={t(key === "own" ? "devices.spillOwnHint" : "devices.spillOthersHint")}
-                control={
-                  <Switch
-                    id={`dv-pc-spill-${key}-switch`}
-                    checked={d.spill[key]}
-                    disabled={!owner && !d.spill[key]}
-                    onCheckedChange={(on) => save({ id: d.id, spill: { [key]: on } })}
-                  />
-                }
-              />
-            ))}
+          {/* Its help: its owner turns it on, an admin only off, and the workspace's switch off wins. Never a server
+              install's. */}
+          {d.mayManage && d.machineKind === "connected" && !d.systemMode && (
+            <PrefRow
+              id="dv-pc-spill"
+              icon="bolt"
+              label={t("devices.spillOwn")}
+              hint={t(d.belongsToWorkspace ? "devices.spillTeamHint" : "devices.spillOwnHint")}
+              status={helpOff ? t("devices.spillWorkspaceOff") : undefined}
+              control={
+                <Switch
+                  id="dv-pc-spill-switch"
+                  checked={d.spill.own && !helpOff}
+                  disabled={helpOff || (!owner && !d.spill.own)}
+                  onCheckedChange={(own) => save({ id: d.id, spill: { own } })}
+                />
+              }
+            />
+          )}
+          {/* Its owner's agents' work starts here first: only its owner chooses it, and only for their own agents. */}
+          {owner && d.machineKind === "connected" && !d.systemMode && (
+            <PrefRow
+              id="dv-pc-first"
+              icon="move"
+              label={t("devices.spillFirst")}
+              hint={t("devices.spillFirstHint")}
+              status={helpOff ? t("devices.spillWorkspaceOff") : undefined}
+              control={
+                <Switch
+                  id="dv-pc-first-switch"
+                  checked={(d.spill.first ?? false) && !helpOff}
+                  disabled={helpOff}
+                  onCheckedChange={(first) => save({ id: d.id, spill: { first } })}
+                />
+              }
+            />
+          )}
+          {/* Its owner lends its internet to the workspace's computer; an admin may only stop it (ADR 0237). */}
+          {internet && (d.mayManage || internet.on) && (
+            <PrefRow
+              id="dv-pc-internet"
+              icon="globe"
+              label={t("devices.shareInternet")}
+              hint={t("devices.shareInternetHint")}
+              status={shareInternetText(t, d, lending)}
+              {...(mayPick
+                ? {
+                    // Beside a button the row's words are no label: the switch names itself.
+                    actions: (
+                      <>
+                        <Button size="sm" onClick={() => save({ id: d.id, shareInternet: true })}>
+                          {t("devices.shareInternetPick")}
+                        </Button>
+                        <Switch
+                          id="dv-pc-internet-switch"
+                          aria-label={t("devices.shareInternet")}
+                          checked
+                          onCheckedChange={(on) => save({ id: d.id, shareInternet: on })}
+                        />
+                      </>
+                    ),
+                  }
+                : {
+                    control: (
+                      <Switch
+                        id="dv-pc-internet-switch"
+                        checked={internet.on}
+                        disabled={!d.mayManage || (!owner && !internet.on)}
+                        onCheckedChange={(on) => save({ id: d.id, shareInternet: on })}
+                      />
+                    ),
+                  })}
+            />
+          )}
           {admin && d.machineKind === "connected" && (
             <PrefRow
               id="dv-pc-belongs"

@@ -91,6 +91,7 @@ export function useSetKeyFallback(orgId: string) {
 
 /** What `useAiChoice` gives a picker. */
 export interface AiChoiceState {
+  target: AiChoiceTarget;
   /** The "Conta" select's options, grouped (`AiChoiceRow.group`) and in order; dimmed ones say why. */
   rows: AiChoiceRow[];
   /** What the target thinks with now; null: nothing yet (a new agent, several agents). */
@@ -99,8 +100,8 @@ export interface AiChoiceState {
   selected: AiChoiceRow | null;
   /** The "Modelo" select for a row, worded with the app's `t`. */
   models: (row: AiChoiceRow, t: TFunction) => ModelRow[];
-  /** The "Esforço" select for a row. */
-  efforts: (row: AiChoiceRow) => readonly EffortLevel[];
+  /** The "Esforço" select for a row on `model` (as the choice stores it). */
+  efforts: (row: AiChoiceRow, model: string | null | undefined) => readonly EffortLevel[];
   /** The choice a row makes (its model and effort kept while the brain stays). */
   choose: (row: AiChoiceRow) => AiChoice;
   /**
@@ -112,6 +113,11 @@ export interface AiChoiceState {
   loading: boolean;
   /** The caller may change it (an agent's owner or who manages it; a mission before Start). */
   canEdit: boolean;
+  /**
+   * Where the row thinks, its commands are held only in part (Codex on Windows without MXC, `BrainOption.sandbox`).
+   * Never for Lodi: its turns run no commands.
+   */
+  sandboxPartial: (row: AiChoiceRow) => boolean;
 }
 
 const agentId = (t: AiChoiceTarget) => (t.kind === "agent" || t.kind === "lodi" ? t.agentId : "");
@@ -228,11 +234,12 @@ export function useAiChoice(orgId: string, target: AiChoiceTarget): AiChoiceStat
   });
 
   return {
+    target,
     rows,
     current,
     selected: rows.find((r) => r.selected) ?? null,
     models: (row, t) => aiChoiceModels(t, row, { current, options: optionsFor(row), models: catalog }),
-    efforts: aiChoiceEfforts,
+    efforts: (row, model) => aiChoiceEfforts(row, model, optionsFor(row)),
     choose: (row) => aiChoiceOf(row, current),
     save: (choice, options) => mutation.mutateAsync({ choice, ...(options?.preview ? { preview: true } : {}) }),
     saving: mutation.isPending,
@@ -243,6 +250,8 @@ export function useAiChoice(orgId: string, target: AiChoiceTarget): AiChoiceStat
       (target.kind === "newAgent" && newSetup.isLoading),
     canEdit:
       target.kind === "mission" ? (mission.data?.canSetModel ?? false) : brainTarget ? (view?.canEdit ?? false) : true,
+    sandboxPartial: (row) =>
+      target.kind !== "lodi" && optionsFor(row).find((o) => o.kind === row.brain)?.sandbox === "partial",
   };
 }
 
@@ -256,6 +265,7 @@ export function currentOf(
       model: string | null;
       effort: AiChoice["effort"];
       computer: { machineId: string } | null;
+      keyId?: string | null;
     };
     newSetup?: {
       brain: AiChoice["brain"];
@@ -280,6 +290,7 @@ export function currentOf(
         machineId: b.computer?.machineId ?? null,
         model: b.model,
         effort: b.effort,
+        ...(b.brain === "model" && b.keyId ? { usesKey: b.keyId } : {}),
       };
     }
     case "newAgent": {

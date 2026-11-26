@@ -128,8 +128,12 @@ describe("the conversation's rows", () => {
     const messages = between(chat, "const messageRows = useMemo<Row[]>(() => {", "const liveRows");
     expect(messages).not.toContain("browsing");
     expect(messages).not.toContain("waits");
-    // Nor the DM and channel lists, read again with each message: only the thread head's words and count.
-    expect(messages).toContain("}, [isThread, threadId, list, startedText, replyCount, superseded, timeLines, t]);");
+    // Nor the DM and channel lists, read again with each message: only the thread head's words and count, and the
+    // consulted agents' words folded into their askers' quotes, kept until a fold changes (`relaysKey`).
+    expect(messages).toContain(
+      "}, [isThread, threadId, list, startedText, replyCount, superseded, timeLines, relays, t]);",
+    );
+    expect(chat).toContain("const relays = useMemo(() => relaysNow, [relaysKey]);");
     expect(chat).toContain("[browsing, held, making, waits],");
     expect(chat).toContain('() => messageRows.flatMap((r) => (r.kind === "message" ? [r.message] : [])),');
     expect(chat).toContain("shownRef.current = keepSameRows(shownRef.current, next);");
@@ -263,6 +267,20 @@ describe("the working line", () => {
     expect(pop).toContain("initialValues: { opacity: 0, transform: [{ scale: 0.9 }] },");
   });
 
+  test("the agent at work leads with its rings (the web's), what it did so far under the words, paced", () => {
+    // Its face orbited, never the plain working face; the stack's small faces are the others.
+    expect(lines).toContain("<OrbitFace color={agentLook(dir.agentById.get(orbiting.id)).color} size={ORBIT_FACE}>");
+    expect(lines).toContain("const faces = barFaces(entries).filter((e) => e !== orbiting);");
+    expect(lines).toContain("usePacedTrail(trailRun ? workTrail(t, trailRun, i18n.language) : NO_TRAIL)");
+    const orbit = src("agent/OrbitFace.tsx");
+    // The web's rings and colours, turning on the UI thread by transforms alone, still with Reduce Motion and paused
+    // on a screen that isn't showing.
+    expect(orbit).toContain('import { ORBIT_RINGS, ORBIT_SPAN, orbitColors } from "@agenteschat/ui/agent/orbit";');
+    expect(orbit).toContain("const turning = !reduced;");
+    expect(orbit).toContain('loopStyle(ring.back ? UNTURN : TURN, turn, "linear", delay, paused)');
+    expect(orbit).not.toMatch(/useFrameCallback|requestAnimationFrame|setInterval/);
+  });
+
   test('"View" reaches 44 points', () => {
     expect(lines).toContain(
       "hitSlop={{ top: (TOUCH - SEE_LINE) / 2, bottom: (TOUCH - SEE_LINE) / 2, left: 12, right: 12 }}",
@@ -365,7 +383,8 @@ describe("a voice message's row", () => {
     expect(row).toContain("const starting = useSyncExternalStore(subscribePlayback, startingId) === clipId;");
     expect(row).toContain('<ActivityIndicator size="small" color={c.bg} />');
     const toggle = between(row, "const toggle = () => {", "const seek =");
-    expect(toggle.indexOf("voiceAudioGone(")).toBeGreaterThan(toggle.indexOf("const failed = () => {"));
+    expect(toggle.indexOf("isGone?.()")).toBeGreaterThan(toggle.indexOf("const failed = () => {"));
+    expect(row).toContain("isGone={() => voiceAudioGone(url, authedFetch as typeof fetch)}");
     expect(toggle).toContain("onError: failed,");
     expect(toggle).toContain("}).catch(failed);");
     // Where it stands is the playback module's: a row drawn again mid-play shows it.

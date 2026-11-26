@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { EmailError, type EmailSender, type PubSub } from "@agenteschat/adapters";
+import { EmailError, type EmailSender, type PubSub, type Undelivered } from "@agenteschat/adapters";
 import {
   and,
   asc,
@@ -14,7 +14,7 @@ import {
   schema,
   sql,
 } from "@agenteschat/db";
-import { formatMoneyUsd } from "@agenteschat/i18n/format";
+import { formatMoneyUsd, formatSpan } from "@agenteschat/i18n/format";
 import { appLocale, localeInfo } from "@agenteschat/i18n/locale";
 import { deepMerge } from "@agenteschat/i18n/tree";
 import { nanoUsdToUsd } from "@agenteschat/providers";
@@ -44,7 +44,7 @@ import { type Words, wordsFor } from "./email/words";
 import { dayAndTime } from "./format";
 import { adminIds } from "./gateway";
 import { publicHostAddress, type ResolveHost, resolveHostDns } from "./net-guard";
-import { enqueue, PermanentJobError } from "./outbox";
+import { enqueue, type OutboxJob, PermanentJobError } from "./outbox";
 import { billingHold } from "./standing";
 import { isAgentesCloud } from "./telemetry";
 import { withoutTrailingSlashes } from "./url-text";
@@ -212,6 +212,13 @@ export type EmailTemplate =
   /** The surface unlinked the account because the sender's identity there changed. `url`: the server, for the pictures. */
   | ({ kind: "surface_unlinked"; locale: EmailLocale; surface: string; display: string; url: string } & Beside)
   /**
+   * "Email me a link" or "Forgot your PIN?" on a page the surface linked to (ADR 0226): `url` is the page that chooses
+   * the PIN, once, for an hour.
+   */
+  | ({ kind: "surface_pin_reset"; locale: EmailLocale; surface: string; url: string } & Beside)
+  /** Three wrong PINs locked approving from the surface; `step` 0, 1, 2: for 15 minutes, an hour, a day. `url`: settings. */
+  | ({ kind: "surface_pin_locked"; locale: EmailLocale; surface: string; step: 0 | 1 | 2; url: string } & Beside)
+  /**
    * Double opt-in for the landing page's waiting list, in the language they
    * joined in. `email` is the address being confirmed (absent in jobs queued
    * before it existed).
@@ -373,6 +380,22 @@ export type EmailTemplate =
       url: string;
       /** A message kept on a billing hold: the conversation it waits in, which the AI step opens instead. */
       keptUrl?: string;
+      personal?: true;
+    }
+  /**
+   * A computer the workspace's agents work on has been away for a while, or is back (`back`) after it was (ADR 0241):
+   * its name, how long it was away, and the runs and webhook calls that waited. `url`: the computer's page.
+   */
+  | {
+      kind: "computer_down";
+      locale: EmailLocale;
+      back: boolean;
+      orgName: string;
+      name: string;
+      awayMinutes: number;
+      runs: number;
+      calls: number;
+      url: string;
       personal?: true;
     }
   /**
@@ -819,6 +842,29 @@ function docOf(t: EmailTemplate, sender: string | null): EmailDoc {
         { crew: crewOr(t.crew), computer: c.computer },
       );
     }
+    case "computer_down": {
+      const c = inMode(w.computerDown, t.personal);
+      const org = inertText(t.orgName);
+      const name = inertText(t.name);
+      const away = formatSpan(lang, t.awayMinutes * 60_000);
+      const said = t.back ? c.back : c;
+      const facts: [string, string][] = [
+        ...(t.runs > 0 ? [[said.runs, t.runs.toLocaleString(lang)] as [string, string]] : []),
+        ...(t.calls > 0 ? [[said.calls, t.calls.toLocaleString(lang)] as [string, string]] : []),
+      ];
+      return doc(
+        said.subject,
+        said.preheader,
+        said.headline,
+        [
+          { p: said.body(name, org, away) },
+          ...(facts.length > 0 ? [{ facts }] : []),
+          ...(t.back ? [] : [{ note: c.note }]),
+          { button: c.button, url: t.url },
+        ],
+        c.why(org),
+      );
+    }
     case "join_request": {
       const c = inMode(w.joinRequest, t.personal);
       const org = inertText(t.orgName);
@@ -981,6 +1027,32 @@ function docOf(t: EmailTemplate, sender: string | null): EmailDoc {
         [{ p: c.body(t.surface, inertSender(t.display)) }, { small: c.small }],
         c.why(t.surface),
         { crew: surfaceCrew(t.assistant), phone: { alt: c.picture, on: false } },
+      );
+    }
+    case "surface_pin_reset": {
+      const c = w.surface.pinReset;
+      return doc(
+        c.subject(t.surface),
+        c.preheader,
+        c.headline(t.surface),
+        [{ p: c.body(t.surface) }, { button: c.button, url: t.url }, { small: c.small }, fallback(t.url)],
+        c.why(t.surface),
+        { crew: surfaceCrew(t.assistant), phone: { alt: w.surface.linked.picture, on: true } },
+      );
+    }
+    case "surface_pin_locked": {
+      const c = w.surface.pinLocked;
+      return doc(
+        c.subject(t.surface),
+        c.preheader,
+        c.headline(t.surface),
+        [
+          { p: c.body(t.surface, c.lockedFor[t.step]) },
+          { button: c.button, url: t.url },
+          { small: c.small(t.surface) },
+        ],
+        w.surface.pinReset.why(t.surface),
+        { crew: surfaceCrew(t.assistant), phone: { alt: w.surface.linked.picture, on: true } },
       );
     }
     case "autonomy_report": {
@@ -1286,6 +1358,8 @@ export async function queueEmail(
     template: EmailTemplate;
     maxAttempts?: number;
     runAt?: Date;
+    /** Sent again by hand after the provider stopped mailing the address: it is asked to mail it again first. */
+    unsuppress?: boolean;
   },
 ) {
   const to = ABOUT_THE_ACCOUNT.has(input.template.kind) ? input.to : await inUse(tx, input.to);
@@ -1293,7 +1367,7 @@ export async function queueEmail(
   await enqueue(tx, {
     orgId: input.orgId,
     kind: "email.send",
-    payload: { key: input.key, to, template: input.template },
+    payload: { key: input.key, to, template: input.template, ...(input.unsuppress ? { unsuppress: true } : {}) },
     dedupeKey: `email:${input.key}`,
     maxAttempts: input.maxAttempts ?? 6,
     runAt: input.runAt,
@@ -1398,8 +1472,86 @@ export async function sendQueuedEmail(sender: EmailSender, payload: Record<strin
 
 /** A provider's refusal that a retry won't change fails the job for good; anything else is retried. */
 export function rethrowEmailError(error: unknown): never {
-  if (error instanceof EmailError && !error.retryable) throw new PermanentJobError(error.message, error.status);
+  if (error instanceof EmailError && !error.retryable) {
+    throw new PermanentJobError(error.message, error.status, { cause: error });
+  }
   throw error;
+}
+
+/** Why an email's job failed for good because of its recipient, if it did. */
+function undeliveredOf(error: unknown): Undelivered | undefined {
+  const cause = error instanceof PermanentJobError ? error.cause : error;
+  return cause instanceof EmailError && !cause.retryable ? cause.recipient : undefined;
+}
+
+/** The emails a person waits on in the app besides an invitation: the account's confirmation and reset links. */
+const WAITED_ON: ReadonlySet<EmailTemplate["kind"]> = new Set(["verify_email", "password_reset"]);
+
+/** Whether the email reached its recipients, where someone waits on it: the invitation's row, or the account. */
+async function noteDelivery(
+  db: Executor,
+  orgId: string | null,
+  kind: EmailTemplate["kind"],
+  to: string[],
+  undelivered: Undelivered | null,
+) {
+  const addresses = to.map((a) => a.toLowerCase());
+  if (kind === "invitation" && orgId) {
+    await db
+      .update(organizationInvitations)
+      .set({ undelivered })
+      .where(
+        and(
+          eq(organizationInvitations.orgId, orgId),
+          inArray(organizationInvitations.email, addresses),
+          isNull(organizationInvitations.acceptedAt),
+        ),
+      );
+  } else if (WAITED_ON.has(kind)) {
+    await db
+      .update(users)
+      .set({ emailUndelivered: undelivered })
+      .where(inArray(sql`lower(${users.email})`, addresses));
+  }
+}
+
+/**
+ * Job `email.send` (`sendQueuedEmail`), on a server: one sent again by hand after a suppression (`unsuppress`) first
+ * has the provider mail its addresses again, when the provider keeps such a list (`removeSuppression`); then the
+ * invitation or the account it was for says whether it could be delivered (ADR 0006, 0090).
+ */
+export async function deliverQueuedEmail(
+  db: Executor,
+  sender: EmailSender,
+  job: Pick<OutboxJob, "id" | "orgId" | "payload">,
+  art?: EmailArt,
+  log?: { info(message: string, data?: Record<string, unknown>): void },
+) {
+  const to = Array.isArray(job.payload.to) ? job.payload.to.map(String) : [];
+  const kind = (job.payload.template as EmailTemplate | undefined)?.kind;
+  if (job.payload.unsuppress === true && sender.removeSuppression) {
+    for (const address of to) {
+      // A provider that won't lift it (a key without the right, say) still gets the email, whose refusal then marks
+      // the row as before; only a failure a retry may change retries the job.
+      const lifted = await sender.removeSuppression(address).catch((error: unknown) => {
+        if (error instanceof EmailError && !error.retryable) return `refused ${error.status ?? ""}`.trim();
+        throw error;
+      });
+      log?.info("email: asked the provider to mail an address again before sending to it", {
+        jobId: job.id,
+        kind,
+        lifted,
+      });
+    }
+  }
+  try {
+    await sendQueuedEmail(sender, job.payload, art);
+  } catch (error) {
+    const undelivered = undeliveredOf(error);
+    if (undelivered && kind) await noteDelivery(db, job.orgId, kind, to, undelivered);
+    throw error;
+  }
+  if (kind) await noteDelivery(db, job.orgId, kind, to, null);
 }
 
 /** The 80%/100% budget email to the agent's owner, or the admins without one (once per agent, month and level). */
@@ -1812,6 +1964,8 @@ export async function queueInvitationEmail(
     url: string;
     inviterId: string;
     secret?: string;
+    /** Sent again by hand after the provider stopped mailing the address (`resendInvitation`). */
+    unsuppress?: boolean;
   },
 ) {
   const [invitation] = await db
@@ -1841,6 +1995,7 @@ export async function queueInvitationEmail(
     // One per sending: the link stays the same when sent again (ADR 0090), its expiry doesn't.
     key: `invite:${input.invitationId}:${invitation?.expiresAt.getTime() ?? input.url.slice(-16)}`,
     to: [input.email],
+    unsuppress: input.unsuppress,
     template: {
       kind: "invitation",
       locale: emailLocale(invitee?.locale ?? inviter?.locale),

@@ -18,7 +18,12 @@ import {
   useReduceMachineAccess,
 } from "@agenteschat/client";
 import { computerName, setupView } from "@agenteschat/client/lib/computer";
-import { mayChangeTasks, offlineCauseText, taskLimitLine } from "@agenteschat/client/lib/devices";
+import {
+  mayChangeTasks,
+  offlineCauseText,
+  RUNNER_UPDATE_COMMAND,
+  taskLimitLine,
+} from "@agenteschat/client/lib/devices";
 import { errorText } from "@agenteschat/client/lib/errors";
 import { clockAt, firstName, formatTime, joinNames } from "@agenteschat/client/lib/format";
 import { agentGrammar } from "@agenteschat/client/lib/grammar";
@@ -26,9 +31,11 @@ import {
   allowedFolders,
   allowsInApp,
   canReduceAccess,
+  codexSandboxNote,
   commandInReason,
   computerKind,
   computerState,
+  egressViaText,
   folderName,
   hostDescKey,
   isPaused,
@@ -224,7 +231,9 @@ function MachinePage({ machineId }: { machineId: string }) {
       ? { icon: "pause", label: paused }
       : m.online
         ? { icon: "check", label: t("machines.online") }
-        : { icon: "circle", label: t("machines.offline") };
+        : m.moving
+          ? { icon: "swap", label: t("machines.moving.short") }
+          : { icon: "circle", label: t("machines.offline") };
   // One facts line, and why it's paused while it is.
   const facts = [
     managed
@@ -242,6 +251,7 @@ function MachinePage({ machineId }: { machineId: string }) {
     // System mode: each agent works in its own home, never in the folder the computer was connected from.
     m.mode === "system" && !managed && m.kind !== "host" ? t("machines.agentUsers") : null,
     managed && m.online && m.egressWaiting ? t("machines.egress.waiting") : null,
+    egressViaText(t, m),
     managed && m.networkTransition
       ? t(m.networkTransition.state === "draining" ? "machines.egress.draining" : "machines.egress.restart", {
           when: formatTime(i18n.language, m.networkTransition.deadline),
@@ -277,6 +287,19 @@ function MachinePage({ machineId }: { machineId: string }) {
           </Text>
         ))}
       </View>
+
+      {m.canManage && m.update ? (
+        <>
+          <Gap />
+          <GroupedFooter>{t(`machines.runnerBehind.${m.update}`, { computer: title })}</GroupedFooter>
+          {m.update === "command" ? (
+            <>
+              <Gap />
+              <CommandBlock command={RUNNER_UPDATE_COMMAND} />
+            </>
+          ) : null}
+        </>
+      ) : null}
 
       {details.length > 0 || egressIp ? (
         <>
@@ -586,13 +609,17 @@ function ToolsSection({ machine: m, onReduce }: { machine: Machine; onReduce: (r
           ]
             .filter(Boolean)
             .join(" ");
+          const label = t(`machines.access.tool.${tool}`);
+          // Codex on Windows: what holds its commands there, when that is less than MXC.
+          const note = tool === "codex" ? codexSandboxNote(t, m) : null;
           return (
             <GroupedRow
               key={tool}
               {...(tool === "commands"
                 ? { icon: "code" as const }
                 : { leading: <ProviderLogo id={tool} size="sm" off={!on} /> })}
-              label={t(`machines.access.tool.${tool}`)}
+              label={label}
+              {...(note ? { hint: { name: t("common.about", { label }), text: note } } : {})}
               sub={sub}
               subLines={3}
               media

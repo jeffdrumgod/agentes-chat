@@ -40,6 +40,7 @@ import {
   setBlockState,
   setFileAccess,
   setFileSharing,
+  setFileWave,
   storedArtifactFile,
   updateArtifact,
   updateFolder,
@@ -127,6 +128,10 @@ const FileContent = z
     text: z.string().optional().openapi({ description: "Small UTF-8 text files only (≤ 40k characters)." }),
     width: z.number().int().optional().openapi({ description: "A picture's width in pixels, when known." }),
     height: z.number().int().optional().openapi({ description: "A picture's height in pixels, when known." }),
+    wave: z
+      .object({ peaks: z.array(z.number()), durationMs: z.number().int() })
+      .optional()
+      .openapi({ description: "An audio file's wave (0–1) and length, once an app measured it." }),
   })
   .openapi("ArtifactFileContent", {
     description: "An uploaded file as is: metadata only; the bytes come from the download link.",
@@ -916,6 +921,43 @@ export function artifactRoutes(deps: AppDeps) {
       );
       deps.wakeWorkers?.();
       return c.json({ id: message.id }, 201);
+    },
+  );
+
+  app.openapi(
+    createRoute({
+      method: "put",
+      path: "/organizations/{orgId}/artifacts/{artifactId}/wave",
+      tags,
+      security,
+      summary: "Keep an audio file's wave and length, measured by the first app that played it (kept once)",
+      request: {
+        params: ArtifactParams,
+        query: z.object({ version: z.coerce.number().int().min(1) }),
+        body: body(
+          z.object({
+            peaks: z.array(z.number().min(0).max(1)).max(200),
+            durationMs: z.number().int().positive(),
+          }),
+        ),
+      },
+      responses: {
+        200: json(z.object({ peaks: z.array(z.number()), durationMs: z.number().int() })),
+        ...errors,
+      },
+    }),
+    async (c) => {
+      const { orgId, artifactId } = c.req.valid("param");
+      const { version } = c.req.valid("query");
+      const wave = await setFileWave(
+        artifacts(),
+        person(c.get("user").id),
+        orgId,
+        artifactId,
+        version,
+        c.req.valid("json"),
+      );
+      return c.json(wave, 200);
     },
   );
 

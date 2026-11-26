@@ -12,6 +12,7 @@ import {
   type PubSub,
   REMOTE_PAUSE_PROTOCOL,
   RUNNER_STOPPED_CLOSE,
+  type TaskRoomReport,
 } from "@agenteschat/adapters";
 import {
   and,
@@ -36,8 +37,9 @@ import { ForbiddenError, NotFoundError, ValidationError } from "./errors";
 import { publishOrgEvent } from "./events";
 import { can, requireActiveMembership, requirePermission } from "./organizations";
 import { maySql } from "./permissions";
-import { isRightHand, RIGHT_HAND, rightHandPermanent } from "./right-hand";
+import { isRightHand, RIGHT_HAND } from "./right-hand";
 import { liveSeats, oneUserComputer, removedSeatIds, removeSeat, SHARED_SEAT, seatName } from "./right-hand-seats";
+import { runnerUpdateOf } from "./runner-update";
 
 const { machines, agents, users, organizationMembers } = schema;
 
@@ -189,6 +191,22 @@ export const shownOnline = (
   row: Pick<MachineRow, "online" | "lastSeenAt" | "deletedAt" | "kind" | "standbyAt" | "wakeWantedAt">,
   now = new Date(),
 ) => machineOnline(row, now) || shownStandby(row, now);
+
+/** The longest the apps say a computer is moving: one whose move never said it ended shows its real state after. */
+export const MOVING_SHOWN_MS = 2 * 60 * 60_000;
+
+/**
+ * Moving to another server as people see it: the workspace's own computer, away, while the operator says it moves
+ * (`moving_at`), for at most `MOVING_SHOWN_MS`. Online, it works as ever: nothing to say.
+ */
+export const shownMoving = (
+  row: Pick<MachineRow, "online" | "lastSeenAt" | "deletedAt" | "kind" | "movingAt">,
+  now = new Date(),
+) =>
+  row.kind === "managed" &&
+  row.movingAt !== null &&
+  !machineOnline(row, now) &&
+  now.getTime() - row.movingAt.getTime() < MOVING_SHOWN_MS;
 
 export type OfflineCause = "unresponsive" | "stopped" | "dropped";
 
@@ -511,6 +529,14 @@ export async function computerDrivers(db: Database, orgId: string, agentId: stri
   return ownersDriving.length > 0 ? ownersDriving : drivers;
 }
 
+/** How long the workspace's computer is said to go out through a lent one after it last did (ADR 0237). */
+export const EGRESS_VIA_SHOWN_MS = 5 * 60_000;
+
+/** The workspace's computer's last lent connection, while recent: whose computer carries its web traffic now. */
+export function egressViaNow(via: { machineId: string; at: string } | null | undefined, now = new Date()) {
+  return via && now.getTime() - Date.parse(via.at) < EGRESS_VIA_SHOWN_MS ? via.machineId : null;
+}
+
 /**
  * The machines of an org as one person sees them: every member sees them;
  * the workspace path and the access report only admins and the pairer.
@@ -567,6 +593,8 @@ async function machineViews(db: Database, actorId: string, orgId: string, only?:
     // The workspace's own computer (ADR 0056 §10) is a service people use, not a box they look into.
     const managed = m.kind === "managed";
     const online = shownOnline(m, now);
+    const viaId = managed ? egressViaNow(m.egressVia, now) : null;
+    const via = viaId ? rows.find((r) => r.machine.id === viaId) : undefined;
     return {
       id: m.id,
       name: m.name,
@@ -576,10 +604,14 @@ async function machineViews(db: Database, actorId: string, orgId: string, only?:
       offlineCause: offlineCause(m, online),
       /** The workspace's own computer is asleep in standby (ADR 0161) and wakes as it should: nothing is wrong. */
       standby: shownStandby(m, now),
+      /** The workspace's own computer is away moving to another server (`shownMoving`): back in a few minutes. */
+      moving: shownMoving(m, now),
       networkTransition: managed ? m.networkTransition : null,
       /** The workspace's own computer's agents wait for their way out, as the operator says: a line, never an error. */
       egressWaiting: managed && machineOnline(m, now) && m.egressWaitingAt !== null,
       egress: managed && machineOnline(m, now) && m.egress?.ip ? { ...m.egress, ip: m.egress.ip } : null,
+      /** ADR 0237: the person's computer whose internet the workspace's own computer's web traffic uses now. */
+      egressVia: via ? { machineId: via.machine.id, name: via.machine.name, userName: via.pairedByName } : null,
       lastSeenAt: m.lastSeenAt?.toISOString() ?? null,
       hostname: managed ? "" : m.hostname,
       os: managed ? "other" : m.os,
@@ -589,6 +621,8 @@ async function machineViews(db: Database, actorId: string, orgId: string, only?:
       runnerVersion: m.runnerVersion,
       /** The runner's machine protocol (9+: pause; 10+: access on the machine). */
       protocol: m.protocol,
+      /** Its runner is behind this server and how its owner updates it (`runnerUpdateOf`); null: nothing to do. */
+      update: runnerUpdateOf(m),
       /** Its runner can hold browser profiles (ADR 0110); a system-mode computer has none at all (`mode`). */
       browserProfiles: m.protocol >= BROWSER_PROFILE_PROTOCOL,
       execAllowed: m.execAllowed,
@@ -613,6 +647,14 @@ async function machineViews(db: Database, actorId: string, orgId: string, only?:
       cliInstall: !managed && m.protocol >= CLI_INSTALL_PROTOCOL,
       /** The coding CLIs there that can't start, with their own error line; admins and the pairer only. */
       cliErrors: (admin || mine) && !managed ? (m.executors?.broken ?? null) : null,
+      /**
+       * ADR 0228 §6: the coding CLIs its runner fetches by itself there (none on the workspace's own computer or in
+       * system mode), and where each fetch stands (`fetching` with bytes, `ready`, `failed` with why).
+       */
+      cliFetchable: managed || m.executors?.mode === "system" ? [] : (m.executors?.copies?.fetchable ?? []),
+      cliFetch: managed ? null : (m.executors?.copies?.fetch ?? null),
+      /** What holds Codex's commands on a Windows computer (`CODEX_UNELEVATED_PROTOCOL`); null elsewhere or unknown. */
+      codexSandbox: m.os === "windows" ? (m.executors?.codex?.sandbox ?? null) : null,
       pairedBy: m.pairedByUserId ? { id: m.pairedByUserId, name: pairedByName ?? "" } : null,
       // A private agent stays out for whom it is unlisted (`listsAgentTo`), but not on the computer of who paired it.
       agents: using
@@ -678,9 +720,14 @@ export async function machineView(db: Database, actorId: string, orgId: string, 
   return view;
 }
 
-/** Its size as stored, with a new task limit (`TASK_LIMIT_PROTOCOL`); a row with no size yet keeps none. */
-export const withTaskLimit = (maxTasks: number) =>
-  sql`jsonb_set(${machines.size}, '{maxTasks}', to_jsonb(${maxTasks}::int))`;
+/**
+ * Its size as stored, with a new task limit (`TASK_LIMIT_PROTOCOL`) and room (`TASK_ROOM_PROTOCOL`); a row with no
+ * size yet keeps none.
+ */
+export const withTaskLimit = (maxTasks: number, room?: TaskRoomReport) => {
+  const limit = sql`jsonb_set(${machines.size}, '{maxTasks}', to_jsonb(${maxTasks}::int))`;
+  return room ? sql`jsonb_set(${limit}, '{room}', ${JSON.stringify(room)}::jsonb)` : limit;
+};
 
 /** `machine.updated` to every member: what changed (no access details: those are for admins and the pairer). */
 
@@ -723,6 +770,34 @@ export async function setMachineEgressWaiting(
   if (!row) return null;
   await publishMachineUpdated(deps.pubsub, orgId, machineId, { egressWaiting: waiting });
   return { waiting };
+}
+
+/**
+ * `PUT …/machines/{machineId}/moving`: the operator says the workspace's own computer is moving to another server
+ * (`moving_at` the latest word, which `MOVING_SHOWN_MS` counts from: a move that waits for its next step says it
+ * again), or no longer; its people's apps read it again. Null: the workspace has no such managed computer.
+ */
+export async function setMachineMoving(
+  deps: { db: Database; pubsub?: PubSub },
+  orgId: string,
+  machineId: string,
+  moving: boolean,
+) {
+  const [row] = await deps.db
+    .update(machines)
+    .set({ movingAt: moving ? sql`now()` : null })
+    .where(
+      and(
+        eq(machines.orgId, orgId),
+        eq(machines.id, machineId),
+        eq(machines.kind, "managed"),
+        isNull(machines.deletedAt),
+      ),
+    )
+    .returning({ id: machines.id });
+  if (!row) return null;
+  await publishMachineUpdated(deps.pubsub, orgId, machineId, { moving });
+  return { moving };
 }
 
 /** How many `deletedAgentIds` lists: a computer that misses one only keeps that agent's transcripts. */
@@ -959,6 +1034,7 @@ export async function detachMachine(tx: Executor, machine: Pick<MachineRow, "id"
       standbyAt: null,
       wakeWantedAt: null,
       egressWaitingAt: null,
+      movingAt: null,
       previousAgentIds: ids,
       updatedAt: now,
     })
@@ -1051,7 +1127,12 @@ export async function setAgentComputerTarget(
   const membership = await requirePermission(deps.db, actorId, orgId, "read");
   const agent = await getAgent(deps.db, orgId, agentId);
   if (!agent || agent.archivedAt) throw new NotFoundError("Agent not found");
-  if (machineId && isRightHand(agent)) throw rightHandPermanent("given a computer");
+  if (machineId && isRightHand(agent)) {
+    throw new ForbiddenError(
+      "The team's right hand always uses the workspace's own computer, so no other can be chosen for it.",
+      "agent.right_hand_computer",
+    );
+  }
   const admin = managesAgent(agent, actorId, membership);
   const machine = machineId ? await getMachine(deps.db, orgId, machineId) : null;
   if (machineId && !machine) throw new NotFoundError("Computer not found", "machine.not_found");

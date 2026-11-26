@@ -1123,8 +1123,8 @@ for another day, `--org <workspace id>` for one workspace).
 <summary><b>Optional services and what they receive</b></summary>
 
 **The usage report.** The instance sends agentes.chat anonymous usage statistics: counts such as people,
-agents, machine sizes, AI tokens used and how much data the agents' browsers send and receive, never
-messages, files, names or sites. The first goes about an hour after the server first starts, then one a
+agents, machine sizes, AI tokens used, how much data the agents' browsers send and receive, and how fast
+the apps open and run, never messages, files, names or sites. The first goes about an hour after the server first starts, then one a
 day at that time, restarts or not (one that came due while the server was off goes about 10 minutes
 after it starts again), as JSON in a POST to `TELEMETRY_URL` (`https://telemetry.agentes.chat/v1/report`).
 It passes through Cloudflare, which sits in front of agentes.chat and decrypts it on the way.
@@ -1136,7 +1136,7 @@ report replaces it. These are all its fields:
 | `report` | The report's format: `1`. |
 | `instance` | A random id made at the server's first start. Nothing else in the report identifies the server. |
 | `version`, `edition`, `install` | The server's version, as `/api/health` gives it (`0.0.0` while releases aren't numbered yet); `selfhost`; `docker`, `native` or `desktop`. |
-| `os`, `arch`, `uptimeHours` | The server's system (`linux`, `darwin`), processor (`x64`, `arm64`) and hours since it started. |
+| `os`, `osVersion`, `arch`, `uptimeHours` | The server's system (`linux`, `darwin`), its version as numbers alone (a Linux or Darwin kernel's, `6.8.0`, a Windows build, `10.0.19045`; `other` when there are none), processor (`x64`, `arm64`) and hours since it started. |
 | `host.size` | The machine the server runs on: its logical CPUs (`cpus`) and memory (`memoryGb`, to 0.5 GB), the disk holding the server's files (`diskGb`, to 1 GB: `FILES_DIR`, the data volume with Docker, else its working folder), and `limit` (`cpus`, `memoryGb`) when a container lets the server use less of the machine. |
 | `host.container` | Whether the server runs in a container. |
 | `host.load` | How busy that whole machine got over the last day, sampled every 5 minutes: the average and highest load per CPU (`loadAvg`, `loadPeak`: the 5-minute load average divided by the machine's CPUs, 1 is every CPU busy), the average and highest share of its memory in use (`memoryAvg`, `memoryPeak`, from 0 to 1), and the hours the samples cover (`hours`); `null` with no sample from the last day. |
@@ -1147,6 +1147,7 @@ report replaces it. These are all its fields:
 | `lastDay.runs`, `lastDay.toolCalls` | Agent runs started, and tool calls they made, in the last 24 hours. |
 | `lastDay.desktopMinutes`, `lastDay.terminalMinutes` | Minutes people watched or controlled agents' desktops, and had terminals open, in the last 24 hours. |
 | `lastDay.models` | For each AI provider and model used in the last 24 hours (the 50 most used): `provider`, `model`, `calls`, `inputTokens` (cached ones included) and `outputTokens`. A model that isn't in agentes.chat's model list (a name someone typed, a deployment, a fine-tune) goes as `other`. |
+| `lastDay.clientVitals` | How fast the apps ran since the last report, for each platform that said: the phone apps (`ios`, `android`), browsers (`web`) and the desktop app on each system (`macos`, `windows`, `linux`). How many speed reports came (`reports`), and for each measure how many values (`n`) with their median (`p50`) and 95th percentile (`p95`): the opening, to the first screen (`coldStartMs`: the desktop app from its start) and to the first rows (`firstRowsMs`), how late the app's JavaScript ran (`jsLagP95Ms`, `jsLagMaxMs`), its JavaScript heap (`heapBytes`), the memory behind the desktop app's window (`webviewBytes`), the reads after each return to the app (`getsPerReturn`) and the realtime connection's reconnects (`reconnects`). The apps send these numbers to their own server, about once at each start and each return to them, with nobody's id; the server keeps a sample of a few hundred of each until the report goes (none with `TELEMETRY=off`). |
 
 It never holds messages, files, names, emails, hostnames, paths, prompts, IP addresses, the sites agents'
 browsers visit, or ids of workspaces, people or computers (the request itself comes from your server's
@@ -1172,10 +1173,10 @@ report. A report holds:
 | --- | --- |
 | `format`, `source`, `place` | `1`; `server` or `desktop`; where it was sent from (`browser`, `computer`, `run`, `desktop_server`, `settings`). |
 | `instance` | The usage report's random id (`null` from the desktop app). |
-| `code`, `step`, `happenedAt`, `timings` | What failed and at which step, as codes (`browser.no_answer`, a run's error code), when, and counts or durations the screen measured (`attempts`). |
-| `versions` | The server's, the runner's (and its protocol), the desktop app's and the phone app's versions, the server's system and processor, and the browser's family and major version (`chrome 142`), never the whole User-Agent. |
+| `code`, `step`, `happenedAt`, `timings` | What failed and at which step, as codes (`browser.no_answer`, a run's error code), when, and counts or durations the screen measured (`attempts`; from the desktop app, `opening`: how long this opening took, from the app's start to the site's first screen). |
+| `versions` | The server's, the runner's (and its protocol), the desktop app's and the phone app's versions, the server's system and processor, and the browser's family and major version (`chrome 142`), never the whole User-Agent. From the desktop app, its computer's system version too, as numbers alone (`osVersion`: macOS's, Windows' build, Linux's kernel). |
 | `install`, `locale` | `docker`, `native` or `desktop`; the app's language. |
-| `facts` | Which settings differ from their defaults, as `config.<NAME>: "set"`, never their values (`TELEMETRY`, `INSTALL_MODE`, `NODE_ENV`, `LOG_LEVEL` and `MACHINE_PROVISIONING` by value, and `config.publicUrl` as `https`, `http` or `loopback`, never the address); how many workspaces, agents and computers; hours since the server started; migrations applied; for the computer involved, its system, processor, runner version, connection, last sign of life, pause, its coding CLIs' versions and which of its tools are on; for a run, its status, brain, turns and hop. |
+| `facts` | Which settings differ from their defaults, as `config.<NAME>: "set"`, never their values (`TELEMETRY`, `INSTALL_MODE`, `NODE_ENV`, `LOG_LEVEL` and `MACHINE_PROVISIONING` by value, and `config.publicUrl` as `https`, `http` or `loopback`, never the address); how many workspaces, agents and computers; hours since the server started; migrations applied; for the computer involved, its system, processor, runner version, connection, last sign of life, pause, its coding CLIs' versions and which of its tools are on; for a run, its status, brain, turns and hop, and its error's words, scrubbed as log lines are (the computer involved is the one its turns ran on); from the desktop app, its computer's CPUs, memory and the memory behind its window (`desktop.cpus`, `desktop.memoryGb`, `desktop.webviewMb`). |
 | `logs` | The last lines of the computer's `runner.log` (up to 300, from its app when it answers within 5 seconds), and the server's own last log lines from the last 30 minutes (only when the installation's owner sends it); the desktop app's server log and setup steps. Every line is scrubbed first: emails, IP addresses, keys, tokens and cookie headers masked, links cut to their origin (with any user and password in them), home folders as `~`, and the names of the server, its workspaces, computers, agents and the sender replaced by `[server]`, `[workspace]`, `[computer]`, `[agent]`, `[person]`. Lines over 1,000 characters are cut. |
 | `note`, `replyTo` | What the person wrote (credentials masked) and an email for a reply, both optional and empty unless filled in. |
 
@@ -1270,11 +1271,11 @@ without an OAuth app) or the GitHub App.
 Connected with a person's GitHub account, agents open pull requests and comment as that person. With the
 GitHub App, they do it as the app: pull requests, issues, comments and commits come from the app's bot, each
 body ends with one line naming the agent and the person it works for, and commits credit that person
-(`Co-authored-by`) when they signed in with GitHub. Where the app isn't installed, the account connection is
+(`Co-Authored-By`) when they signed in with GitHub. Where the app isn't installed, the account connection is
 used, as before.
 
 Every commit an agent makes, through GitHub or with git on its computer, ends with its own line too:
-`Co-authored-by: <agent's name> <noreply@agentes.chat>`, next to the coding CLI's own (`Co-Authored-By: Claude …`)
+`Co-Authored-By: <agent's name> <noreply@agentes.chat>`, next to the coding CLI's own (`Co-Authored-By: Claude …`)
 and the person's, never twice. It is on by default; to turn it off for the whole workspace, ask any agent ("stop
 adding your co-author line to commits"), and ask again to turn it back on. On a computer the runner adds it with git
 hooks of its own, handed only to the agents' processes through their environment: your own git, outside them, is
@@ -1368,7 +1369,7 @@ Install the ones you want on that computer, as the user that runs the runner: Cu
 even when its service's PATH lacks it), OpenCode's with `npm install -g opencode-ai@1.19.5`, Grok Build with
 `curl -fsSL https://x.ai/cli/install.sh | bash` (it puts `grok` in `~/.local/bin` too; agents think with it only
 through a Grok account added in Settings, AI and usage, never the computer's own sign-in. On Linux its sandbox needs
-bubblewrap, `sudo apt install -y bubblewrap`, or Grok Build refuses to start and every turn fails), Google's
+bubblewrap, `sudo apt install -y bubblewrap`, or Grok Build refuses to start and every turn fails; on Ubuntu 24.04 and later it also needs the AppArmor profile below), Google's
 Antigravity CLI with
 `curl -fsSL https://antigravity.google/cli/install.sh | bash` (`agy` in `~/.local/bin`; Gemini accounts sign in on Linux
 and macOS computers, not Windows yet, each in a folder of its own (on a Mac, with a keychain of its own there), and a personal Google plan used this way is against Google's terms for
@@ -1390,6 +1391,23 @@ sign in from the apps (Settings, AI and usage), once for all of their owner's ag
 Commands run as the user that runs the runner, so give it a dedicated user or a VM.
 `agentes-runner tools disable commands` (or `claude`, `codex`, `cursor`, `opencode`, `grok` or `antigravity`) turns a capability off on that
 computer, and `agentes-runner folders allow <path>` shares a folder besides the agents' own.
+
+Ubuntu 24.04 and later block unprivileged user namespaces (`kernel.apparmor_restrict_unprivileged_userns = 1`),
+which the bubblewrap sandbox of Grok Build and of the Antigravity CLI's terminal needs. Allow them for `bwrap`
+alone, rather than turning AppArmor off:
+
+```sh
+sudo tee /etc/apparmor.d/bwrap >/dev/null <<'PROFILE'
+abi <abi/4.0>,
+include <tunables/global>
+
+profile bwrap /usr/bin/bwrap flags=(unconfined) {
+  userns,
+  include if exists <local/bwrap>
+}
+PROFILE
+sudo systemctl reload apparmor
+```
 
 On a Linux server, the installer's `--system` option (below) installs Google Chrome from Google's apt
 repository (its signing key checked against its fingerprint) when the computer has none, with a
@@ -1508,7 +1526,9 @@ simple mode, a Mac) each place is a folder and a browser profile of that one use
 Lodi keeps each person's work in their own place and is told never to look outside it, but other agents'
 commands there can read it, and only the person who connected the computer takes control of its desktop or
 opens its terminal. Lodi's page says which of the two a place is. For places nobody else can read, set the
-server up with `--system`. A computer a person connected is never Lodi's. Turn its commands, browser or desktop
+server up with `--system`. A computer a person connected becomes Lodi's only when the workspace has neither, an
+admin connected it, and it is marked the workspace's on its page ("Belongs to the workspace" on, open to everyone in the workspace): a
+VPS you paired works that way without this server's own runner. Turn its commands, browser or desktop
 off for everyone on its page, under what it can use. The computer's shared folder is still shared: every agent
 and every person's Lodi reads and writes it. Without a computer of the workspace's own, Lodi has no computer,
 and its page links here.
@@ -1535,8 +1555,9 @@ computer (`tailscale serve`, an nginx or a Caddy outside Docker) takes
 `sudo agentes-runner services allow tcp/443` too, or agents can't push to its git. Container and VM
 networks on the computer are closed to agents, except ports published on an address other than
 loopback. Each agent also has its own `/tmp`, `/dev/shm` and `/run/lock`, in memory as the computer's
-are (a tmpfs of its own, which counts in the agents' memory), and its own `/var/tmp` on disk (in
-`/var/lib/agentes-runner-tmp`), cleared of what is 10 days old (30 in `/var/tmp`), so a socket or file
+are (its `/tmp` in one tmpfs all agents share, a fifth of the RAM, which counts in the agents' memory), and
+its own `/var/tmp` on disk (in `/var/lib/agentes-runner-tmp`), cleared of what is 10 days old (30 in
+`/var/tmp`; 6 hours in `/tmp` and `/dev/shm` for an agent with nothing running), so a socket or file
 another agent leaves there is out of its reach, and its own adb server port
 (`ANDROID_ADB_SERVER_PORT`). Agents can't schedule cron or at jobs, which would run outside their own
 folders: the runner adds their users to `/etc/cron.deny` and `/etc/at.deny` (a job one scheduled before
@@ -1554,7 +1575,9 @@ have no owner, so a program an agent runs that listens on one without checking w
 the other agents, and an agent can take a name another agent's program wants. An X display's name taken
 before a desktop starts sends that desktop to another display, but an agent holding all 50 stops every new
 or restarted desktop on the computer, and on this server's own computer the names span its
-organizations.
+organizations. A root-owned `networkLauncher` helper that gives each agent its own network namespace
+closes the second ([ADR 0030](docs/adr/0030-runner-isolation.md), [ADR 0096](docs/adr/0096-agents-own-local-ports.md));
+agentes.chat Cloud's computers run one, and none is installed by default.
 
 **Memory and CPUs.** With `--system` the agents share the computer: none has memory or CPUs of its own,
 so one agent's build may use every CPU and all the memory the agents have; when several want the CPUs,
@@ -1563,13 +1586,17 @@ computer), plus swap for a third of that, which keeps the rest for the system, t
 the server. At that limit the kernel stops one process, usually the biggest (Chrome's pages first), and
 only that process: the command it belonged to fails, and the agent is told it was most likely memory
 (with systemd 253 or newer; a desktop or a task already running when you update gets this when it next
-starts). What agents leave in `/tmp` holds RAM until they delete it or the computer restarts. To keep
-it on disk instead, add `"agentTmpOnDisk": true` to `/var/lib/agentes-runner/config.json` as root (on
+starts). What agents leave in `/tmp` holds RAM until they delete it, it ages out or the computer
+restarts, at most a fifth of the RAM for all of them: past that, writes there fail with "no space". An
+agent's desktop nobody used for an hour is put to rest while less than 1.5 GB is free, and one with a
+command still running in its Terminal once nobody used it for a day. To keep `/tmp` on disk instead (its
+small files stay in the page cache, which the kernel takes back when memory is short), add
+`"agentTmpOnDisk": true` to `/var/lib/agentes-runner/config.json` as root (on
 this server's own computer too, for all its organizations): each agent takes it at its first launch
 after the next boot (until then it keeps the `/tmp` it has). The agents' `/tmp` is then a filesystem of
 their own, made anew at every boot in `/var/cache/agentes-runner-tmp` with half of what the system disk
 has free, so they can't fill that disk or take its inodes. It needs loop devices and `mkfs.ext4`
-(e2fsprogs), which an unprivileged container doesn't have.
+(e2fsprogs), which an unprivileged container doesn't have: there `/tmp` stays in memory.
 `agentes-runner computer`, which any agent (or you) can run, prints what the computer has, what is free
 for new work and which agents use the most; agents are told to run it before something heavy, to tell
 the person when another agent's work leaves no room, and to stop what a finished build left running.
@@ -1630,16 +1657,37 @@ installer), so `codex` is on that user's PATH; the app looks at the PATH again e
 restart. The app can install Claude Code there for you, but not Codex. Then sign in to ChatGPT in
 **Settings → AI and usage**. What differs from Linux and macOS:
 
-- Every turn that can run commands runs inside Windows' own isolation (Microsoft Execution Containers),
-  which needs **Windows 11 24H2 or newer** (`winver` shows yours). On an older Windows those turns fail with
-  "This Windows computer can't isolate Codex's commands": update Windows, give that agent Claude or an API
-  key, or move it to a Linux computer. Lodi's turns run no commands, so they work on any Windows.
-- Nothing asks for approval there: what the isolation refuses stays refused, and it has no network, so
-  `git push` or a package install doesn't run from Codex's own commands.
+- Every turn that can run commands runs isolated, and how well depends on the Windows:
+  - **Windows 11 24H2 with the August 2026 update** (build 26100.9278 or newer, `winver` shows yours) runs
+    them inside Windows' own isolation (Microsoft Execution Containers): writes only in the agent's folders,
+    no network.
+  - **Older Windows** (Windows 10, Windows 11 without that update) runs them in Codex's own sandbox: writes
+    still only in the agent's folders, but the network is blocked only through proxy settings (a program
+    that ignores them still gets out), and commands can read anything the Windows user can. The AI choice
+    and the computer's page say so behind an ⓘ.
+  - **When neither starts** (Codex's own sandbox fails to set up on some Windows 10 computers), Codex isn't
+    offered for agents on that computer and says why: give that agent Claude or an API key, update to
+    Windows 11 24H2 or newer with its latest updates, or move it to a Linux computer.
+
+  The computer checks which one works by itself, shortly after it starts, and while it runs on Codex's own
+  sandbox it looks for Windows' own isolation again every 10 minutes. Lodi's turns run no commands, so they
+  work on any Windows, ChatGPT included.
+- Nothing asks for approval there: what the isolation refuses stays refused. Windows' own isolation has no
+  network, so `git push` or a package install doesn't run from Codex's own commands. Codex's own sandbox
+  blocks only what honours the proxy settings: a program that ignores them (an SSH `git push`, for one) can
+  still reach the network.
 - No background Codex tasks, and Codex doesn't do a mission's items there (Claude Code or the agent does).
 - No plan on Windows, Codex's or Claude's, picks who answers a message (Plans, below).
 - The isolation leaves the computer's own loopback open: a command can reach a service listening on
   `127.0.0.1` there.
+
+**Grok Build on Windows.** Install it as the Windows user that runs the app, with
+`powershell -ExecutionPolicy Bypass -Command "irm https://x.ai/cli/install.ps1 | iex"` (it puts `grok.exe` in
+`%USERPROFILE%\.grok\bin`), then add a Grok account in **Settings → AI and usage**; a PC can hold several, each
+in a folder of its own. Grok Build's own sandbox doesn't run on Windows, so there its own tools only edit files in
+the agent's folder and run read-only commands (`git status`, `ls`, `grep`); every other command goes through the
+agent's terminal tool, under the same command rules as Claude Code's on Windows. Lodi's turns are the same as
+elsewhere.
 
 Use HTTPS with a certificate from a public authority (Tailscale and the Caddy profile get one). Over
 plain http the computer's token travels unencrypted, and the runner's background service doesn't

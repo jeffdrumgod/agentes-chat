@@ -9,6 +9,7 @@ import { recordAudit } from "./audit";
 import type { AutoModels } from "./auto-model";
 import { resolveDefaultBudgetPaused } from "./budget-paused-rows";
 import { caches } from "./cache";
+import { noteJoined, writeLeftLine } from "./channel-joins";
 import {
   announceChannelLeavers,
   CHANNEL_NAME_PATTERN,
@@ -96,6 +97,8 @@ export interface OrgSettings extends MediaSettings {
   teamWatch: boolean;
   /** The right hand greets each person who joins, once. On by default. */
   welcomePeople: boolean;
+  /** The right hand learns from conversations on its own (each person may also turn it off for themselves). On by default. */
+  rightHandLearns: boolean;
   /** What agents without their own choice ask before acting (ADR 0173). Set with `setWorkspaceApprovalsLevel`. */
   approvalsLevel: ApprovalsLevel;
 }
@@ -124,6 +127,7 @@ export async function getOrgSettings(db: Database, actorId: string, orgId: strin
     mode: isWorkspaceMode(s?.mode) ? s.mode : "team",
     teamWatch: s?.teamWatch ?? true,
     welcomePeople: s?.welcomePeople ?? true,
+    rightHandLearns: s?.rightHandLearns ?? true,
     approvalsLevel: s?.approvalsLevel ?? DEFAULT_APPROVALS_LEVEL,
     ...mediaSettingsFrom(s),
   };
@@ -137,6 +141,20 @@ export const isValidTimeZone = (tz: string) => {
     return false;
   }
 };
+
+/**
+ * The zone of the device someone joined from becomes theirs in the workspace while they have none of their own, so
+ * agents keep their clock rather than the workspace's. A zone they set stays.
+ */
+export async function adoptDeviceZone(db: Database, orgId: string, userId: string, zone: string | undefined) {
+  if (!zone || !isValidTimeZone(zone)) return;
+  const m = schema.organizationMembers;
+  await db
+    .update(m)
+    .set({ timezone: zone })
+    .where(and(eq(m.orgId, orgId), eq(m.userId, userId), isNull(m.timezone)));
+  caches.zones.delete(`${orgId}:${userId}`);
+}
 
 /** Updates name, context (goes into every agent's prompt) and settings. Admins (`configure`). */
 export async function updateOrgSettings(
@@ -259,6 +277,7 @@ export async function updateOrgSettings(
       ...(input.mode !== undefined ? { mode: input.mode } : {}),
       ...(input.teamWatch !== undefined ? { teamWatch: input.teamWatch } : {}),
       ...(input.welcomePeople !== undefined ? { welcomePeople: input.welcomePeople } : {}),
+      ...(input.rightHandLearns !== undefined ? { rightHandLearns: input.rightHandLearns } : {}),
       ...(input.autoModels !== undefined
         ? { autoModels: mergeAutoModels(await storedAutoModels(), input.autoModels) }
         : {}),
@@ -548,12 +567,28 @@ export async function setAgentChannels(
           ),
         ),
       );
+      // Out of a channel, it is no longer responsible for it.
+      await tx
+        .update(channels)
+        .set({ leadAgentId: null })
+        .where(
+          and(
+            eq(channels.orgId, orgId),
+            eq(channels.leadAgentId, agentId),
+            inArray(
+              channels.id,
+              removing.map((c) => c.id),
+            ),
+          ),
+        );
     }
     for (const c of adding) {
-      await tx
+      const fresh = await tx
         .insert(channelMembers)
         .values({ orgId, channelId: c.id, agentId, autoReply: wanted.get(c.id) ?? true })
-        .onConflictDoNothing();
+        .onConflictDoNothing()
+        .returning({ id: channelMembers.id });
+      if (fresh.length > 0 && c.kind === "channel") await noteJoined(tx, orgId, c.id, actorId);
     }
     for (const c of retuned) {
       await tx
@@ -563,6 +598,8 @@ export async function setAgentChannels(
     }
   });
   caches.channelMembers.deletePrefix(`${orgId}:`);
+  // The rows of the channels it left: their responsible agent may have gone with it.
+  for (const c of removing) caches.channels.delete(`${orgId}:${c.id}`);
   caches.scopes.deletePrefix(`${orgId}:${agentId}:visible`);
   // Each channel's members column follows, as when it is added or taken out from the channel itself.
   const member = (autoReply?: boolean) => ({
@@ -576,8 +613,10 @@ export async function setAgentChannels(
       channelId: c.id,
       member: member(wanted.get(c.id) ?? true),
     });
-  for (const c of removing)
+  for (const c of removing) {
+    await writeLeftLine({ db, pubsub: options.pubsub }, orgId, c.id, { type: "agent", id: agentId });
     await publishChannelEvent(options.pubsub, { type: "channel.member_removed", channelId: c.id, member: member() });
+  }
   for (const c of retuned)
     await publishChannelEvent(options.pubsub, {
       type: "channel.member_updated",
@@ -607,6 +646,8 @@ export async function updateChannel(
     visibility?: "public" | "private";
     audienceRoleIds?: string[];
     replyInThreads?: boolean;
+    /** The agent responsible for the channel, one of its member agents; null: none. */
+    leadAgentId?: string | null;
   },
   options: { pubsub?: PubSub } = {},
 ) {
@@ -627,6 +668,8 @@ export async function updateChannel(
   if (channel.kind === "dm") throw new ValidationError("A direct conversation keeps its participants");
   if (input.replyInThreads !== undefined && channel.kind !== "channel")
     throw new ValidationError("Only a channel can reply in threads", "channel.reply_in_threads");
+  if (input.leadAgentId !== undefined && channel.kind !== "channel")
+    throw new ValidationError("Only channels have a responsible agent", "channel.lead_channel_only");
   const accessChanges = input.visibility !== undefined || input.audienceRoleIds !== undefined;
   const visibility = input.visibility ?? channel.visibility;
   const asked =
@@ -651,12 +694,32 @@ export async function updateChannel(
         dropped = audienceRoleIds.length > 0 ? before.filter((id) => !audienceRoleIds.includes(id)) : [];
         access = { visibility, audienceRoleIds };
       }
+      if (input.leadAgentId) {
+        // Its member row FOR SHARE (ADR 0095): taking the agent out of the channel either went first and the row is
+        // gone here, or waits for this save and then clears the lead it wrote.
+        const [member] = await tx
+          .select({ id: channelMembers.id })
+          .from(channelMembers)
+          .innerJoin(agents, eq(agents.id, channelMembers.agentId))
+          .where(
+            and(
+              eq(channelMembers.orgId, orgId),
+              eq(channelMembers.channelId, channelId),
+              eq(channelMembers.agentId, input.leadAgentId),
+              isNull(agents.archivedAt),
+            ),
+          )
+          .for("share", { of: channelMembers });
+        if (!member)
+          throw new ValidationError("The responsible agent must be in the channel", "channel.lead_not_member");
+      }
       const [row] = await tx
         .update(channels)
         .set({
           ...(name !== undefined ? { name } : {}),
           ...(input.topic !== undefined ? { topic: input.topic } : {}),
           ...(input.replyInThreads !== undefined ? { replyInThreads: input.replyInThreads } : {}),
+          ...(input.leadAgentId !== undefined ? { leadAgentId: input.leadAgentId } : {}),
           ...access,
         })
         .where(eq(channels.id, channelId))

@@ -396,6 +396,45 @@ export const words: EmailWords = {
       why: () => "agentes.chat의 이 워크스페이스에 참여 중이어서 이 메일을 보내 드렸어요.",
     },
   },
+  computerDown: {
+    subject: "컴퓨터가 응답하지 않아요",
+    preheader: "이 컴퓨터에서 에이전트의 작업이 기다리고 있어요.",
+    headline: "컴퓨터가 응답하지 않아요",
+    body: (name, org, away) => [
+      { b: name },
+      " (",
+      { b: org },
+      `)이(가) ${away} 동안 응답하지 않아요. 이 컴퓨터가 필요한 작업은 기다렸다가 다시 연결되면 계속돼요.`,
+    ],
+    runs: "대기 중인 에이전트 요청",
+    calls: "대기 중인 웹훅 호출",
+    note: "지금 계속하려면 컴퓨터 페이지에서 에이전트를 다른 컴퓨터로 옮기세요.",
+    button: "컴퓨터 열기",
+    why: (org) => `agentes.chat의 ${org} 컴퓨터를 관리하고 있어서 이 메일을 보내 드렸어요.`,
+    back: {
+      subject: "컴퓨터가 다시 연결됐어요",
+      preheader: "기다리던 작업이 이제 계속돼요.",
+      headline: "컴퓨터가 다시 연결됐어요",
+      runs: "대기했던 에이전트 요청",
+      calls: "대기했던 웹훅 호출",
+      body: (name, org, away) => [
+        { b: name },
+        " (",
+        { b: org },
+        `)이(가) ${away} 후 다시 연결됐어요. 기다리던 작업이 이제 계속돼요.`,
+      ],
+    },
+    personal: {
+      body: (name, _org, away) => [
+        { b: name },
+        `이(가) ${away} 동안 응답하지 않아요. 이 컴퓨터가 필요한 작업은 기다렸다가 다시 연결되면 계속돼요.`,
+      ],
+      why: () => "agentes.chat 개인 워크스페이스의 컴퓨터를 관리하고 있어서 이 메일을 보내 드렸어요.",
+      back: {
+        body: (name, _org, away) => [{ b: name }, `이(가) ${away} 후 다시 연결됐어요. 기다리던 작업이 이제 계속돼요.`],
+      },
+    },
+  },
   appConnected: {
     subject: "agentes.chat 계정에 앱이 연결됐어요",
     preheader: "한 워크스페이스에서 나 대신 에이전트의 작업을 읽고 보낼 수 있어요.",
@@ -588,6 +627,28 @@ export const words: EmailWords = {
       small: "본인이라면 설정에서 다시 연결하세요.",
       why: (surface) => `${surface}이(가) agentes.chat 계정에 연결되어 있었기 때문에 이 이메일을 보내드립니다.`,
       picture: "더 이상 휴대폰에 없는 어시스턴트",
+    },
+    pinReset: {
+      subject: (surface) => `${surface} PIN 설정`,
+      preheader: "채팅 앱에서 작업을 승인할 때 쓰는 PIN을 정하세요.",
+      headline: (surface) => `${surface} PIN 설정`,
+      body: (surface) =>
+        `${surface}에서 작업을 승인할 때 쓰는 PIN을 정하는 링크 요청이 있었습니다. 본인이라면 이 버튼으로 열리는 페이지에서 정하세요.`,
+      button: "내 PIN 정하기",
+      small:
+        "이 링크는 한 시간 동안 한 번만 작동합니다. 본인이 아니라면 이 이메일을 무시하세요. 아무것도 바뀌지 않습니다.",
+      why: (surface) => `${surface}이(가) agentes.chat 계정에 연결되어 있기 때문에 이 이메일을 보내드립니다.`,
+    },
+    pinLocked: {
+      subject: (surface) => `${surface} PIN이 잠겼습니다`,
+      preheader: "PIN을 세 번 연속 잘못 입력했습니다. 채팅 앱에서의 승인이 잠시 멈췄습니다.",
+      headline: (surface) => `${surface} PIN이 잠겼습니다`,
+      body: (surface, time) =>
+        `누군가 ${surface}에서 작업을 승인하려고 잘못된 PIN을 세 번 연속 입력했습니다. ${surface}에서의 승인은 ${time} 동안 멈춥니다.`,
+      lockedFor: ["15분", "1시간", "24시간"],
+      small: (surface) =>
+        `본인이었다면 나중에 다시 시도하세요. 본인이 아니라면 알림 설정에서 ${surface} 연결을 해제해 아무도 그곳에서 승인할 수 없게 하세요.`,
+      button: "알림 설정 열기",
     },
   },
   supportReply: {

@@ -296,6 +296,14 @@ export function githubAppRoutes(deps: AppDeps) {
     private: z.boolean(),
     updatedAt: z.string().nullable(),
   });
+  const Account = z.object({
+    host: z.string(),
+    hostLabel: z.string(),
+    prefix: z.string(),
+    login: z.string(),
+    type: z.string(),
+    repositories: z.array(Repository),
+  });
   const listing = {
     db: deps.db,
     connectors: githubAccess(deps).connectors,
@@ -319,7 +327,10 @@ export function githubAppRoutes(deps: AppDeps) {
           z
             .object({
               connected: z.boolean(),
-              accounts: z.array(z.object({ login: z.string(), type: z.string(), repositories: z.array(Repository) })),
+              accounts: z.array(Account),
+              elsewhere: z
+                .array(Account)
+                .openapi({ description: "What the organization's other git hosts reach (GitLab, Bitbucket)" }),
               truncated: z.boolean(),
             })
             .openapi("GitHubRepositories"),

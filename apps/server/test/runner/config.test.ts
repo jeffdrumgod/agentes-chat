@@ -152,6 +152,11 @@ test("services: what of the computer agents may reach, one TCP or UDP port each,
   expect(normalizeStored({ services: "tcp/11434" })).toEqual({});
 });
 
+test("Push harder survives the config being read back: a restart or an edit keeps the owner's switch", () => {
+  expect(normalizeStored({ pushHarder: true }).pushHarder).toBe(true);
+  expect(normalizeStored({ pushHarder: "yes" })).toEqual({});
+});
+
 test("gate: a service token kept for the server's gate survives a read; a half-formed one is dropped", () => {
   const gate = {
     server: "https://chat.example.com",

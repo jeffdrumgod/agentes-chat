@@ -381,6 +381,8 @@ export function planForTurn(plan: CodingPlan, value: unknown): CodingPlan {
 }
 
 const isAlias = (v: unknown): v is PlanAlias => PLAN_ALIASES.some((a) => a === v);
+/** Claude Code's aliases no plan maps (`fable`): Claude's own sign-in runs them as they are, a plan's runs `sonnet`. */
+const isClaudeOnlyAlias = (v: unknown) => v === "fable";
 
 /**
  * The model a stored value runs on a plan: one of its models by id, the model of an alias, else (`auto`, an alias
@@ -482,14 +484,14 @@ export const isPlanModelId = (v: string) => planModelById(v) !== undefined;
 
 /**
  * The `--model` of a Claude Code turn for a stored value: an alias as is (on a plan, the plan names its model);
- * with a plan, one of its models by id; without one, a Claude id. Anything else (another plan's model, none) runs
- * `sonnet`.
+ * with a plan, one of its models by id; without one, `fable` or a Claude id. Anything else (another plan's model,
+ * none) runs `sonnet`.
  */
 export function claudeCodeModel(plan: CodingPlan | undefined, value: unknown): string {
   if (isAlias(value)) return value;
   if (typeof value !== "string") return "sonnet";
   if (plan) return plan.claudeCode.models.some((m) => m.id === value) ? value : "sonnet";
-  return /^claude-/.test(value) ? value : "sonnet";
+  return isClaudeOnlyAlias(value) || /^claude-/.test(value) ? value : "sonnet";
 }
 
 /**
@@ -501,7 +503,7 @@ export function claudeCodeModel(plan: CodingPlan | undefined, value: unknown): s
 export function droppedPlanModel(provider: unknown, value: unknown): PlanModel | null {
   const plan = isPlanId(provider) ? learned.get(provider) : undefined;
   if (!isPlanId(provider) || !plan?.modelsUrl) return null;
-  if (typeof value !== "string" || isAlias(value) || /^claude-/.test(value)) return null;
+  if (typeof value !== "string" || isAlias(value) || isClaudeOnlyAlias(value) || /^claude-/.test(value)) return null;
   if (plan.claudeCode.models.some((m) => m.id === value) || planModelById(value)) return null;
   const table: readonly PlanModel[] = CODING_PLANS[provider].claudeCode.models;
   return table.find((m) => m.id === value) ?? { id: value, label: value };
@@ -556,6 +558,10 @@ export const SHARED_SIGN_INS: Readonly<Record<"claude_code" | "codex" | "antigra
   grok: true,
   key: true,
 };
+
+/** Computer brains whose CLI never thinks with the computer's own sign-in, only a connected account (ADR 0142, ADR 0143 §3). */
+export const ACCOUNT_ONLY_BRAINS = ["antigravity", "grok"] as const;
+export const accountOnlyBrain = (kind: string) => (ACCOUNT_ONLY_BRAINS as readonly string[]).includes(kind);
 
 /**
  * The kinds whose subscriptions a run may go on with at a plan's limit, each within its own kind (ADR 0041 §6). Never

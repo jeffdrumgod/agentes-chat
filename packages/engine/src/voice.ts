@@ -89,7 +89,7 @@ export interface VoiceDeps {
 /** How long an engine has a recording to itself before the next one starts beside it: 19 s for 88 s of audio. */
 export const hedgeAfterMs = (durationMs: number) => 8_000 + durationMs / 8;
 
-function cleanPeaks(peaks: unknown): number[] {
+export function cleanPeaks(peaks: unknown): number[] {
   if (!Array.isArray(peaks)) return [];
   return peaks.slice(0, MAX_PEAKS).map((p) => {
     const n = Number(p);
@@ -387,6 +387,8 @@ export async function transcribeVoiceClip(deps: VoiceDeps, clipId: string, optio
         attachments: clip.attachments ?? undefined,
         clientId: clip.clientId,
         replyTo: clip.replyTo,
+        // Only a surface hands a clip its `via` (ADR 0187): one recorded in our apps has none.
+        origin: clip.via ? "surface" : "app",
         meta: {
           voice,
           ...(clip.via ? { via: clip.via, ...(clip.via.forwarded === true ? { readOutside: true } : {}) } : {}),

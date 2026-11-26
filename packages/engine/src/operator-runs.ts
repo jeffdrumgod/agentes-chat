@@ -44,6 +44,7 @@ import {
   wordOf,
 } from "./operator-paging";
 import { jobsOfRun } from "./outbox";
+import { LEAD } from "./reply-policy";
 import { rightHandReaches } from "./right-hand";
 import { DEFAULT_CAP, UNDER_NEED_GATE } from "./router";
 import { RELEASE_REASONS } from "./run-inbox";
@@ -941,6 +942,7 @@ const ROUTING_MARKERS: ReadonlySet<string> = new Set([
   "alone",
   "default",
   "coordinator",
+  LEAD,
   "talking to",
   "best",
   "last talked to",

@@ -168,6 +168,12 @@ export const envVars = {
       "Directory containing the built web app (single-page app). Served by this server when it exists; otherwise only the API runs.",
     section: "Server",
   },
+  FONTS_DIR: {
+    schema: z.string().optional(),
+    description:
+      "Directory of the fonts live files use (ADR 0220): the catalog built by `scripts/fonts/build.py` (the image sets it). Served at `/api/fonts/*`, read to measure text, draw pictures and embed fonts in PDFs. Unset: the catalog is still offered, and every app and export falls back to system fonts.",
+    section: "Server",
+  },
   SHUTDOWN_DELAY_MS: {
     schema: z.coerce.number().int().min(0).max(5_000).default(0),
     description:
@@ -398,6 +404,12 @@ export const envVars = {
       "Unused: new agents start on Automático (`auto`, each run picks the model and effort), whatever this says. Still checked when set; to be removed.",
     section: "Agents",
   },
+  MODEL_PROGRESS_NOTES: {
+    schema: z.stringbool().default(true),
+    description:
+      "Ask the models that keep their notes between tool calls apart from the reply (Claude's progress updates, OpenAI's reasoning summaries) to send them, so the conversation shows what an agent is doing while it works. Their reasoning stays hidden either way. Off = only the words a model writes as text.",
+    section: "Agents",
+  },
   ROUTER_ENABLED: {
     schema: z.stringbool().default(true),
     description:
@@ -484,9 +496,9 @@ export const envVars = {
     section: "Agents",
   },
   CLAUDE_PLAN_CONCURRENCY: {
-    schema: z.coerce.number().int().min(0).max(50).default(6),
+    schema: z.coerce.number().int().min(0).max(50).optional(),
     description:
-      "How many agent runs one Claude plan sign-in (a subscription, never an API key) works on at once. Past it, the next run waits in line like any other and starts as soon as one ends. 0 turns the limit off.",
+      "An optional cap on how many agent runs one Claude plan sign-in (a subscription, never an API key) works on at once. Past it, the next run waits in line like any other and starts as soon as one ends. Unset or 0: no cap.",
     section: "Agents",
   },
   AGENT_MAX_TOOL_TURNS: {
@@ -856,6 +868,30 @@ export const envVars = {
   CONNECTOR_LINEAR_CLIENT_SECRET: {
     schema: z.string().optional(),
     description: "Client secret of the Linear OAuth app for the Linear connector.",
+    section: "Connectors",
+    secret: true,
+  },
+  CONNECTOR_GITLAB_CLIENT_ID: {
+    schema: z.string().optional(),
+    description:
+      "Application ID of this server's GitLab application (gitlab.com › Preferences › Applications, confidential, scopes `api` and `write_repository`), so people connect GitLab by signing in (ADR 0227). Set together with `CONNECTOR_GITLAB_CLIENT_SECRET`. Redirect URI: `{PUBLIC_URL}/api/app/connectors/oauth/callback`. Without it, GitLab connects with an access token, as a GitLab of one's own always does.",
+    section: "Connectors",
+  },
+  CONNECTOR_GITLAB_CLIENT_SECRET: {
+    schema: z.string().optional(),
+    description: "Secret of the GitLab application for the GitLab connector.",
+    section: "Connectors",
+    secret: true,
+  },
+  CONNECTOR_BITBUCKET_CLIENT_ID: {
+    schema: z.string().optional(),
+    description:
+      "Key of this server's Bitbucket OAuth consumer (a workspace's settings › OAuth consumers; permissions: Account read, Repositories write, Pull requests write), so people connect Bitbucket by signing in (ADR 0227). Set together with `CONNECTOR_BITBUCKET_CLIENT_SECRET`. Callback URL: `{PUBLIC_URL}/api/app/connectors/oauth/callback`. Without it, Bitbucket connects with an access token.",
+    section: "Connectors",
+  },
+  CONNECTOR_BITBUCKET_CLIENT_SECRET: {
+    schema: z.string().optional(),
+    description: "Secret of the Bitbucket OAuth consumer for the Bitbucket connector.",
     section: "Connectors",
     secret: true,
   },
@@ -1388,7 +1424,7 @@ export const envVars = {
       .min(32, "must be at least 32 characters; generate one with `openssl rand -base64 48`")
       .optional(),
     description:
-      "Signs the link to the billing service (HMAC-SHA256, 5 minutes). The billing service holds the same value. Generate with `openssl rand -base64 48`.",
+      "Seals the link to the billing service (AES-256-GCM under a key derived from it, 5 minutes). The billing service holds the same value. Generate with `openssl rand -base64 48`.",
     section: "Operator",
     example: "<output of openssl rand -base64 48>",
     secret: true,
@@ -1396,7 +1432,7 @@ export const envVars = {
   REFERRALS_URL: {
     schema: z.url({ protocol: /^https$/ }).optional(),
     description:
-      "Your referral service's address (ADR 0192). Signed-in people get Refer and earn in their menu, and `/refer`, which open it signed in as them. Needs `REFERRALS_LINK_SECRET`, or `BILLING_LINK_SECRET` when this server also has a billing service, to sign the link. Unset (default): no referrals anywhere.",
+      "Your referral service's address (ADR 0192). Signed-in people get Refer and earn in their menu, and `/refer`, which open it signed in as them. Needs `REFERRALS_LINK_SECRET`, or `BILLING_LINK_SECRET` when this server also has a billing service, to seal the link. Unset (default): no referrals anywhere.",
     section: "Operator",
     example: "https://refer.example.com",
   },
@@ -1406,7 +1442,7 @@ export const envVars = {
       .min(32, "must be at least 32 characters; generate one with `openssl rand -base64 48`")
       .optional(),
     description:
-      "Signs the link to the referral service (HMAC-SHA256, 5 minutes). The referral service holds the same value. Unset (default): `BILLING_LINK_SECRET` signs it. Generate with `openssl rand -base64 48`.",
+      "Seals the link to the referral service (AES-256-GCM under a key derived from it, 5 minutes). The referral service holds the same value. Unset (default): `BILLING_LINK_SECRET` seals it. Generate with `openssl rand -base64 48`.",
     section: "Operator",
     example: "<output of openssl rand -base64 48>",
     secret: true,
@@ -1435,7 +1471,7 @@ export const envVars = {
       .transform((on) => (on ? "on" : "off") as "on" | "off")
       .default("on"),
     description:
-      "Send anonymous usage statistics to agentes.chat once a day: counts such as people, agents, machine sizes, AI tokens used and how much data the agents' browsers send and receive. Never messages, files, names or sites. `off` stops it, whatever the switch in Settings → General says (the installation's owner can turn it off there too). `docker compose run --rm agentes telemetry` prints exactly what would be sent (https://agentes.chat/docs/install-on-a-server#data).",
+      "Send anonymous usage statistics to agentes.chat once a day: counts such as people, agents, machine sizes, AI tokens used, how much data the agents' browsers send and receive, and how fast the apps open and run. Never messages, files, names or sites. `off` stops it, whatever the switch in Settings → General says (the installation's owner can turn it off there too). `docker compose run --rm agentes telemetry` prints exactly what would be sent (https://agentes.chat/docs/install-on-a-server#data).",
     section: "Usage report",
   },
   TELEMETRY_URL: {

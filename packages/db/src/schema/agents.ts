@@ -193,6 +193,8 @@ export const agents = pgTable(
       hello?: string;
       starter?: string;
       apps?: Record<string, "read" | "write">;
+      /** Closed on its page (its ×): the page shows it no more; its chat's stays. */
+      closed?: boolean;
     }>(),
     /**
      * Its computer (ADR 0025): the connected machine it works on; null = none yet (the workspace's own computer
@@ -216,6 +218,16 @@ export const agents = pgTable(
      * `approvals_level` alone.
      */
     approvalsLevelOwn: boolean().notNull().default(false),
+    /**
+     * "Learns on its own": it turns what it does the same way again and again into a skill of its own and fixes the
+     * skills it uses (`promoteHowTos`, `changeSkillAsAgent`). Off: skills change only when a person asks it.
+     */
+    learnsSkills: boolean().notNull().default(true),
+    /**
+     * The library's skills that would help it, from its last week of work (`agentSkillSuggestions`): each with why, in
+     * the language of who looked, and when they were picked. Picked again once a day at most.
+     */
+    skillSuggestions: jsonb().$type<{ at: string; items: { skillId: string; why: string }[] }>(),
     /**
      * Who thinks for it (ADR 0032): `model` (the API, default), `claude_code`
      * or `codex` on its computer; validated in code (`brain-settings.ts`).
@@ -408,7 +420,7 @@ export const organizationSettings = pgTable("organization_settings", {
    */
   mode: text().$type<"team" | "personal">().notNull().default("team"),
   /**
-   * Agents' commits end with their own `Co-authored-by: <name> <noreply@agentes.chat>` (ADR 0156). On unless a person
+   * Agents' commits end with their own `Co-Authored-By: <name> <noreply@agentes.chat>` (ADR 0156). On unless a person
    * asks an agent to turn it off (`commit_co_author`); no screen has it.
    */
   agentCoAuthor: boolean().notNull().default(true),
@@ -420,10 +432,20 @@ export const organizationSettings = pgTable("organization_settings", {
   /** "Dar boas-vindas a quem entra": the right hand greets each person who joins, once. On without a row too. */
   welcomePeople: boolean().notNull().default(true),
   /**
+   * The right hand learns from conversations on its own, as every other agent does (each person can also turn it off
+   * for themselves, `organization_members.right_hand_learns`). Off: only what people ask it to remember. On without a row.
+   */
+  rightHandLearns: boolean().notNull().default(true),
+  /**
    * How much the workspace's agents ask before acting (ADR 0173 addendum 2026-11-15): what every agent without its
    * own choice (`agents.approvals_level_own`) uses. A workspace with no row here is at `risky`.
    */
   approvalsLevel: text().$type<"always" | "risky" | "never">().notNull().default("risky"),
+  /**
+   * People's computers may help when the workspace's computer is full or away, each as its owner allows
+   * (`machines.spill_own`, ADR 0233). An admin turns it off for everyone; on without a row.
+   */
+  devicesHelp: boolean().notNull().default(true),
   updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
