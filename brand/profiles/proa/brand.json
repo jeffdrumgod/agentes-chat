@@ -141,10 +141,6 @@
       "file": "override/packages/ui/src/components/Surfaces.tsx",
       "upstreamSha256": "660d0f969161125dcf9ad0f26409ef1923495bb0ac400a4c157cf61822d9a9fd"
     },
-    "apps/web/src/routes/__root.tsx": {
-      "file": "override/apps/web/src/routes/__root.tsx",
-      "upstreamSha256": "8c7a9395c766d0cdeaef1f7563a2c64be7bd00c66e80f64777a19671732ddea1"
-    },
     "docs/design/desktop/wall.ts": {
       "file": "override/docs/design/desktop/wall.ts",
       "upstreamSha256": "50a06f97f77bbd87d9fc462bdfe2a71bf98ea0fe0b301e3c2742e0f55cc90ba3"
