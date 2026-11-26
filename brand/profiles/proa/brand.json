@@ -75,15 +75,15 @@
     },
     "packages/ui/test/sky.test.tsx": {
       "file": "override/packages/ui/test/sky.override-test.tsx",
-      "upstreamSha256": "49ea0a4ce4595ee334611ff18f1447c51e2224c07c244431653f7d58ca870256"
+      "upstreamSha256": "ff3e70720fd72a902524a1654c54ed87e04681bfca17d6fa230bf727e645addf"
     },
     "packages/ui/test/components.test.tsx": {
       "file": "override/packages/ui/test/components.override-test.tsx",
-      "upstreamSha256": "70e1695edb42ba656405015a9c7ce9eedae11a27a0c11db07cfe805ed04f768e"
+      "upstreamSha256": "3daafdd5197dd1a717bf86093b6696f70ac25faa210244adcf927e74a7702166"
     },
     "packages/ui/test/app-icons.test.ts": {
       "file": "override/packages/ui/test/app-icons.override-test.ts",
-      "upstreamSha256": "dbdcc767cdf37c3d8741384cbeae04639616f05efa83f485f221e76b5daab031"
+      "upstreamSha256": "1bdfa4f2af9f6203ee16e0d517b9346e21a992db4975a2c7c4aaf2801d2ed31e"
     },
     "packages/ui/test/media.test.tsx": {
       "file": "override/packages/ui/test/media.override-test.tsx",
@@ -107,7 +107,7 @@
     },
     "apps/mobile/test/features/settings.test.ts": {
       "file": "override/apps/mobile/test/features/settings.override-test.ts",
-      "upstreamSha256": "4226175fc3e2ec59ce8c864b6736a8d77b19f2a608eb9565b1ea91d03a27af61"
+      "upstreamSha256": "69e069c1d7c86e7e1c86f8d2ebbb2174f0ade8c042059c1fad48c87c782034f2"
     },
     "packages/ui/src/sky/wallpaper.ts": {
       "file": "override/packages/ui/src/sky/wallpaper.ts",
@@ -115,11 +115,11 @@
     },
     "packages/ui/src/sky/engine.ts": {
       "file": "override/packages/ui/src/sky/engine.ts",
-      "upstreamSha256": "d1f747bfa7bd93698fd55a9ee6239fa89d4819bb7df7cd68f1145bdc5283d39b"
+      "upstreamSha256": "44a694f888a0eee072cd27b99ea2b40aeb0edd201210804872bb43e22a87358d"
     },
     "packages/ui/src/sky/burst.ts": {
       "file": "override/packages/ui/src/sky/burst.ts",
-      "upstreamSha256": "9673b393545953d5196dde639cc931540b98ae74cf55c9f12881f41e3831075d"
+      "upstreamSha256": "1385051afa2fce46955c274fdef0c2903084397cc805394b37f04b99df571981"
     },
     "apps/desktop/scripts/dmg-art.ts": {
       "file": "override/apps/desktop/scripts/dmg-art.ts",
@@ -131,11 +131,11 @@
     },
     "apps/web/src/components/AuthLayout.tsx": {
       "file": "override/apps/web/src/components/AuthLayout.tsx",
-      "upstreamSha256": "2f93ba385c873bb299a2cad0d51d0f0cdd40ff87b99bd7e66c116eef7fa86f99"
+      "upstreamSha256": "905614d2d3356cf029eefcb96af217b542bf0198c88742c6d5d289ab465cdbc8"
     },
     "apps/web/src/pages/OnboardingPage.tsx": {
       "file": "override/apps/web/src/pages/OnboardingPage.tsx",
-      "upstreamSha256": "6779ab8df951c6b03f62509b2a2c051c7aaed2ff66b2d99b2aeb3497a4ba7642"
+      "upstreamSha256": "768f2640c35adbb19c644d59e50cd4cd825be6396d84f99be3d26dce2bd3d9cd"
     },
     "packages/ui/src/components/Surfaces.tsx": {
       "file": "override/packages/ui/src/components/Surfaces.tsx",
@@ -143,7 +143,7 @@
     },
     "apps/web/src/routes/__root.tsx": {
       "file": "override/apps/web/src/routes/__root.tsx",
-      "upstreamSha256": "34d06b992fda588ff9cdcdffc4c2234cf103cd9175524aa8b7750e37ccf3b7bf"
+      "upstreamSha256": "8c7a9395c766d0cdeaef1f7563a2c64be7bd00c66e80f64777a19671732ddea1"
     },
     "docs/design/desktop/wall.ts": {
       "file": "override/docs/design/desktop/wall.ts",
@@ -243,14 +243,14 @@
     {
       "why": "first run: the first place's title",
       "file": "apps/desktop/src/windows/FirstRun.tsx",
-      "find": "{p === \"cloud\" && makeFirst ? t(\"desktop.first.addCloud\") : t(`desktop.place.${p}`)}",
-      "replace": "{p === \"cloud\" ? t(\"desktop.connect.title\") : t(`desktop.place.${p}`)}"
+      "find": "title: p === \"cloud\" && makeFirst ? t(\"desktop.first.addCloud\") : t(`desktop.place.${p}`),",
+      "replace": "title: p === \"cloud\" ? t(\"desktop.connect.title\") : t(`desktop.place.${p}`),"
     },
     {
       "why": "first run: the first place's line",
       "file": "apps/desktop/src/windows/FirstRun.tsx",
-      "find": "<span className=\"ac-optrow__desc\">{t(`desktop.place.${p}Text`)}</span>",
-      "replace": "<span className=\"ac-optrow__desc\">{p === \"cloud\" ? t(\"desktop.connect.lead\") : t(`desktop.place.${p}Text`)}</span>"
+      "find": "description: t(`desktop.place.${p}Text`),",
+      "replace": "description: p === \"cloud\" ? t(\"desktop.connect.lead\") : t(`desktop.place.${p}Text`),"
     },
     {
       "why": "first run: the first place's drawing is the team's server",
