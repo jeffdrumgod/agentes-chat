@@ -1,18 +1,12 @@
-/** Proa / Timo. Import-free engine, compatible with the upstream canvas and mobile recorder API. */
-/** Top and bottom of each agent color. Sky is Timo's mint, the same in both themes. */
-export const AGENT_GRADIENTS = {
-  sky: ["#C4F0E0", "#A2E5CE"],
-  indigo: ["#7d8bff", "#3f4fd6"],
-  violet: ["#ae8cf7", "#6e45d1"],
-  rose: ["#f58aa6", "#c9406a"],
-  amber: ["#f3c25c", "#c07d0b"],
-  green: ["#5fcf8b", "#1f8a4c"],
-  teal: ["#4cd0c0", "#0f8f86"],
-  graphite: ["#9a9a95", "#4a4a47"],
-};
-
-/** The landing's sky: what `sky` is in a workspace without an accent. */
-export const DEFAULT_SKY = AGENT_GRADIENTS.sky;
+/* ---------------------------------------------------------------------------------------------------------------
+ * Proa: Timo, the agent's drawing (brand/profiles/proa/agent/proa-agent.js). brand/apply.ts appends this file to
+ * packages/ui/src/agent/engine.js after the profile's patches move the upstream's drawing out of the way
+ * (`function upstreamDrawAgent`, `const UPSTREAM_ACCESSORIES`, ...): the upstream's colors, poses, expressions and
+ * helpers stay theirs, and what draws the agent is this. Same module: it reads `mixHex`, `gradientOf`, `contrastOf`,
+ * `bodyFrame` and `eyeShapes` as they are. No imports; only the 2D context subset the phone records (engine.d.ts
+ * `Ctx2D`: no gradient, no image, no global alpha); the upstream's exported names and signatures (engine.d.ts stays
+ * theirs). brand/test/engine-exports.test.ts holds the list of exports and who draws each.
+ * ------------------------------------------------------------------------------------------------------------- */
 
 /**
  * A workspace's accent (ADR 0193) is its default agent color: while one is shown, `sky` (every agent with no color of
@@ -24,14 +18,6 @@ export function setSkyColors(pair) {
   // Keep the mascot mint for that palette; an explicitly customized accent still wins.
   const defaultAccent = pair?.[0]?.toLowerCase() === "#2a8a7f" && pair?.[1]?.toLowerCase() === "#14635c";
   AGENT_GRADIENTS.sky = !pair || defaultAccent ? DEFAULT_SKY : pair;
-}
-
-/**
- * A color as it is drawn now, for a cache's or a memo's key: `sky` (and no color) by the pair it resolves to, which
- * follows the workspace's accent; any other color as is.
- */
-export function drawnKey(color) {
-  return !color || color === "sky" ? AGENT_GRADIENTS.sky.join() : color;
 }
 
 /** Timo's default ink; drawAgent chooses cream on dark faces. */
@@ -47,168 +33,6 @@ export const EYE_STYLES = {
   sleepy: { w: 0.15, h: 0.075, cy: 0.53, kind: "lid" },
 };
 export const WRITING_EYE = { w: 0.15, h: 0.04, cy: 0.53 };
-
-/** "#rrggbb" → [r, g, b]. */
-export function rgbOf(hex) {
-  const n = Number.parseInt(hex.slice(1, 7), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-/** `a` → `b` by `k` (0..1), as "#rrggbb". */
-export function mixHex(a, b, k) {
-  const A = rgbOf(a);
-  const B = rgbOf(b);
-  return `#${A.map((v, i) =>
-    Math.round(v + (B[i] - v) * k)
-      .toString(16)
-      .padStart(2, "0"),
-  ).join("")}`;
-}
-
-/** Whether `v` is a custom agent color: "#rrggbb". */
-export function isHexColor(v) {
-  return typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v);
-}
-
-/** A color's name under `look.colors.*`: a preset's own, or "custom" for a "#rrggbb". */
-export function colorKey(color) {
-  return isHexColor(color) ? "custom" : color;
-}
-
-/** "#rrggbb" → [hue 0..360, saturation 0..1, value 0..1] (the picker's space). */
-export function hexToHsv(hex) {
-  const [r, g, b] = rgbOf(hex).map((c) => c / 255);
-  const max = Math.max(r, g, b);
-  const d = max - Math.min(r, g, b);
-  let h = 0;
-  if (d) h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  return [(h * 60 + 360) % 360, max ? d / max : 0, max];
-}
-
-/** [hue 0..360, saturation 0..1, value 0..1] → "#rrggbb". */
-export function hsvToHex(h, s, v) {
-  const f = (n) => {
-    const k = (n + h / 60) % 6;
-    return v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
-  };
-  return `#${[f(5), f(3), f(1)]
-    .map((c) =>
-      Math.round(c * 255)
-        .toString(16)
-        .padStart(2, "0"),
-    )
-    .join("")}`;
-}
-
-function hexToHsl(hex) {
-  const [h, s, v] = hexToHsv(hex);
-  const l = v * (1 - s / 2);
-  return [h, l === 0 || l === 1 ? 0 : (v - l) / Math.min(l, 1 - l), l];
-}
-
-function hslToHex(h, s, l) {
-  const v = l + s * Math.min(l, 1 - l);
-  return hsvToHex(h, v ? 2 * (1 - l / v) : 0, v);
-}
-
-/** WCAG relative luminance of "#rrggbb" (0 black .. 1 white). */
-export function luminance(hex) {
-  const [r, g, b] = rgbOf(hex).map((c) => {
-    const x = c / 255;
-    return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-/** WCAG contrast ratio of two "#rrggbb" (1 to 21). */
-export function contrastOf(a, b) {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-  return (hi + 0.05) / (lo + 0.05);
-}
-
-/**
- * An agent's @mention chip in a theme: a solid tint of its color, so the chip reads the same on a page, a row or a
- * bubble, and its own color pushed toward black (or white in the dark) until the text passes WCAG AA on that tint.
- */
-export function mentionTone(color, dark = false) {
-  const [top, bottom] = gradientOf(color);
-  const background = dark ? mixHex("#181817", bottom, 0.34) : mixHex("#ffffff", bottom, 0.16);
-  const base = dark ? top : bottom;
-  let ink = base;
-  for (let k = 0.05; k <= 1 && contrastOf(ink, background) < 4.5; k += 0.05) {
-    ink = mixHex(base, dark ? "#ffffff" : "#000000", k);
-  }
-  return { background, ink };
-}
-
-/**
- * A custom color's [top, bottom], built like the presets: the bottom is the color itself, its lightness held
- * between graphite's and a level where the white eyes and text still read (luminance ≤ 0.28, about 3:1 against
- * white, which also keeps it off a dark theme's background); the top is the same hue 26 points lighter.
- */
-export function customGradient(hex) {
-  const [h, s, l0] = hexToHsl(hex);
-  let l = Math.max(0.28, Math.min(0.55, l0));
-  let bottom = hslToHex(h, s, l);
-  while (luminance(bottom) > 0.28 && l > 0.2) {
-    l -= 0.01;
-    bottom = hslToHex(h, s, l);
-  }
-  // The top is capped too: yellow, lime or cyan 26 points lighter would be near white, washing out the body's
-  // light tones behind the eyes and vanishing on light surfaces. No custom top reads worse than amber's.
-  let lt = Math.min(0.78, l + 0.26);
-  let top = hslToHex(h, s, lt);
-  while ((luminance(top) > 0.59 || luminance(mixHex(bottom, top, 0.5)) > 0.405) && lt > l) {
-    lt -= 0.01;
-    top = hslToHex(h, s, lt);
-  }
-  return [top, bottom];
-}
-
-/** Where the custom color picker starts: the custom color itself, or the current preset's own tone. */
-export function pickerStart(color) {
-  return isHexColor(color) ? color.toLowerCase() : gradientOf(color)[1];
-}
-
-/** The preset closest to a color by hue (graphite when nearly gray): for places that only have the presets' pictures. */
-export function nearestPreset(color) {
-  if (!isHexColor(color)) return color in AGENT_GRADIENTS ? color : "sky";
-  const [h, s] = hexToHsl(color.toLowerCase());
-  if (s < 0.15) return "graphite";
-  let best = "sky";
-  let gap = 360;
-  for (const [name, [, bottom]] of Object.entries(AGENT_GRADIENTS)) {
-    if (name === "graphite") continue;
-    const d = Math.abs(hexToHsl(bottom)[0] - h) % 360;
-    const dd = Math.min(d, 360 - d);
-    if (dd < gap) [best, gap] = [name, dd];
-  }
-  return best;
-}
-
-/** An agent color's [top, bottom]: a preset, a custom "#rrggbb", a [top, bottom] pair as is, or sky for anything else. */
-export function gradientOf(color) {
-  if (Array.isArray(color)) return color;
-  return AGENT_GRADIENTS[color] ?? (isHexColor(color) ? customGradient(color.toLowerCase()) : AGENT_GRADIENTS.sky);
-}
-
-/**
- * Five body tones, deep (0) to light (4). `deep` runs one step deeper, for a
- * big agent on a light halo (the landing's giant), so its top still reads.
- */
-export function bodyTones(color, deep = false) {
-  const [top, bottom] = gradientOf(color);
-  if (deep)
-    return [mixHex(bottom, "#000000", 0.5), mixHex(bottom, "#000000", 0.22), bottom, mixHex(bottom, top, 0.5), top];
-  return [mixHex(bottom, "#000000", 0.38), bottom, mixHex(bottom, top, 0.5), top, mixHex(top, "#ffffff", 0.5)];
-}
-
-/** The small pixel agents' body: deep enough for white eyes (navy on the sky). */
-export function spriteBody(color) {
-  return (!color || color === "sky") && AGENT_GRADIENTS.sky === DEFAULT_SKY
-    ? DEFAULT_SKY[1]
-    : mixHex(gradientOf(color || "sky")[1], "#000000", 0.45);
-}
 
 /** Kept positive for consumers that divide a box into cells; Timo never dithers. */
 export function ditherCells(_px) {
@@ -281,52 +105,6 @@ export function bodySvg(color, n, deep = false) {
   const [top, bottom] = gradientOf(color);
   const hi = deep ? top : mixHex(top, "#ffffff", 0.12);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" preserveAspectRatio="none"><defs><linearGradient id="timo-body" x2=".8" y2="1"><stop stop-color="${hi}"/><stop offset="1" stop-color="${bottom}"/></linearGradient></defs><path d="${bodyPath(0, 0, n)}" fill="url(#timo-body)"/></svg>`;
-}
-
-/**
- * Passing expressions (a pose, not the agent's look): they replace the eye
- * style for a moment. Each eye gets a kind the renderers know how to draw.
- */
-export const EXPRESSIONS = {
-  closed: { w: 0.17, h: 0.08, cy: 0.5, kind: "cup" },
-  happy: { w: 0.17, h: 0.1, cy: 0.45, kind: "arc" },
-  dizzy: { w: 0.23, h: 0.23, cy: 0.465, kind: "spiral" },
-  heart: { w: 0.2, h: 0.19, cy: 0.465, kind: "heart" },
-  star: { w: 0.22, h: 0.22, cy: 0.465, kind: "star" },
-  cross: { w: 0.16, h: 0.16, cy: 0.465, kind: "cross" },
-  surprised: { w: 0.17, h: 0.23, cy: 0.46, kind: "ring" },
-  angry: { w: 0.12, h: 0.22, cy: 0.48, kind: "slant" },
-  wink: { w: 0.14, h: 0.14, cy: 0.51, kind: "pill", right: { w: 0.17, h: 0.08, cy: 0.5, kind: "cup" } },
-};
-
-/**
- * The two eyes for a style and a pose, as boxes in body fractions:
- * `{ x, y, w, h, kind, side }`. Kinds: "pill", "arc" (∩), "lid" (half),
- * "cup" (∪, closed), "spiral" (@), "heart", "star", "cross" (×), "ring" (O),
- * "slant" (angry). Pose: `writing` (dashes), `blink`, `expression` (one of
- * EXPRESSIONS), `look` [dx, dy] in fractions and `turn` [tx, ty] in -1..1:
- * the eyes slide toward the turn and the far one narrows (pseudo-3D).
- */
-export function eyeShapes(style = "round", pose = {}) {
-  const ex = pose.writing ? null : EXPRESSIONS[pose.expression];
-  const base = pose.writing ? { ...WRITING_EYE, kind: "pill" } : (ex ?? EYE_STYLES[style] ?? EYE_STYLES.round);
-  const [lx, ly] = pose.look ?? [0, 0];
-  const [tx, ty] = pose.turn ?? [0, 0];
-  // The face turns with the body (drawAgent); the eyes only lean a little toward where it looks.
-  const dx = lx + 0.025 * tx;
-  const dy = ly + 0.02 * ty;
-  const spread = 1;
-  return EYE_X.map((cx, side) => {
-    const e = side === 1 && base.right ? base.right : base;
-    const kind = e.kind ?? "pill";
-    const blink = pose.blink && (kind === "pill" || kind === "ring" || kind === "slant");
-    // The eye on the side the head turns to is farther away: narrower.
-    const far = (side === 1 && tx > 0) || (side === 0 && tx < 0) ? Math.abs(tx) : 0;
-    const w = e.w * (1 - 0.12 * far);
-    const h = blink ? Math.max(0.03, e.h * 0.12) : e.h;
-    const center = 0.5 + (cx - 0.5) * spread + dx;
-    return { x: center - w / 2, y: e.cy - h / 2 + dy, w, h, kind: blink ? "pill" : kind, side };
-  });
 }
 
 /** Draws the eyes on a 2D canvas for a body at (x, y), side `s`. */
@@ -432,58 +210,6 @@ export function drawEyes(ctx, x, y, s, shapes, color = EYE_COLOR) {
         }
     }
   }
-}
-
-const hash = (a, b) => {
-  const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
-  return s - Math.floor(s);
-};
-const ease = (k) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
-
-/**
- * An agent's idle life at time `t` (seconds): it turns its head toward a new
- * spot every couple of seconds (faster while `active`), blinks, breathes
- * (`squash`), and now and then shows an expression for a moment. `seed`
- * keeps several agents out of step; `every` (seconds, default 6.5) spaces the
- * expressions (each lasts 1.7 s). Returns a pose for drawAgent/eyeShapes.
- */
-export function idlePose(t, seed = 0, opts = {}) {
-  const period = opts.active ? 1.2 : 2.6;
-  const at = t / period + seed * 3.1;
-  const i = Math.floor(at);
-  const target = (j) => [(hash(j, seed) * 2 - 1) * 0.85, (hash(j + 0.5, seed + 1) * 2 - 1) * 0.5];
-  const a = target(i);
-  const b = target(i + 1);
-  const k = ease(Math.min(1, (at - i) * 2.4));
-  const turn = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
-  const blink = (t + seed * 1.7) % 3.9 < 0.12;
-  const squash = Math.sin(t * (opts.active ? 4 : 2.1) + seed) * (opts.active ? 0.7 : 0.35);
-  let expression;
-  const list = opts.expressions ?? Object.keys(EXPRESSIONS);
-  if (list.length) {
-    const every = opts.every ?? 6.5;
-    const slot = Math.floor((t + seed * 5) / every);
-    const phase = (t + seed * 5) % every;
-    if (phase > every - 1.7) expression = list[Math.floor(hash(slot, seed + 2) * list.length)];
-  }
-  return { turn, blink, squash, expression };
-}
-
-/**
- * How the body sits for a pose: scale and shift (pseudo-3D turn and breath),
- * around the bottom middle. Accessories use `head` (a parallax shift in body
- * fractions, smaller than the eyes').
- */
-export function bodyFrame(pose = {}) {
-  const [tx, ty] = pose.turn ?? [0, 0];
-  const sq = pose.squash ?? 0;
-  return {
-    sx: 1 + 0.035 * sq,
-    sy: 1 - 0.045 * sq,
-    dx: 0,
-    // Accessories sit on the turning face; a touch of lean so hats feel on top of the head.
-    head: [0.02 * tx, 0.015 * ty - 0.03 * sq],
-  };
 }
 
 const NAVY = "#183A55",
@@ -728,7 +454,7 @@ export const ACCESSORY_PALETTE = {
   M: NAVY,
   L: "#14635C",
 };
-export const ACCESSORY_CHECK = { c: ["K", "k"], h: ["Y", "y"], s: ["R", "r"], m: ["N", "n"] };
+
 export const ACCESSORIES = {
   hat: { ox: 2, oy: 0, rows: ["    KKKK    ", " KKKKYYKKKK ", "KKKKKKKKKKKK"] },
   cap: { ox: 2, oy: 0, rows: ["   WWWWWW   ", "WWWWWWWWWWWW", " KKKKKKKKKK "] },
@@ -743,7 +469,7 @@ export const ACCESSORIES = {
   scarf: { ox: 4, oy: 14, rows: ["RRRRRRRR", "  RRRR  ", " RR  RR "] },
 };
 export const ACCESSORY_NAMES = ["none", ...Object.keys(ACCESSORIES)];
-export const ACCESSORY_REACH = { top: 9 / 16, left: 1 / 16, right: 2 / 16, bottom: 7 / 16 };
+
 export function drawAccessory(ctx, s, name, frame, _t = 0, _active = false) {
   if (!ACCESSORIES[name]) return;
   ctx.save();
@@ -880,10 +606,7 @@ export function drawAccessory(ctx, s, name, frame, _t = 0, _active = false) {
   } else if (name === "scarf") scarf(ctx, true);
   ctx.restore();
 }
-export const SLEEP_SPOTS = [
-  [14.5, -2.6],
-  [17, -4.8],
-];
+
 export function drawSleep(ctx, s, frame, color, t) {
   ctx.save();
   ctx.translate((frame?.head?.[0] ?? 0) * s, (frame?.head?.[1] ?? 0) * s);
@@ -905,9 +628,4 @@ export function drawSleep(ctx, s, frame, color, t) {
       );
   });
   ctx.restore();
-}
-
-/** A sleeping agent's pose: eyes closed, the head a little down, breathing slowly (still: no breath). */
-export function sleepPose(t, seed = 0) {
-  return { expression: "closed", turn: [0, 0.15], squash: t === undefined ? 0 : Math.sin(t * 1.1 + seed) * 0.3 };
 }

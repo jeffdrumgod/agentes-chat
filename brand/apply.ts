@@ -49,6 +49,8 @@ type Profile = {
   patches?: Patch[];
   // CSS appended to repo files: repo path -> profile file (a font face, a wordmark weight).
   css?: Record<string, string>;
+  // Profile files appended to repo files after the patches: repo path -> profile file(s) (the agent's drawing).
+  append?: Record<string, string | string[]>;
   // Shared i18n values by key and language ("look.accessories.hat" -> { en, pt-BR, de, … }), every language required.
   texts?: Record<string, Record<string, string>>;
   // Path (in the profile) of the color tokens: { "light": { "--bg": "#…" }, "dark": { … } }.
@@ -1251,6 +1253,18 @@ if (version) {
     write(phone, `${JSON.stringify({ ...JSON.parse(read(phone)), ios: version, android: version }, null, 2)}\n`);
     count("version: phone", phone, 1);
   }
+}
+
+// Appends: profile files added to the end of repo files after the patches (code a patch renamed out of the way
+// comes back from the profile here, in the same module). `{ "<repo path>": ["<profile file>", …] }`.
+for (const [target, from] of Object.entries(brand.append ?? {})) {
+  if (!existsSync(join(SRC, target))) {
+    fail(`append: ${target} no longer exists upstream`);
+    continue;
+  }
+  const parts = (Array.isArray(from) ? from : [from]).map((f) => readFileSync(join(PROFILE, f), "utf8").trimEnd());
+  write(target, `${read(target).trimEnd()}\n\n${parts.join("\n\n")}\n`);
+  count("appended", target, parts.length);
 }
 
 // Overrides: whole files the profile replaces (a drawing engine, a generator script). Each one records the SHA-256 of

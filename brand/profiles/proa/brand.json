@@ -37,10 +37,6 @@
   },
   "theme": "theme.json",
   "overrides": {
-    "packages/ui/src/agent/engine.js": {
-      "file": "override/packages/ui/src/agent/engine.js",
-      "upstreamSha256": "23a83fbe403c65b67df16167d24a5f5d7c7b481f5ab9ba08ff1078e92d924709"
-    },
     "packages/ui/test/agent-engine.test.ts": {
       "file": "override/packages/ui/test/agent-engine.override-test.ts",
       "upstreamSha256": "cbdc8019999ddc9f1467c2020d118141c9202e5b865bcd6283e14c7026fcee3c"
@@ -601,6 +597,167 @@
       "find": "export const agentRadius = [0.3, 0.3, 0.3, 0.09] as const;",
       "replace": "export const agentRadius = [0.5, 0.5, 0.5, 0.5] as const;",
       "count": 1
+    },
+    {
+      "why": "agent: Timo draws the default color: mint (engine.js AGENT_GRADIENTS.sky)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "  sky: [\"#8cc3ff\", \"#0063d1\"],",
+      "replace": "  sky: [\"#C4F0E0\", \"#A2E5CE\"],",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws the default accent's sky as mint (setSkyColors, agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function setSkyColors(pair) {",
+      "replace": "function upstreamSetSkyColors(pair) {",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own EYE_COLOR (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const EYE_COLOR =",
+      "replace": "const UPSTREAM_EYE_COLOR =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own BODY_RADIUS (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const BODY_RADIUS =",
+      "replace": "const UPSTREAM_BODY_RADIUS =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own BODY_CUT (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const BODY_CUT =",
+      "replace": "const UPSTREAM_BODY_CUT =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own EYE_X (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const EYE_X =",
+      "replace": "const UPSTREAM_EYE_X =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own EYE_STYLES (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const EYE_STYLES =",
+      "replace": "const UPSTREAM_EYE_STYLES =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own WRITING_EYE (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const WRITING_EYE =",
+      "replace": "const UPSTREAM_WRITING_EYE =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws the small agents' body in mint on the default sky (spriteBody)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "    ? \"#04203f\"",
+      "replace": "    ? DEFAULT_SKY[1]",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own ditherCells (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function ditherCells(",
+      "replace": "function upstreamDitherCells(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own inBody (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function inBody(",
+      "replace": "function upstreamInBody(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own bodyPath (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function bodyPath(",
+      "replace": "function upstreamBodyPath(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own toneAt (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function toneAt(",
+      "replace": "function upstreamToneAt(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own bodySvg (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function bodySvg(",
+      "replace": "function upstreamBodySvg(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own drawEyes (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function drawEyes(",
+      "replace": "function upstreamDrawEyes(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own drawAgent (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function drawAgent(",
+      "replace": "function upstreamDrawAgent(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own spriteGrid (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function spriteGrid(",
+      "replace": "function upstreamSpriteGrid(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own drawAccessory (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function drawAccessory(",
+      "replace": "function upstreamDrawAccessory(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own drawSleep (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export function drawSleep(",
+      "replace": "function upstreamDrawSleep(",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws a wink's open eye round like its eyes (EXPRESSIONS.wink)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "  wink: { w: 0.093, h: 0.27, cy: 0.465, kind: \"pill\",",
+      "replace": "  wink: { w: 0.14, h: 0.14, cy: 0.51, kind: \"pill\",",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own ACCESSORY_PALETTE (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const ACCESSORY_PALETTE =",
+      "replace": "const UPSTREAM_ACCESSORY_PALETTE =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own ACCESSORIES (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const ACCESSORIES =",
+      "replace": "const UPSTREAM_ACCESSORIES =",
+      "count": 1
+    },
+    {
+      "why": "agent: Timo draws its own ACCESSORY_NAMES (agent/proa-agent.js)",
+      "file": "packages/ui/src/agent/engine.js",
+      "find": "export const ACCESSORY_NAMES = [\"none\", ...Object.keys(ACCESSORIES)];",
+      "replace": "const UPSTREAM_ACCESSORY_NAMES = [\"none\", ...Object.keys(UPSTREAM_ACCESSORIES)];",
+      "count": 1
     }
   ],
   "texts": {
@@ -636,5 +793,10 @@
       "tr": "Yuvarlak gözlük",
       "zh-Hans": "圆框眼镜"
     }
+  },
+  "append": {
+    "packages/ui/src/agent/engine.js": [
+      "agent/proa-agent.js"
+    ]
   }
 }
