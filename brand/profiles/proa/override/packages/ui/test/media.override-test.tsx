@@ -116,10 +116,10 @@ describe("the agents' stickers (ADR 0091)", () => {
     expect(later.calls).not.toEqual(now.calls);
   });
 
-  test("the hearts fade with their color's alpha, in the agent's own tones (rose: #f58aa6, #c9406a)", () => {
+  test("the hearts fade with their color's alpha, in the agent's own tones (rose, Coral: #FFC2B5, #FA8E7A)", () => {
     const { ctx, calls } = recorder();
     drawSticker(ctx, { color: "rose" }, "love", STICKER_STILL_T, 128);
-    const hearts = calls.filter((c) => /^fillStyle=rgba\((245, 138, 166|201, 64, 106), 0\.\d+\)$/.test(c));
+    const hearts = calls.filter((c) => /^fillStyle=rgba\((255, 194, 181|250, 142, 122), 0\.\d+\)$/.test(c));
     expect(hearts.length).toBeGreaterThan(0);
   });
 

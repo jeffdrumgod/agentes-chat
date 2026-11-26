@@ -40,10 +40,10 @@ describe("agent engine: one agent everywhere", () => {
     }
   });
 
-  test("writing turns any style into short dashes; blinking closes them", () => {
+  test("writing turns any style into round pupils looking down; blinking closes them", () => {
     const [dash] = eyeShapes("happy", { writing: true });
     expect(dash?.kind).toBe("pill");
-    expect(dash && dash.w > dash.h).toBe(true);
+    expect(dash && dash.w === dash.h).toBe(true);
     const [open] = eyeShapes("round");
     const [closed] = eyeShapes("round", { blink: true });
     expect((closed?.h ?? 1) < (open?.h ?? 0)).toBe(true);
@@ -74,17 +74,16 @@ describe("agent engine: one agent everywhere", () => {
   });
 
   test("a custom #rrggbb is built like the presets and kept readable", () => {
-    // A preset's own bottom comes back as the bottom, with a lighter top of the same hue.
+    // The presets are pastel, lighter than a custom color: a lighter top, and navy eyes read on it. A preset's bottom
+    // picked as a custom color keeps its hue.
+    const hueGap = (a: string, b: string) => {
+      const d = Math.abs(hexToHsv(a)[0] - hexToHsv(b)[0]) % 360;
+      return Math.min(d, 360 - d);
+    };
     for (const [top, bottom] of Object.values(AGENT_GRADIENTS)) {
-      // Mint is deliberately lighter than custom picker colors and uses navy eyes.
-      if (bottom === AGENT_GRADIENTS.sky[1]) {
-        expect(contrastOf(EYE_COLOR, bottom)).toBeGreaterThanOrEqual(4.5);
-        continue;
-      }
-      const [ctop, cbottom] = customGradient(bottom);
-      expect(cbottom).toBe(bottom);
-      expect(luminance(ctop)).toBeGreaterThan(luminance(bottom));
-      expect(Math.abs(hexToHsv(ctop)[0] - hexToHsv(top)[0]) % 360).toBeLessThan(12);
+      expect(luminance(top)).toBeGreaterThan(luminance(bottom));
+      expect(contrastOf(EYE_COLOR, top)).toBeGreaterThanOrEqual(4.5);
+      expect(hueGap(customGradient(bottom)[0], bottom)).toBeLessThan(12);
     }
     // Extremes are clamped: white eyes still read (about 3:1) and the body never vanishes into black.
     for (const hex of ["#ffffff", "#ffff00", "#00ff00", "#000000", "#00ffff", "#7f7f7f"]) {
@@ -96,7 +95,7 @@ describe("agent engine: one agent everywhere", () => {
     expect(gradientOf("#0063D1")).toEqual(customGradient("#0063d1"));
     expect(gradientOf("rose")).toEqual(AGENT_GRADIENTS.rose);
     expect(gradientOf("#12345")).toEqual(AGENT_GRADIENTS.sky);
-    expect(bodyTones("#1f8a4c").slice(0, 2)).toEqual(bodyTones("green").slice(0, 2));
+    expect(gradientOf("#93c77e")).toEqual(customGradient("#93C77E"));
   });
 
   test("a custom top never washes out more than amber's (the light tones behind the eyes)", () => {
@@ -112,7 +111,7 @@ describe("agent engine: one agent everywhere", () => {
     for (const name of Object.keys(AGENT_GRADIENTS)) expect(nearestPreset(name)).toBe(name as never);
     expect(nearestPreset("#e0457b")).toBe("rose");
     expect(nearestPreset("#ffd000")).toBe("amber");
-    expect(nearestPreset("#20c060")).toBe("green");
+    expect(nearestPreset("#60c020")).toBe("green");
     expect(nearestPreset("#808080")).toBe("graphite");
     expect(nearestPreset("nonsense")).toBe("sky");
   });
@@ -143,27 +142,39 @@ describe("agent engine: one agent everywhere", () => {
 
 describe("a sleeping agent (paused until its plan or budget is back)", () => {
   const rects = (t?: number) => {
+    // Where each shape starts, through the drawing's translate and scale (the moon is drawn in the sketch's units).
     const out: [number, number][] = [];
+    let m = { sx: 1, sy: 1, tx: 0, ty: 0 };
+    const kept: (typeof m)[] = [];
     const ctx = {
-      save() {},
-      restore() {},
-      translate() {},
-      scale() {},
+      save: () => kept.push({ ...m }),
+      restore: () => {
+        m = kept.pop() ?? m;
+      },
+      translate: (x: number, y: number) => {
+        m = { ...m, tx: m.tx + m.sx * x, ty: m.ty + m.sy * y };
+      },
+      scale: (x: number, y: number) => {
+        m = { ...m, sx: m.sx * x, sy: m.sy * y };
+      },
       beginPath() {},
-      moveTo: (x: number, y: number) => out.push([x, y]),
+      moveTo: (x: number, y: number) => out.push([m.tx + m.sx * x, m.ty + m.sy * y]),
       lineTo() {},
+      quadraticCurveTo() {},
+      closePath() {},
+      fill() {},
       stroke() {},
     };
     drawSleep(ctx as never, 16, undefined, "#000000", t);
     return out;
   };
-  test("eyes closed and still without time; two vector z's, the high one coming and going with it", () => {
+  test("eyes closed and still without time; a crescent moon (filled, outlined) and a star coming and going", () => {
     expect(sleepPose(undefined).expression).toBe("closed");
     expect(sleepPose(undefined).squash).toBe(0);
-    expect(rects()).toHaveLength(2);
-    expect(rects(0)).toHaveLength(1);
-    expect(rects(0.9)).toHaveLength(2);
-    expect(rects(1.7)).toHaveLength(2);
+    expect(rects()).toHaveLength(3);
+    expect(rects(0)).toHaveLength(2);
+    expect(rects(0.9)).toHaveLength(3);
+    expect(rects(1.7)).toHaveLength(3);
   });
   test("the zz stay inside a tile's room around a bare head (4.8 cells above, 4.1 right) and off the face", () => {
     for (const [x, y] of rects()) {

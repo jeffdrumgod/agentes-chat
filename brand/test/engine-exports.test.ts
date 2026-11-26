@@ -56,6 +56,8 @@ const EXPORTS: Record<string, "proa" | "upstream"> = {
   drawSleep: "proa",
   sleepPose: "upstream",
 };
+/** Exports only the profile has, declared in engine.d.ts by a patch: the porthole's ring (live.ts, AgentAvatar.tsx). */
+const EXTRA = ["drawPorthole"];
 const exportsOf = (src: string) => [...src.matchAll(/^export (?:const|let|function|class) (\w+)/gm)].map((m) => m[1]);
 describe("the agent engine: upstream file, Proa drawing", () => {
   test("every upstream export is listed with who draws it", () => {
@@ -64,7 +66,7 @@ describe("the agent engine: upstream file, Proa drawing", () => {
 
   test("each Proa export moves the upstream's out of the way once and is defined by agent/proa-agent.js", () => {
     const ours = Object.keys(EXPORTS).filter((k) => EXPORTS[k] === "proa");
-    expect(exportsOf(proa).sort()).toEqual(ours.sort());
+    expect(exportsOf(proa).sort()).toEqual([...ours, ...EXTRA].sort());
     for (const name of ours) {
       const head = new RegExp(`^export (?:const ${name} =|function ${name}\\()`, "m").exec(upstream)?.[0];
       expect(head, name).toBeDefined();
@@ -79,7 +81,7 @@ describe("the agent engine: upstream file, Proa drawing", () => {
   test("the injected engine loads as one module with the upstream's exports and appearance ids", async () => {
     const E = await injectedEngine();
     const U = await import(join(REPO, ENGINE));
-    expect(Object.keys(E).sort()).toEqual(Object.keys(U).sort());
+    expect(Object.keys(E).sort()).toEqual([...Object.keys(U), ...EXTRA].sort());
     expect(E.ACCESSORY_NAMES).toEqual(U.ACCESSORY_NAMES);
     expect(Object.keys(E.EYE_STYLES)).toEqual(Object.keys(U.EYE_STYLES));
     expect(Object.keys(E.AGENT_GRADIENTS)).toEqual(Object.keys(U.AGENT_GRADIENTS));

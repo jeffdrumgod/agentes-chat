@@ -32,7 +32,8 @@ export const EYE_STYLES = {
   happy: { w: 0.17, h: 0.07, cy: 0.51, kind: "arc" },
   sleepy: { w: 0.15, h: 0.075, cy: 0.53, kind: "lid" },
 };
-export const WRITING_EYE = { w: 0.15, h: 0.04, cy: 0.53 };
+/** Writing: round pupils low in the eyes, looking down at the logbook (not the upstream's dashes). */
+export const WRITING_EYE = { w: 0.11, h: 0.11, cy: 0.57 };
 
 /** Kept positive for consumers that divide a box into cells; Timo never dithers. */
 export function ditherCells(_px) {
@@ -299,114 +300,311 @@ function cap(ctx, color = CREAM, tilt = 0, volume = true) {
   }
   ctx.restore();
 }
-function scarf(ctx, big = false) {
-  const k = big ? 1.25 : 1;
+
+const INK = "#102E39",
+  WOOL = "#2E5573",
+  OILSKIN = "#F2C14E",
+  OILSKIN_BRIM = "#D9A23A",
+  FLAG_BLUE = "#2C5FA8",
+  SEA_MINT = "#7FD1BC";
+
+/**
+ * The approved sketches (propostas/avatares) are drawn in the 128 box of timo/icon-flat.svg; the body's box is its
+ * 22..106 square. Inside the body's own space (0..1), `sketch` switches to those units for the parts drawn there.
+ */
+function sketch(ctx, draw) {
   ctx.save();
-  ctx.translate(0.5, 0.93);
+  ctx.scale(1 / 84, 1 / 84);
+  ctx.translate(-22, -22);
+  draw();
+  ctx.restore();
+}
+
+/** The sail of the Proa emblem (sketch units, its own 0..52 box), filled and outlined in one color. */
+function sail(ctx, x, y, k, color) {
+  ctx.save();
+  ctx.translate(x, y);
   ctx.scale(k, k);
-  path(
-    ctx,
-    [["M", -0.2, -0.05], ["Q", 0, 0.03, 0.2, -0.05], ["L", 0.2, 0.05], ["Q", 0, 0.1, -0.2, 0.05], ["Z"]],
-    CORAL,
-  );
+  path(ctx, [["M", 18, 44], ["Q", 24, 20, 42, 6], ["Q", 40, 26, 48, 44], ["Z"]], color);
+  path(ctx, [["M", 18, 44], ["Q", 24, 20, 42, 6], ["Q", 40, 26, 48, 44], ["Z"]], color, true, 4);
   path(
     ctx,
     [
-      ["M", 0, 0.02],
-      ["Q", -0.18, 0.02, -0.2, 0.15],
-      ["Q", -0.02, 0.13, 0, 0.05],
-      ["Q", 0.18, 0.17, 0.2, 0.15],
-      ["Q", 0.18, 0.02, 0, 0.02],
+      ["M", 20, 51],
+      ["L", 46, 51],
     ],
-    CORAL,
+    color,
+    true,
+    5,
   );
-  disc(ctx, 0, 0.04, 0.048, 0.05, "#f98b75");
   ctx.restore();
 }
-/** Smooth vector portrait. Fine shading uses clipped solid strips supported by the mobile recorder. */
+
+/** The knotted kerchief under the chin: coral, navy on a coral face; `big` is the scarf accessory. */
+function kerchief(ctx, color, big = false) {
+  ctx.save();
+  if (big) {
+    ctx.translate(64, 100);
+    ctx.scale(1.4, 1.4);
+    ctx.translate(-64, -100);
+  }
+  path(ctx, [["M", 48, 96], ["Q", 64, 102, 80, 96], ["L", 81, 108], ["L", 64, 103], ["L", 47, 108], ["Z"]], color);
+  path(
+    ctx,
+    [
+      ["M", 50, 98.5],
+      ["Q", 64, 103, 78, 98.5],
+    ],
+    mixHex(color, "#ffffff", 0.25),
+    true,
+    1,
+  );
+  disc(ctx, 64, 100, 3.6, 3.6, mixHex(color, "#000000", 0.1));
+  ctx.restore();
+}
+
+/** A hand (the waiting wave, the flag, the logbook): a disc in the face's ear tone with a soft edge. */
+function hand(ctx, x, y, r, tone) {
+  disc(ctx, x, y, r, r, tone);
+  ctx.beginPath();
+  ctx.ellipse(x, y, r, r, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(16,46,57,0.28)";
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+}
+
+/**
+ * The agent being drawn, read by its accessory and its sleep inside drawAgent's `after`: its colors, and its sailor
+ * cap until whatever goes on the head says whether it stays. One item per head: a hat takes the cap's place
+ * (`HATS`), the rest is worn with it.
+ */
+let drawing = null;
+const HATS = new Set(["hat", "cap", "beanie", "crown"]);
+function wearCap(ctx) {
+  if (drawing?.ctx !== ctx || !drawing.cap) return;
+  const put = drawing.cap;
+  drawing.cap = null;
+  put();
+}
+const tonesNow = () => drawing ?? { top: DEFAULT_SKY[0], bottom: DEFAULT_SKY[1], volume: true, detail: true };
+
+/**
+ * Timo, vector all the way (no dither), in the body's box: ears, head with soft volume (concentric ellipses: the
+ * phone's recorder has no gradient), kerchief, eyes and smile, the sailor cap. Poses: `writing` looks down at the
+ * logbook it writes in, `waiting` raises a hand, the expressions are the upstream's (eyeShapes).
+ */
 export function drawAgent(ctx, x, y, s, opts = {}) {
   if (s <= 0 || (opts.progress ?? 1) <= 0) return;
   const pose = opts.pose ?? {},
     frame = bodyFrame(pose),
     progress = Math.max(0, Math.min(1, opts.progress ?? 1));
   const [top, bottom] = gradientOf(opts.color);
-  ctx.save();
-  ctx.translate(x + s / 2, y + s);
-  ctx.scale(frame.sx, frame.sy);
-  ctx.translate(-s / 2, -s);
-  if (progress < 1) {
-    ctx.beginPath();
-    ctx.roundRect(-s * 0.1, s * (1 - progress), s * 1.2, s * progress * 1.2, 0);
-    ctx.clip();
-  }
   const volume = s >= 28;
-  ctx.save();
-  ctx.scale(s, s);
-  if (volume) {
-    for (let i = 0; i < 8; i++) {
-      const r = 1 - i / 10;
-      disc(ctx, 0.5, 1.13, 0.24 * r, 0.045 * r, "rgba(16,46,57,0.025)");
-    }
-  }
-  for (const [ex, k] of [
-    [0.095, 0.65],
-    [0.905, 0.75],
-  ]) {
-    const ear = mixHex(top, bottom, k);
-    disc(ctx, ex, 0.525, 0.095, 0.115, volume ? mixHex(ear, "#102E39", 0.2) : ear);
-    if (volume) {
-      ctx.save();
+  // Below this the logbook is only a pencil's tip: at a list's size the open book is a blur.
+  const detail = s >= 40;
+  const face = mixHex(top, bottom, 0.51);
+  const ink = contrastOf(EYE_COLOR, face) >= contrastOf(CREAM, face) ? EYE_COLOR : CREAM;
+  const earTone = mixHex(top, bottom, 0.7);
+  // The kerchief is coral, navy on a coral face (the rose preset, or a custom color of that hue).
+  const [hue, sat] = hexToHsv(face);
+  const coralFace = Math.min(Math.abs(hue - 9), 360 - Math.abs(hue - 9)) < 28 && sat > 0.25;
+  const scarfColor = opts.color === "rose" || coralFace ? NAVY : CORAL;
+  const outer = drawing;
+  drawing = { ctx, top, bottom, ink, earTone, scarfColor, volume, detail, cap: null };
+  try {
+    ctx.save();
+    ctx.translate(x + s / 2, y + s);
+    ctx.scale(frame.sx, frame.sy);
+    ctx.translate(-s / 2, -s);
+    if (progress < 1) {
+      ctx.beginPath();
+      ctx.roundRect(-s * 0.1, s * (1 - progress), s * 1.2, s * progress * 1.2, 0);
       ctx.clip();
-      radial(ctx, ex - 0.02, 0.49, 0.12, 0.15, mixHex(ear, "#102E39", 0.2), mixHex(ear, "#ffffff", 0.2), 12);
-      ctx.restore();
     }
-  }
-  ctx.restore();
-  ctx.save();
-  head(ctx, s);
-  ctx.fillStyle = volume ? mixHex(bottom, "#102E39", 0.18) : bottom;
-  ctx.fill();
-  ctx.clip();
-  if (volume) {
+    ctx.save();
     ctx.scale(s, s);
-    radial(ctx, 0.31, 0.34, 0.87, 0.83, mixHex(bottom, "#102E39", 0.18), mixHex(top, "#ffffff", 0.27), 56);
-    sheen(ctx, 0.25, 0.37, 0.075, 0.11, 0.035);
-    // A restrained reflected edge on the shaded side of the vinyl head.
-    head(ctx, 1);
-    ctx.strokeStyle = "rgba(255,255,255,0.17)";
-    ctx.lineWidth = 0.016;
-    ctx.stroke();
-  }
-  ctx.restore();
-  ctx.save();
-  ctx.scale(s, s);
-  scarf(ctx);
-  ctx.restore();
-  if (opts.withEyes !== false && progress > 0.92) {
-    const face = mixHex(top, bottom, 0.51);
-    const ink = contrastOf(EYE_COLOR, face) >= contrastOf(CREAM, face) ? EYE_COLOR : CREAM;
-    drawEyes(ctx, 0, 0, s, eyeShapes(opts.eyes, pose), ink);
-    if (s >= 28) {
+    if (volume) {
+      for (let i = 0; i < 8; i++) {
+        const r = 1 - i / 10;
+        disc(ctx, 0.5, 1.13, 0.24 * r, 0.045 * r, "rgba(16,46,57,0.025)");
+      }
+    }
+    for (const [ex, k] of [
+      [0.095, 0.65],
+      [0.905, 0.75],
+    ]) {
+      const ear = mixHex(top, bottom, k);
+      disc(ctx, ex, 0.525, 0.095, 0.115, volume ? mixHex(ear, "#102E39", 0.2) : ear);
+      if (volume) {
+        ctx.save();
+        ctx.clip();
+        radial(ctx, ex - 0.02, 0.49, 0.12, 0.15, mixHex(ear, "#102E39", 0.2), mixHex(ear, "#ffffff", 0.2), 12);
+        ctx.restore();
+      }
+    }
+    // Waiting on someone: a hand up beside the head (behind it), waving.
+    if (pose.waiting && progress > 0.92)
+      sketch(ctx, () => {
+        path(
+          ctx,
+          [
+            ["M", 98, 96],
+            ["Q", 110, 84, 109, 64],
+          ],
+          mixHex(bottom, INK, 0.12),
+          true,
+          6,
+        );
+        hand(ctx, 109, 58, 6.5, earTone);
+        if (detail)
+          for (const [a, b, c] of [
+            [103, 47, 115],
+            [105.5, 42, 112.5],
+          ])
+            path(
+              ctx,
+              [
+                ["M", a, b + 3],
+                ["Q", (a + c) / 2, b - 1, c, b + 3],
+              ],
+              "rgba(16,46,57,0.45)",
+              true,
+              1.8,
+            );
+      });
+    ctx.restore();
+    ctx.save();
+    head(ctx, s);
+    ctx.fillStyle = volume ? mixHex(bottom, "#102E39", 0.18) : bottom;
+    ctx.fill();
+    ctx.clip();
+    if (volume) {
+      ctx.scale(s, s);
+      radial(ctx, 0.31, 0.34, 0.87, 0.83, mixHex(bottom, "#102E39", 0.18), mixHex(top, "#ffffff", 0.27), 56);
+      sheen(ctx, 0.25, 0.37, 0.075, 0.11, 0.035);
+      // A restrained reflected edge on the shaded side of the vinyl head.
+      head(ctx, 1);
+      ctx.strokeStyle = "rgba(255,255,255,0.17)";
+      ctx.lineWidth = 0.016;
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.save();
+    ctx.scale(s, s);
+    sketch(ctx, () => kerchief(ctx, scarfColor));
+    ctx.restore();
+    if (opts.withEyes !== false && progress > 0.92) {
+      drawEyes(ctx, 0, 0, s, eyeShapes(opts.eyes, pose), ink);
+      if (s >= 28) {
+        ctx.save();
+        ctx.scale(s, s);
+        sketch(ctx, () => {
+          if (pose.waiting || pose.expression === "surprised") disc(ctx, 66, 81, 2.6, 2.2, ink);
+          else if (pose.writing)
+            path(
+              ctx,
+              [
+                ["M", 60, 82],
+                ["Q", 65, 84, 70, 81],
+              ],
+              ink,
+              true,
+              2.7,
+            );
+          else
+            path(
+              ctx,
+              [
+                ["M", 59.4, 79.5],
+                ["Q", 66.5, 83.7, 72, 76.6],
+              ],
+              ink,
+              true,
+              2.7,
+            );
+        });
+        ctx.restore();
+      }
+    }
+    drawing.cap = () => {
       ctx.save();
       ctx.scale(s, s);
+      cap(ctx, CREAM, 0, volume);
+      ctx.restore();
+    };
+    if (opts.after && progress > 0.92) opts.after(ctx, s, frame);
+    wearCap(ctx);
+    if (pose.writing && progress > 0.92) {
+      ctx.save();
+      ctx.scale(s, s);
+      sketch(ctx, () => logbook(ctx, earTone, detail));
+      ctx.restore();
+    }
+    ctx.restore();
+  } finally {
+    drawing = outer;
+  }
+}
+
+/** Writing: the logbook (the sail on its page) and the pencil; small, only the pencil's tip. */
+function logbook(ctx, tone, detail) {
+  ctx.save();
+  ctx.translate(0, -5);
+  if (detail) {
+    path(
+      ctx,
+      [["M", 33, 98], ["L", 64, 102], ["L", 95, 98], ["L", 97, 120], ["L", 64, 124], ["L", 31, 120], ["Z"]],
+      NAVY,
+    );
+    path(
+      ctx,
+      [["M", 36, 97], ["L", 64, 100.5], ["L", 92, 97], ["L", 93, 117], ["L", 64, 121], ["L", 35, 117], ["Z"]],
+      CREAM,
+    );
+    path(
+      ctx,
+      [
+        ["M", 64, 100.5],
+        ["L", 64, 121],
+      ],
+      "rgba(24,58,85,0.5)",
+      true,
+      1.2,
+    );
+    for (let i = 0; i < 3; i++)
       path(
         ctx,
         [
-          ["M", 0.445, 0.685],
-          ["Q", 0.53, 0.735, 0.595, 0.65],
+          ["M", 40, 104 + i * 3.4],
+          ["L", 58, 105 + i * 3.4],
         ],
-        ink,
+        "rgba(24,58,85,0.35)",
         true,
-        0.032,
+        1.2,
       );
-      ctx.restore();
-    }
+    sail(ctx, 71, 103, 0.22, "#103D42");
   }
-  ctx.save();
-  ctx.scale(s, s);
-  cap(ctx, CREAM, 0, volume);
-  ctx.restore();
-  if (opts.after && progress > 0.92) opts.after(ctx, s, frame);
+  path(
+    ctx,
+    [
+      ["M", 80, 112],
+      ["L", 94, 95],
+    ],
+    GOLD,
+    true,
+    detail ? 3.4 : 5,
+  );
+  path(
+    ctx,
+    [
+      ["M", 80, 112],
+      ["L", 78.6, 114],
+    ],
+    INK,
+    true,
+    detail ? 2 : 3,
+  );
+  if (detail) hand(ctx, 88, 104, 5, tone);
   ctx.restore();
 }
 
@@ -431,85 +629,76 @@ export function spriteGrid(n = 9, style = "round") {
   return rows;
 }
 
-/** Legacy grid metadata remains valid for older icon consumers; live artwork uses curves below. */
+/**
+ * The accessories on the body's 16×16 grid, for what still draws them in pixels (the brain's portrait, the code
+ * home's cubes): a coarse picture of each one. The avatars draw the curves of drawAccessory.
+ */
 export const ACCESSORY_PALETTE = {
   K: NAVY,
-  k: NAVY,
+  k: INK,
   W: CREAM,
   R: CORAL,
   r: CORAL,
-  Y: GOLD,
-  y: GOLD,
+  Y: OILSKIN,
+  y: OILSKIN_BRIM,
   P: CORAL,
   p: CORAL,
-  B: NAVY,
-  G: NAVY,
-  g: NAVY,
-  N: CORAL,
-  n: CORAL,
-  V: "#ae8cf7",
+  B: FLAG_BLUE,
+  G: GOLD,
+  g: GOLD,
+  N: WOOL,
+  n: WOOL,
+  V: SEA_MINT,
   F: CREAM,
   f: CREAM,
   O: GOLD,
   M: NAVY,
   L: "#14635C",
 };
-
 export const ACCESSORIES = {
-  hat: { ox: 2, oy: 0, rows: ["    KKKK    ", " KKKKYYKKKK ", "KKKKKKKKKKKK"] },
-  cap: { ox: 2, oy: 0, rows: ["   WWWWWW   ", "WWWWWWWWWWWW", " KKKKKKKKKK "] },
+  hat: { ox: 1, oy: -1, rows: ["   WWWWWWWW   ", " WWWWWGWWWWWW ", "KKKKKKKKKKKKKK", " kkkkkkkkkkkk "] },
+  cap: { ox: 1, oy: -1, rows: ["   KKKKKKKK   ", " KKKKKKKKKKKK ", "KKRRRRRRRRRRKK", "kkkkkkkk      "] },
   headphones: { ox: 0, oy: 0, rows: ["  KKKKKKKKKKKK  ", " KK          KK ", "KK            KK"] },
-  bow: { ox: 10, oy: 1, rows: ["RR RR", " RRR ", "RR RR"] },
-  crown: { ox: 4, oy: -2, rows: ["Y  YY  Y", "YY YY YY", "YYYYYYYY"] },
+  bow: { ox: 15, oy: 3, rows: ["BBB", "BWB", "BBB", "K  ", "K  ", "K  "] },
+  crown: {
+    ox: 0,
+    oy: -2,
+    rows: ["    YYYYYYYY    ", "   YYYYYYYYYY   ", "  YYYYYYYYYYYY  ", "yyyyyyyyyyyyyyyy", " yyy        yyy "],
+  },
   antenna: { ox: 3, oy: 6, rows: [" KKK  KKK ", "K   KK   K", "K   KK   K", " KKK  KKK "] },
-  headset: { ox: 0, oy: 5, rows: ["KK", "KK", "KK", " KKKK"] },
-  beanie: { ox: 2, oy: 0, rows: ["   KKKKKK   ", " KKKKKKKKKK ", "KKKKKKKKKKKK"] },
-  party: { ox: 5, oy: -3, rows: ["  Y  ", " VVV ", "VVVVV", "YYYYY"] },
-  flower: { ox: 11, oy: 1, rows: [" W ", "WYW", " W "] },
+  headset: { ox: 13, oy: 7, rows: [" RRR", "RRRR", " RRR", "  K ", " K  ", "K   "] },
+  beanie: {
+    ox: 1,
+    oy: -2,
+    rows: ["    NNNNNN    ", "  NNNNNNNNNN  ", " NNNNNNNNNNNN ", "KKKKKKKKKKKKKK", "KKKKKKKKKKKKKK"],
+  },
+  party: { ox: 0, oy: -2, rows: ["  RkYkVkRkYkV   ", "  R Y V R Y V   "] },
+  flower: { ox: 11, oy: 7, rows: ["    yy", "  YYyy", "YYYY  "] },
   scarf: { ox: 4, oy: 14, rows: ["RRRRRRRR", "  RRRR  ", " RR  RR "] },
 };
 export const ACCESSORY_NAMES = ["none", ...Object.keys(ACCESSORIES)];
 
+/**
+ * What a crew member wears for its job on board, in the body's own space (inside drawAgent's `after`), with the head's
+ * parallax: `hat` the captain's cap with the gold sail, `cap` the deck cap, `headphones` the radio's, `headset` the
+ * engineer's, `antenna` round glasses (research), `beanie` the fisherman's wool cap, `crown` the sou'wester, `bow` the
+ * "P" flag ("all aboard"), `party` bunting, `flower` the spyglass (lookout), `scarf` a big kerchief. A hat takes the
+ * sailor cap's place; the rest is worn with it. Everything stays inside the porthole's circle and the upstream's
+ * ACCESSORY_REACH (the room an unframed avatar's canvas leaves).
+ */
 export function drawAccessory(ctx, s, name, frame, _t = 0, _active = false) {
   if (!ACCESSORIES[name]) return;
+  if (HATS.has(name)) {
+    if (drawing?.ctx === ctx) drawing.cap = null;
+  } else wearCap(ctx);
+  const now = tonesNow();
+  const earTone = now.earTone ?? mixHex(now.top, now.bottom, 0.7);
+  const scarfColor = now.scarfColor ?? CORAL;
+  const { volume, detail } = now;
   ctx.save();
   ctx.translate((frame?.head?.[0] ?? 0) * s, (frame?.head?.[1] ?? 0) * s);
   ctx.scale(s, s);
-  if (name === "hat" || name === "beanie") {
-    cap(ctx, NAVY, 0, s >= 28);
-    if (name === "hat") {
-      path(ctx, [["M", 0.2, 0.31], ["Q", 0.5, 0.44, 0.8, 0.31], ["Z"]], NAVY);
-      if (s >= 28) {
-        path(
-          ctx,
-          [["M", 0.52, 0.055], ["Q", 0.4, 0.1, 0.43, 0.19], ["L", 0.59, 0.19], ["Q", 0.53, 0.13, 0.52, 0.055], ["Z"]],
-          GOLD,
-        );
-        path(
-          ctx,
-          [
-            ["M", 0.42, 0.225],
-            ["L", 0.6, 0.225],
-          ],
-          GOLD,
-          true,
-          0.018,
-        );
-      }
-    } else if (s >= 28)
-      for (let i = 0; i < 7; i++)
-        path(
-          ctx,
-          [
-            ["M", 0.23 + i * 0.09, 0.14],
-            ["L", 0.23 + i * 0.09, 0.23],
-          ],
-          "#31546b",
-          true,
-          0.012,
-        );
-  } else if (name === "cap") cap(ctx, CREAM, -0.07, s >= 28);
-  else if (name === "headphones" || name === "headset") {
+  if (name === "headphones") {
     path(
       ctx,
       [
@@ -524,108 +713,303 @@ export function drawAccessory(ctx, s, name, frame, _t = 0, _active = false) {
       0.045,
     );
     disc(ctx, 0.075, 0.54, 0.065, 0.13, NAVY);
-    if (name === "headphones") disc(ctx, 0.925, 0.54, 0.065, 0.13, NAVY);
-    else {
+    disc(ctx, 0.925, 0.54, 0.065, 0.13, NAVY);
+    if (volume) {
+      disc(ctx, 0.085, 0.53, 0.03, 0.08, CORAL);
+      disc(ctx, 0.915, 0.53, 0.03, 0.08, CORAL);
+    }
+    ctx.restore();
+    return;
+  }
+  sketch(ctx, () => {
+    if (name === "hat") {
+      path(ctx, [["M", 27, 37], ["Q", 28, 17, 64, 15], ["Q", 100, 17, 101, 37], ["Q", 64, 44, 27, 37], ["Z"]], CREAM);
+      if (volume)
+        path(
+          ctx,
+          [
+            ["M", 36, 27],
+            ["Q", 60, 17, 88, 24],
+          ],
+          "rgba(255,255,255,0.6)",
+          true,
+          2,
+        );
+      ctx.beginPath();
+      ctx.roundRect(33, 34, 62, 13, 3);
+      ctx.fillStyle = NAVY;
+      ctx.fill();
+      path(ctx, [["M", 34, 47], ["Q", 64, 60, 94, 47], ["Q", 64, 52, 34, 47], ["Z"]], INK);
+      if (detail) {
+        path(
+          ctx,
+          [
+            ["M", 36, 41],
+            ["Q", 64, 45, 92, 41],
+          ],
+          GOLD,
+          true,
+          1.6,
+        );
+        sail(ctx, 56.5, 18.5, 0.26, GOLD);
+      } else disc(ctx, 64, 26, 3.4, 3.4, GOLD);
+    } else if (name === "cap") {
+      path(ctx, [["M", 29, 46], ["Q", 28, 17, 64, 15], ["Q", 100, 17, 99, 46], ["Z"]], NAVY);
+      if (volume)
+        path(
+          ctx,
+          [
+            ["M", 38, 30],
+            ["Q", 52, 19, 68, 19],
+          ],
+          "rgba(255,255,255,0.22)",
+          true,
+          3,
+        );
+      ctx.beginPath();
+      ctx.roundRect(29, 37, 70, 7, 2);
+      ctx.fillStyle = CORAL;
+      ctx.fill();
+      disc(ctx, 64, 15.5, 3, 2.2, CORAL);
+      path(ctx, [["M", 22, 47], ["Q", 40, 57, 70, 49], ["Q", 46, 50, 29, 44], ["Z"]], INK);
+    } else if (name === "beanie") {
+      path(ctx, [["M", 28, 47], ["Q", 26, 14, 64, 12], ["Q", 102, 14, 100, 47], ["Z"]], WOOL);
+      if (volume)
+        path(
+          ctx,
+          [
+            ["M", 40, 30],
+            ["Q", 52, 20, 66, 20],
+          ],
+          "rgba(255,255,255,0.25)",
+          true,
+          3,
+        );
+      ctx.beginPath();
+      ctx.roundRect(28, 40, 72, 14, 6);
+      ctx.fillStyle = NAVY;
+      ctx.fill();
+      if (detail)
+        for (let i = 0; i < 10; i++)
+          path(
+            ctx,
+            [
+              ["M", 35 + i * 6.4, 42.5],
+              ["L", 35 + i * 6.4, 51.5],
+            ],
+            "#31546b",
+            true,
+            2,
+          );
+    } else if (name === "crown") {
+      path(ctx, [["M", 31, 43], ["Q", 29, 12, 64, 11], ["Q", 99, 12, 97, 43], ["Z"]], OILSKIN);
+      if (volume)
+        path(
+          ctx,
+          [
+            ["M", 44, 26],
+            ["Q", 54, 17, 67, 17],
+          ],
+          "rgba(255,255,255,0.45)",
+          true,
+          3,
+        );
       path(
         ctx,
         [
-          ["M", 0.08, 0.61],
-          ["Q", 0.12, 0.76, 0.4, 0.73],
+          ["M", 19, 46],
+          ["Q", 64, 31, 109, 46],
+          ["Q", 112, 55, 103, 58],
+          ["Q", 64, 44, 25, 58],
+          ["Q", 17, 55, 19, 46],
+          ["Z"],
+        ],
+        OILSKIN_BRIM,
+      );
+    } else if (name === "headset") {
+      disc(ctx, 98, 67, 10, 10, CORAL);
+      ctx.beginPath();
+      ctx.ellipse(98, 67, 10, 10, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = NAVY;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      path(
+        ctx,
+        [
+          ["M", 98, 76],
+          ["Q", 97, 89, 80, 90],
         ],
         NAVY,
         true,
-        0.026,
+        2.6,
       );
-      disc(ctx, 0.4, 0.73, 0.055, 0.035, NAVY);
-    }
-  } else if (name === "antenna") {
-    for (const x of EYE_X) {
-      ctx.beginPath();
-      ctx.ellipse(x, 0.51, 0.125, 0.13, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = NAVY;
-      ctx.lineWidth = 0.024;
-      ctx.stroke();
-    }
-    path(
-      ctx,
-      [
-        ["M", 0.46, 0.5],
-        ["Q", 0.5, 0.47, 0.54, 0.5],
-      ],
-      NAVY,
-      true,
-      0.025,
-    );
-  } else if (name === "bow") {
-    path(
-      ctx,
-      [
-        ["M", 0.73, 0.16],
-        ["Q", 0.57, -0.01, 0.61, 0.2],
-        ["Q", 0.61, 0.28, 0.73, 0.16],
-        ["Q", 0.9, 0.02, 0.85, 0.23],
-        ["Q", 0.8, 0.28, 0.73, 0.16],
-      ],
-      CORAL,
-    );
-    disc(ctx, 0.73, 0.16, 0.04, 0.04, CORAL);
-  } else if (name === "crown") {
-    path(
-      ctx,
-      [
-        ["M", 0.29, 0.15],
-        ["L", 0.25, -0.09],
-        ["L", 0.41, 0.025],
-        ["L", 0.5, -0.13],
-        ["L", 0.59, 0.025],
-        ["L", 0.75, -0.09],
-        ["L", 0.71, 0.15],
-        ["Z"],
-      ],
-      GOLD,
-    );
-  } else if (name === "party") {
-    path(ctx, [["M", 0.27, 0.22], ["L", 0.52, -0.31], ["L", 0.76, 0.22], ["Z"]], "#ae8cf7");
-    path(
-      ctx,
-      [
-        ["M", 0.35, 0.05],
-        ["L", 0.67, 0.05],
-      ],
-      GOLD,
-      true,
-      0.055,
-    );
-    disc(ctx, 0.52, -0.3, 0.045, 0.045, GOLD);
-  } else if (name === "flower") {
-    for (let i = 0; i < 5; i++) {
-      const a = (i * Math.PI * 2) / 5;
-      disc(ctx, 0.77 + Math.cos(a) * 0.055, 0.24 + Math.sin(a) * 0.055, 0.045, 0.045, CREAM);
-    }
-    disc(ctx, 0.77, 0.24, 0.033, 0.033, GOLD);
-  } else if (name === "scarf") scarf(ctx, true);
-  ctx.restore();
-}
-
-export function drawSleep(ctx, s, frame, color, t) {
-  ctx.save();
-  ctx.translate((frame?.head?.[0] ?? 0) * s, (frame?.head?.[1] ?? 0) * s);
-  ctx.scale(s / 16, s / 16);
-  const rising = t !== undefined && Math.floor(t / 0.8) % 3 === 0;
-  SLEEP_SPOTS.forEach(([x, y], i) => {
-    if (!rising || i === 0)
+      disc(ctx, 78, 90, 3.6, 2.6, NAVY);
+    } else if (name === "antenna") {
+      for (const cx of [50, 78]) {
+        disc(ctx, cx, 66, 9.5, 9.5, "rgba(255,255,255,0.18)");
+        ctx.beginPath();
+        ctx.ellipse(cx, 66, 9.5, 9.5, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = NAVY;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+      }
+      for (const line of [
+        [
+          ["M", 59.5, 64],
+          ["Q", 64, 61, 68.5, 64],
+        ],
+        [
+          ["M", 40.5, 64],
+          ["L", 33, 61],
+        ],
+        [
+          ["M", 87.5, 64],
+          ["L", 95, 61],
+        ],
+      ])
+        path(ctx, line, NAVY, true, 2.2);
+    } else if (name === "bow") {
+      hand(ctx, 99, 99, 6, earTone);
       path(
         ctx,
         [
-          ["M", x, y],
-          ["L", x + 2, y],
-          ["L", x, y + 2.5],
-          ["L", x + 2, y + 2.5],
+          ["M", 100, 101],
+          ["L", 104, 40],
         ],
-        color,
+        NAVY,
         true,
-        0.48,
+        2.2,
       );
+      path(ctx, [["M", 104, 40], ["L", 116, 41.5], ["L", 115.5, 53], ["L", 104, 52], ["Z"]], FLAG_BLUE);
+      path(ctx, [["M", 107.2, 43.4], ["L", 112.6, 44.1], ["L", 112.4, 49.6], ["L", 107.1, 49], ["Z"]], "#ffffff");
+    } else if (name === "party") {
+      const at = (t) => [
+        (1 - t) ** 2 * 22 + 2 * (1 - t) * t * 64 + t * t * 106,
+        (1 - t) ** 2 * 34 + 2 * (1 - t) * t * -18 + t * t * 34,
+      ];
+      path(
+        ctx,
+        [
+          ["M", 22, 34],
+          ["Q", 64, -18, 106, 34],
+        ],
+        "rgba(16,46,57,0.55)",
+        true,
+        1.3,
+      );
+      const colors = [CORAL, GOLD, SEA_MINT, FLAG_BLUE];
+      for (let i = 0; i < 7; i++) {
+        const [ax, ay] = at(0.12 + i * 0.125 - 0.035);
+        const [bx, by] = at(0.12 + i * 0.125 + 0.035);
+        path(
+          ctx,
+          [["M", ax, ay], ["L", bx, by], ["L", (ax + bx) / 2, Math.max(ay, by) + 7], ["Z"]],
+          colors[i % colors.length],
+        );
+      }
+    } else if (name === "flower") {
+      hand(ctx, 96, 72, 5.5, earTone);
+      for (const [x0, y0, x1, y1, w, c] of [
+        [79, 66, 90, 61.5, 6, OILSKIN_BRIM],
+        [90, 61.5, 101, 57, 8, GOLD],
+        [101, 57, 111, 53, 10, OILSKIN_BRIM],
+      ])
+        path(
+          ctx,
+          [
+            ["M", x0, y0],
+            ["L", x1, y1],
+          ],
+          c,
+          true,
+          w,
+        );
+      if (detail)
+        for (const [x, y, r] of [
+          [90, 61.5, 4.4],
+          [101, 57, 5.4],
+        ])
+          path(
+            ctx,
+            [
+              ["M", x - r * 0.38, y - r * 0.92],
+              ["L", x + r * 0.38, y + r * 0.92],
+            ],
+            NAVY,
+            true,
+            1.6,
+          );
+      disc(ctx, 111.5, 52.8, 2.2, 4.6, NAVY);
+    } else if (name === "scarf") kerchief(ctx, scarfColor, true);
   });
+  ctx.restore();
+}
+
+/**
+ * A sleeping agent (paused until its plan or budget is back): a gold crescent moon over the head's right side in the
+ * body's own space, outlined in `color` (the page's ink), and a small star that comes and goes with `t` (still frames
+ * and reduced motion show both).
+ */
+export function drawSleep(ctx, s, frame, color, t) {
+  wearCap(ctx);
+  ctx.save();
+  ctx.translate((frame?.head?.[0] ?? 0) * s, (frame?.head?.[1] ?? 0) * s);
+  ctx.scale(s, s);
+  sketch(ctx, () => {
+    const [cx, cy, r] = [96, 22, 8];
+    const moon = [];
+    for (let i = 0; i <= 16; i++) {
+      const a = Math.PI / 2 + (i / 16) * Math.PI;
+      moon.push([i ? "L" : "M", cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    }
+    for (let i = 16; i >= 0; i--) {
+      const a = Math.PI / 2 + (i / 16) * Math.PI;
+      moon.push(["L", cx + 0.45 * r + Math.cos(a) * r * 0.82, cy - 0.08 * r + Math.sin(a) * r * 0.86]);
+    }
+    moon.push(["Z"]);
+    path(ctx, moon, GOLD);
+    path(ctx, moon, color, true, 1.1);
+    const rising = t !== undefined && Math.floor(t / 0.8) % 3 === 0;
+    if (!rising) {
+      path(
+        ctx,
+        [
+          ["M", 108, 28],
+          ["L", 109, 31],
+          ["L", 112, 32],
+          ["L", 109, 33],
+          ["L", 108, 36],
+          ["L", 107, 33],
+          ["L", 104, 32],
+          ["L", 107, 31],
+          ["Z"],
+        ],
+        GOLD,
+      );
+    }
+  });
+  ctx.restore();
+}
+
+/**
+ * The porthole around an agent's tile of side `s` (the tile is clipped round by its view): a navy ring at the edge and
+ * a fine gold line inside it, thinner on a small tile. Drawn over the agent, after drawAgent, by the web's framed
+ * avatar (live.ts) and the phone's (AgentAvatar.tsx). Profile-only export (engine.d.ts declares it by patch).
+ */
+export function drawPorthole(ctx, s) {
+  const ring = Math.max(1.5, s * 0.036);
+  const line = Math.max(0.7, s * 0.012);
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(s / 2, s / 2, s / 2 - ring / 2, s / 2 - ring / 2, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = NAVY;
+  ctx.lineWidth = ring;
+  ctx.stroke();
+  const r = s / 2 - ring - line / 2 - s * 0.008;
+  ctx.beginPath();
+  ctx.ellipse(s / 2, s / 2, r, r, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(255,212,119,0.8)";
+  ctx.lineWidth = line;
+  ctx.stroke();
   ctx.restore();
 }

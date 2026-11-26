@@ -104,8 +104,8 @@ describe("app icons (ADR 0179)", () => {
     const faces = MADE_FACES.map((look) => count({ sky: "night", color: "rose", look }, white));
     expect(faces.every((n) => n > 0)).toBe(true);
     expect(new Set(faces).size).toBeGreaterThanOrEqual(6);
-    // The crown's gold is on the icon that wears it and on no other.
-    const gold: [number, number, number] = [0xff, 0xd4, 0x77];
+    // The sou'wester's oilskin (the crown's id) is on the icon that wears it and on no other.
+    const gold: [number, number, number] = [0xf2, 0xc1, 0x4e];
     expect(count({ sky: "night", color: "rose", look: "crown" }, gold)).toBeGreaterThan(0);
     expect(count({ sky: "night", color: "rose", look: "round" }, gold)).toBe(0);
     // The one-color icon keeps the accessory's shape.

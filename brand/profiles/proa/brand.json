@@ -599,10 +599,10 @@
       "count": 1
     },
     {
-      "why": "agent: Timo draws the default color: mint (engine.js AGENT_GRADIENTS.sky)",
+      "why": "agent: Timo's colors, the same ids (sky Mint, indigo Tide, violet Plum, rose Coral, amber Lighthouse, green Seaweed, teal Petrol, graphite Mist)",
       "file": "packages/ui/src/agent/engine.js",
-      "find": "  sky: [\"#8cc3ff\", \"#0063d1\"],",
-      "replace": "  sky: [\"#C4F0E0\", \"#A2E5CE\"],",
+      "find": "  sky: [\"#8cc3ff\", \"#0063d1\"],\n  indigo: [\"#7d8bff\", \"#3f4fd6\"],\n  violet: [\"#ae8cf7\", \"#6e45d1\"],\n  rose: [\"#f58aa6\", \"#c9406a\"],\n  amber: [\"#f3c25c\", \"#c07d0b\"],\n  green: [\"#5fcf8b\", \"#1f8a4c\"],\n  teal: [\"#4cd0c0\", \"#0f8f86\"],\n  graphite: [\"#9a9a95\", \"#4a4a47\"],",
+      "replace": "  sky: [\"#C4F0E0\", \"#A2E5CE\"],\n  indigo: [\"#B9D2F5\", \"#7FA6E0\"],\n  violet: [\"#D9C6EE\", \"#A98BCF\"],\n  rose: [\"#FFC2B5\", \"#FA8E7A\"],\n  amber: [\"#FFE7B0\", \"#F6C35C\"],\n  green: [\"#CDE8B5\", \"#93C77E\"],\n  teal: [\"#8FD3C9\", \"#3E9A8F\"],\n  graphite: [\"#DCE3E6\", \"#AAB7BD\"],",
       "count": 1
     },
     {
@@ -758,9 +758,293 @@
       "find": "export const ACCESSORY_NAMES = [\"none\", ...Object.keys(ACCESSORIES)];",
       "replace": "const UPSTREAM_ACCESSORY_NAMES = [\"none\", ...Object.keys(UPSTREAM_ACCESSORIES)];",
       "count": 1
+    },
+    {
+      "why": "agent look: engine.d.ts declares the profile's drawPorthole",
+      "file": "packages/ui/src/agent/engine.d.ts",
+      "find": "export function drawSleep(ctx: Ctx2D, s: number, frame: BodyFrame | undefined, color: string, t?: number): void;",
+      "replace": "export function drawSleep(ctx: Ctx2D, s: number, frame: BodyFrame | undefined, color: string, t?: number): void;\n/** The porthole's ring around a framed agent's tile of side `s` (the profile's drawing). */\nexport function drawPorthole(ctx: Ctx2D, s: number): void;",
+      "count": 1
+    },
+    {
+      "why": "agent look: a pose says the agent waits on someone (it raises a hand)",
+      "file": "packages/ui/src/agent/engine.d.ts",
+      "find": "  writing?: boolean;\n",
+      "replace": "  writing?: boolean;\n  /** Waiting on a person: the profile's drawing raises a hand. */\n  waiting?: boolean;\n",
+      "count": 1
+    },
+    {
+      "why": "agent look: the web's waiting pose is marked as such",
+      "file": "packages/ui/src/agent/live.ts",
+      "find": "    pose.look = [0, -0.12];\n",
+      "replace": "    pose.look = [0, -0.12];\n    pose.waiting = true;\n",
+      "count": 1
+    },
+    {
+      "why": "agent look: the web imports the ring",
+      "file": "packages/ui/src/agent/live.ts",
+      "find": "  drawAgent,\n  drawSleep,\n",
+      "replace": "  drawAgent,\n  drawPorthole,\n  drawSleep,\n",
+      "count": 1
+    },
+    {
+      "why": "agent look: the web's framed agent, one size whatever it wears (one item per head)",
+      "file": "packages/ui/src/agent/live.ts",
+      "find": "  const inner = s * (look.accessory ? 0.6 : 0.66);\n  const x = (s - inner) / 2;\n  const y = s - inner - s * (look.accessory ? 0.1 : 0.14);",
+      "replace": "  const inner = s * 0.64;\n  const x = (s - inner) / 2;\n  const y = s - inner - s * 0.15;",
+      "count": 1
+    },
+    {
+      "why": "agent look: the web's framed agent gets its ring",
+      "file": "packages/ui/src/agent/live.ts",
+      "find": "    cells: size <= 32 ? 12 : undefined,\n    after: decorate(agent, t, still),\n  });\n",
+      "replace": "    cells: size <= 32 ? 12 : undefined,\n    after: decorate(agent, t, still),\n  });\n  drawPorthole(ctx, s);\n",
+      "count": 1
+    },
+    {
+      "why": "agent look: up to 24 px only the head, no tile (the web's sm joins xs)",
+      "file": "packages/ui/src/components/Avatar.tsx",
+      "find": "  const tile = framed ?? (size !== \"xs\" && size !== \"xl\");",
+      "replace": "  const tile = framed ?? (size !== \"xs\" && size !== \"sm\" && size !== \"xl\");",
+      "count": 1
+    },
+    {
+      "why": "agent look: the tile's sky over its sea, in the agent's tones (no dither)",
+      "file": "packages/ui/src/sky/avatar.ts",
+      "find": "  if (dark) return [mixHex(deep, \"#1c1c1b\", 0.78), mixHex(deep, \"#1c1c1b\", 0.55)];\n  return [mixHex(light, \"#ffffff\", 0.86), mixHex(light, \"#ffffff\", 0.62)];",
+      "replace": "  if (dark) return [mixHex(light, \"#0D252A\", 0.18), mixHex(deep, \"#183A55\", 0.52)];\n  return [mixHex(light, \"#FFF1D9\", 0.5), mixHex(deep, \"#183A55\", 0.42)];",
+      "count": 1
+    },
+    {
+      "why": "agent look: the sea line, a gentle swell across the tile",
+      "file": "packages/ui/src/sky/avatar.ts",
+      "find": "  const t = Math.min(1, Math.max(0, (y / (n - 1)) * 1.15 - 0.1));\n  return t > bayerAt(x, y) ? 1 : 0;",
+      "replace": "  const swell = 0.012 * Math.sin((x / n) * Math.PI * 4);\n  return (y + 0.5) / n > 0.745 + swell ? 1 : 0;",
+      "count": 1
+    },
+    {
+      "why": "agent look: the sea line needs no dither (its import goes too)",
+      "file": "packages/ui/src/sky/avatar.ts",
+      "find": "import { bayerAt } from \"./math\";\n",
+      "replace": "",
+      "count": 1
+    },
+    {
+      "why": "agent look: the phone imports the ring",
+      "file": "apps/mobile/src/agent/AgentAvatar.tsx",
+      "find": "  drawAgent,\n  drawnKey,\n",
+      "replace": "  drawAgent,\n  drawnKey,\n  drawPorthole,\n",
+      "count": 1
+    },
+    {
+      "why": "agent look: the phone's framed agent gets its ring",
+      "file": "apps/mobile/src/agent/AgentAvatar.tsx",
+      "find": "  });\n  return compile(rec.commands);\n}",
+      "replace": "  });\n  if (frame) drawPorthole(asCtx(rec), size);\n  return compile(rec.commands);\n}",
+      "count": 1
+    },
+    {
+      "why": "agent look: the phone's tile is round",
+      "file": "apps/mobile/src/agent/AgentAvatar.tsx",
+      "find": "          borderRadius: radius ?? size * 0.3,",
+      "replace": "          borderRadius: radius ?? size / 2,",
+      "count": 1
+    },
+    {
+      "why": "agent look: up to 24 pt only the head, no tile (the phone)",
+      "file": "apps/mobile/src/agent/poses.ts",
+      "find": "export const framedByDefault = (size: number) => size >= 20 && size < 64;",
+      "replace": "export const framedByDefault = (size: number) => size > 24 && size < 64;",
+      "count": 1
+    },
+    {
+      "why": "agent look: the phone's framed agent, one size whatever it wears",
+      "file": "apps/mobile/src/agent/poses.ts",
+      "find": "  const inner = size * (withAccessory ? 0.6 : 0.66);\n  return {\n    x: (size - inner) / 2,\n    y: size - inner - size * (withAccessory ? 0.1 : 0.14),",
+      "replace": "  const inner = size * 0.64;\n  return {\n    x: (size - inner) / 2,\n    y: size - inner - size * 0.15,",
+      "count": 1
+    },
+    {
+      "why": "agent look: the phone's framed layout test: one size whatever it wears",
+      "file": "apps/mobile/test/poses.test.ts",
+      "find": "  expect(plain.inner).toBeCloseTo(33);\n  expect(plain.x).toBeCloseTo(8.5);\n  expect(plain.y + plain.inner).toBeCloseTo(50 - 7);",
+      "replace": "  expect(plain.inner).toBeCloseTo(32);\n  expect(plain.x).toBeCloseTo(9);\n  expect(plain.y + plain.inner).toBeCloseTo(50 - 7.5);",
+      "count": 1
+    },
+    {
+      "why": "agent look: the phone's framed layout test: a hat doesn't shrink the head",
+      "file": "apps/mobile/test/poses.test.ts",
+      "find": "  expect(hat.inner).toBeLessThan(plain.inner);",
+      "replace": "  expect(hat.inner).toBe(plain.inner);",
+      "count": 1
+    },
+    {
+      "why": "agent look test: the picker opens on Lighthouse's tone (as the preset writes it)",
+      "file": "packages/ui/test/color-picker.test.tsx",
+      "find": "    expect(hex.value).toBe(\"#c07d0b\");",
+      "replace": "    expect(hex.value).toBe(\"#F6C35C\");",
+      "count": 1
+    },
+    {
+      "why": "agent look test: Enter applies Lighthouse's tone (the picker's lowercase)",
+      "file": "packages/ui/test/color-picker.test.tsx",
+      "find": "    expect(picked).toEqual([\"#c07d0b\"]);",
+      "replace": "    expect(picked).toEqual([\"#f6c35c\"]);",
+      "count": 1
+    },
+    {
+      "why": "agent look test: the phone's tile is round",
+      "file": "apps/mobile/test/island-faces.test.ts",
+      "find": "  expect(source(\"agent/AgentAvatar.tsx\")).toContain(\"borderRadius: radius ?? size * 0.3\");",
+      "replace": "  expect(source(\"agent/AgentAvatar.tsx\")).toContain(\"borderRadius: radius ?? size / 2\");",
+      "count": 1
     }
   ],
   "texts": {
+    "look.colors.sky": {
+      "en": "Mint",
+      "pt-BR": "Menta",
+      "de": "Minze",
+      "es": "Menta",
+      "fr": "Menthe",
+      "id": "Mint",
+      "it": "Menta",
+      "ja": "ミント",
+      "ko": "민트",
+      "nl": "Munt",
+      "pl": "Mięta",
+      "ru": "Мята",
+      "tr": "Nane",
+      "zh-Hans": "薄荷"
+    },
+    "look.colors.indigo": {
+      "en": "Tide",
+      "pt-BR": "Maré",
+      "de": "Flut",
+      "es": "Marea",
+      "fr": "Marée",
+      "id": "Pasang",
+      "it": "Marea",
+      "ja": "潮",
+      "ko": "조수",
+      "nl": "Getij",
+      "pl": "Pływ",
+      "ru": "Прилив",
+      "tr": "Gelgit",
+      "zh-Hans": "潮汐"
+    },
+    "look.colors.violet": {
+      "en": "Plum",
+      "pt-BR": "Ameixa",
+      "de": "Pflaume",
+      "es": "Ciruela",
+      "fr": "Prune",
+      "id": "Prem",
+      "it": "Prugna",
+      "ja": "プラム",
+      "ko": "자두",
+      "nl": "Pruim",
+      "pl": "Śliwka",
+      "ru": "Слива",
+      "tr": "Erik",
+      "zh-Hans": "李子"
+    },
+    "look.colors.rose": {
+      "en": "Coral",
+      "pt-BR": "Coral",
+      "de": "Koralle",
+      "es": "Coral",
+      "fr": "Corail",
+      "id": "Koral",
+      "it": "Corallo",
+      "ja": "コーラル",
+      "ko": "코랄",
+      "nl": "Koraal",
+      "pl": "Koral",
+      "ru": "Коралл",
+      "tr": "Mercan",
+      "zh-Hans": "珊瑚"
+    },
+    "look.colors.amber": {
+      "en": "Lighthouse",
+      "pt-BR": "Farol",
+      "de": "Leuchtturm",
+      "es": "Faro",
+      "fr": "Phare",
+      "id": "Mercusuar",
+      "it": "Faro",
+      "ja": "灯台",
+      "ko": "등대",
+      "nl": "Vuurtoren",
+      "pl": "Latarnia",
+      "ru": "Маяк",
+      "tr": "Fener",
+      "zh-Hans": "灯塔"
+    },
+    "look.colors.green": {
+      "en": "Seaweed",
+      "pt-BR": "Alga",
+      "de": "Seetang",
+      "es": "Alga",
+      "fr": "Algue",
+      "id": "Rumput laut",
+      "it": "Alga",
+      "ja": "海藻",
+      "ko": "해초",
+      "nl": "Zeewier",
+      "pl": "Wodorost",
+      "ru": "Водоросль",
+      "tr": "Yosun",
+      "zh-Hans": "海藻"
+    },
+    "look.colors.teal": {
+      "en": "Petrol",
+      "pt-BR": "Petróleo",
+      "de": "Petrol",
+      "es": "Azul petróleo",
+      "fr": "Bleu pétrole",
+      "id": "Biru petrol",
+      "it": "Blu petrolio",
+      "ja": "ピーコック",
+      "ko": "피콕",
+      "nl": "Petrolblauw",
+      "pl": "Morski",
+      "ru": "Петроль",
+      "tr": "Petrol mavisi",
+      "zh-Hans": "孔雀蓝"
+    },
+    "look.colors.graphite": {
+      "en": "Mist",
+      "pt-BR": "Névoa",
+      "de": "Nebel",
+      "es": "Niebla",
+      "fr": "Brume",
+      "id": "Kabut",
+      "it": "Nebbia",
+      "ja": "霧",
+      "ko": "안개",
+      "nl": "Nevel",
+      "pl": "Mgła",
+      "ru": "Туман",
+      "tr": "Sis",
+      "zh-Hans": "雾"
+    },
+    "look.accessories.none": {
+      "en": "Sailor cap",
+      "pt-BR": "Gorro de marinheiro",
+      "de": "Matrosenmütze",
+      "es": "Gorro de marinero",
+      "fr": "Bachi de marin",
+      "id": "Topi pelaut",
+      "it": "Berretto da marinaio",
+      "ja": "セーラー帽",
+      "ko": "세일러 모자",
+      "nl": "Matrozenmuts",
+      "pl": "Czapka marynarska",
+      "ru": "Бескозырка",
+      "tr": "Denizci şapkası",
+      "zh-Hans": "水手帽"
+    },
     "look.accessories.hat": {
       "en": "Captain's cap",
       "pt-BR": "Quepe de capitão",
@@ -777,6 +1061,70 @@
       "tr": "Kaptan şapkası",
       "zh-Hans": "船长帽"
     },
+    "look.accessories.cap": {
+      "en": "Deck cap",
+      "pt-BR": "Boné de convés",
+      "de": "Deckkappe",
+      "es": "Gorra de cubierta",
+      "fr": "Casquette de pont",
+      "id": "Topi dek",
+      "it": "Berretto da coperta",
+      "ja": "デッキキャップ",
+      "ko": "갑판 모자",
+      "nl": "Dekpet",
+      "pl": "Czapka pokładowa",
+      "ru": "Палубная кепка",
+      "tr": "Güverte şapkası",
+      "zh-Hans": "甲板帽"
+    },
+    "look.accessories.headphones": {
+      "en": "Radio headphones",
+      "pt-BR": "Fones de rádio",
+      "de": "Funkkopfhörer",
+      "es": "Auriculares de radio",
+      "fr": "Casque radio",
+      "id": "Headphone radio",
+      "it": "Cuffie radio",
+      "ja": "無線ヘッドホン",
+      "ko": "무전 헤드폰",
+      "nl": "Radiokoptelefoon",
+      "pl": "Słuchawki radiowe",
+      "ru": "Радионаушники",
+      "tr": "Telsiz kulaklığı",
+      "zh-Hans": "无线电耳机"
+    },
+    "look.accessories.bow": {
+      "en": "Signal flag",
+      "pt-BR": "Bandeira de sinal",
+      "de": "Signalflagge",
+      "es": "Bandera de señales",
+      "fr": "Pavillon de signal",
+      "id": "Bendera isyarat",
+      "it": "Bandiera di segnalazione",
+      "ja": "信号旗",
+      "ko": "신호기",
+      "nl": "Seinvlag",
+      "pl": "Flaga sygnałowa",
+      "ru": "Сигнальный флаг",
+      "tr": "İşaret bayrağı",
+      "zh-Hans": "信号旗"
+    },
+    "look.accessories.crown": {
+      "en": "Sou'wester",
+      "pt-BR": "Chapéu de oleado",
+      "de": "Südwester",
+      "es": "Sueste",
+      "fr": "Suroît",
+      "id": "Topi hujan pelaut",
+      "it": "Cappello impermeabile",
+      "ja": "雨よけ帽",
+      "ko": "방수 모자",
+      "nl": "Zuidwester",
+      "pl": "Zydwestka",
+      "ru": "Зюйдвестка",
+      "tr": "Yağmur şapkası",
+      "zh-Hans": "防雨帽"
+    },
     "look.accessories.antenna": {
       "en": "Round glasses",
       "pt-BR": "Óculos redondos",
@@ -792,11 +1140,94 @@
       "ru": "Круглые очки",
       "tr": "Yuvarlak gözlük",
       "zh-Hans": "圆框眼镜"
+    },
+    "look.accessories.headset": {
+      "en": "Headset with mic",
+      "pt-BR": "Headset com microfone",
+      "de": "Headset mit Mikrofon",
+      "es": "Auriculares con micrófono",
+      "fr": "Micro-casque",
+      "id": "Headset dengan mikrofon",
+      "it": "Cuffie con microfono",
+      "ja": "マイク付きヘッドセット",
+      "ko": "마이크 헤드셋",
+      "nl": "Headset met microfoon",
+      "pl": "Zestaw z mikrofonem",
+      "ru": "Гарнитура с микрофоном",
+      "tr": "Mikrofonlu kulaklık",
+      "zh-Hans": "带麦克风的耳机"
+    },
+    "look.accessories.beanie": {
+      "en": "Wool beanie",
+      "pt-BR": "Gorro de lã",
+      "de": "Wollmütze",
+      "es": "Gorro de lana",
+      "fr": "Bonnet en laine",
+      "id": "Kupluk wol",
+      "it": "Berretta di lana",
+      "ja": "ウールのニット帽",
+      "ko": "털모자",
+      "nl": "Wollen muts",
+      "pl": "Wełniana czapka",
+      "ru": "Шерстяная шапка",
+      "tr": "Yün bere",
+      "zh-Hans": "毛线帽"
+    },
+    "look.accessories.party": {
+      "en": "Bunting",
+      "pt-BR": "Bandeirolas",
+      "de": "Wimpelkette",
+      "es": "Banderines",
+      "fr": "Fanions",
+      "id": "Bendera hias",
+      "it": "Bandierine",
+      "ja": "万国旗",
+      "ko": "만국기",
+      "nl": "Vlaggetjes",
+      "pl": "Girlanda z flag",
+      "ru": "Флажки",
+      "tr": "Flama dizisi",
+      "zh-Hans": "彩旗"
+    },
+    "look.accessories.flower": {
+      "en": "Spyglass",
+      "pt-BR": "Luneta",
+      "de": "Fernrohr",
+      "es": "Catalejo",
+      "fr": "Longue-vue",
+      "id": "Teropong",
+      "it": "Cannocchiale",
+      "ja": "望遠鏡",
+      "ko": "망원경",
+      "nl": "Kijker",
+      "pl": "Luneta",
+      "ru": "Подзорная труба",
+      "tr": "Dürbün",
+      "zh-Hans": "单筒望远镜"
+    },
+    "look.accessories.scarf": {
+      "en": "Big neckerchief",
+      "pt-BR": "Lenço grande",
+      "de": "Großes Halstuch",
+      "es": "Pañuelo grande",
+      "fr": "Grand foulard",
+      "id": "Kacu besar",
+      "it": "Foulard grande",
+      "ja": "大きなスカーフ",
+      "ko": "큰 스카프",
+      "nl": "Grote halsdoek",
+      "pl": "Duża chusta",
+      "ru": "Большой платок",
+      "tr": "Büyük fular",
+      "zh-Hans": "大领巾"
     }
   },
   "append": {
     "packages/ui/src/agent/engine.js": [
       "agent/proa-agent.js"
+    ],
+    "packages/ui/src/styles/components.css": [
+      "agent/porthole.css"
     ]
   }
 }

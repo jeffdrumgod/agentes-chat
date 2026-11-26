@@ -14,7 +14,7 @@ describe("agent dither", () => {
     expect(svg).toContain('viewBox="0 0 8 8"');
     expect(svg).toContain("linearGradient");
     expect(svg).toContain('<path d="M');
-    expect(svg).toContain('stop-color="#6e45d1"');
+    expect(svg).toContain('stop-color="#A98BCF"');
     expect(svg).not.toContain("<rect");
   });
 
@@ -52,7 +52,8 @@ describe("avatar tile sky", () => {
       return ((n >> 16) & 255) + ((n >> 8) & 255) + (n & 255);
     };
     expect(lum(top)).toBeGreaterThan(lum(bottom));
-    expect(lum(dTop)).toBeLessThan(lum(dBottom));
+    // The porthole: its sky lighter than its sea in both themes.
+    expect(lum(dTop)).toBeGreaterThan(lum(dBottom));
     expect(lum(dBottom)).toBeLessThan(lum(bottom));
     expect(avatarSkyTones("unknown", false)).toEqual(avatarSkyTones("sky", false));
   });
@@ -65,8 +66,9 @@ describe("avatar tile sky", () => {
       Array.from({ length: n }, (_, x) => avatarSkyCell(x, y, n)).reduce<number>((s, v) => s + v, 0);
     expect(row(0)).toBe(0);
     expect(row(n - 1)).toBe(n);
-    expect(row(Math.floor(n / 2))).toBeGreaterThan(0);
-    expect(row(Math.floor(n / 2))).toBeLessThan(n);
+    // The sea line sits low, about a quarter of the tile.
+    expect(row(Math.floor(n / 2))).toBe(0);
+    expect(row(Math.floor(n * 0.85))).toBe(n);
   });
 
   test("the tile sky cache stays small while a picker's live preview asks for a new color every move", () => {

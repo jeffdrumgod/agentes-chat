@@ -51,7 +51,7 @@ describe("engine portraits", () => {
       drawBrain(ctx, "claude_code", "idle", { agentLook: { color: "rose", accessory: "crown" } }),
     );
     expect(rose.some((c) => own.has(c))).toBe(true);
-    expect(own.has("#FFD477")).toBe(true); // the crown's gold
+    expect(own.has("#F2C14E")).toBe(true); // the sou'wester's oilskin (the crown's id)
     const plain = colors((ctx) => drawBrain(ctx, "codex", "idle"));
     expect(sky.some((c) => plain.has(c))).toBe(true);
     expect(rose.some((c) => plain.has(c))).toBe(false);

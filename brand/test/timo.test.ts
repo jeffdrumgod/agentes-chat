@@ -11,7 +11,8 @@ const { RecordingContext } = ROOT
   ? await import(`${root}/apps/mobile/src/agent/recorder.ts`)
   : { RecordingContext: null };
 test.skipIf(!ROOT)("Timo preserves every public export and stored appearance id", () => {
-  expect(Object.keys(E).sort()).toEqual(Object.keys(upstream).sort());
+  // drawPorthole is the profile's own (the porthole's ring), declared in engine.d.ts by a patch.
+  expect(Object.keys(E).sort()).toEqual([...Object.keys(upstream), "drawPorthole"].sort());
   expect(E.ACCESSORY_NAMES).toEqual(upstream.ACCESSORY_NAMES);
   expect(Object.keys(E.EYE_STYLES)).toEqual(Object.keys(upstream.EYE_STYLES));
   expect(E.BODY_CUT).toBe(0);
@@ -41,7 +42,9 @@ test.skipIf(!ROOT)(
               ctx.commands.filter((c) => c.op === "restore").length,
             );
             expect(JSON.stringify(ctx.commands)).not.toMatch(/NaN|Infinity|null/);
-            expect(ctx.commands.some((c) => c.op === "fill" && c.color === "#FA7C66")).toBe(true);
+            // The kerchief: coral, navy on the coral face.
+            const kerchief = color === "rose" ? "#183A55" : "#FA7C66";
+            expect(ctx.commands.some((c) => c.op === "fill" && c.color === kerchief)).toBe(true);
           }
   },
 );
@@ -68,7 +71,9 @@ test.skipIf(!ROOT)("progress, contrast and sleeping keep their contracts", () =>
   expect(E.sleepPose().expression).toBe("closed");
   const rec = new RecordingContext();
   E.drawSleep(rec, 96, undefined, E.EYE_COLOR);
-  expect(rec.commands.filter((c) => c.op === "stroke")).toHaveLength(2);
+  // A gold crescent outlined in the page's ink, and its star.
+  expect(rec.commands.filter((c) => c.op === "stroke" && c.color === E.EYE_COLOR)).toHaveLength(1);
+  expect(rec.commands.filter((c) => c.op === "fill" && c.color === "#FFD477")).toHaveLength(2);
 });
 
 test.skipIf(!ROOT)("default workspace accent stays mint; custom workspace accents still win", async () => {
