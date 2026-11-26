@@ -570,6 +570,71 @@
       "file": "apps/mobile/test/features/egress-share.test.ts",
       "find": "  // Shown where there is something to lend to, and to whoever may change it or while it is on.\n  expect(computer).toContain(\"d.shareInternet && (d.mayManage || sharing)\");\n  expect(computer).toContain('label={t(\"devices.shareInternet\")}');\n  expect(computer).toContain(\"sub={shareInternetText(t, d, lending) ?? undefined}\");\n  // Its owner turns it on; an admin may only turn it off.\n  expect(computer).toContain(\"disabled={!d.mayManage || (!mine && !sharing)}\");\n  // The pending value shows at once; on again picks it first, its owner's alone.\n  expect(computer).toContain(\"(share.isPending ? share.variables : undefined) ?? d.shareInternet?.on ?? false\");\n  expect(computer).toContain('label={t(\"devices.shareInternetPick\")}');\n  expect(computer).toContain(\"lending !== null && mine\");\n",
       "replace": "  // This build lends none: where there is something to lend to, one line and no switch.\n  expect(computer).toContain(\n    '{d.shareInternet ? <GroupedRow label={t(\"devices.shareInternetJoin\")} labelLines={3} /> : null}',\n  );\n  expect(computer).not.toContain('label={t(\"devices.shareInternet\")}');\n"
+    },
+    {
+      "why": "presence badge: a round disc instead of the agent's body with its cut corner (web and phone share the cells)",
+      "file": "packages/ui/src/presence/badge.ts",
+      "find": "const SHAPE = [\n  \".#######.\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"########.\",\n];",
+      "replace": "const SHAPE = [\n  \"..#####..\",\n  \".#######.\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \"#########\",\n  \".#######.\",\n  \"..#####..\",\n];",
+      "count": 1
+    },
+    {
+      "why": "presence badge test (phone): the round badge's top row starts one cell in",
+      "file": "apps/mobile/test/presence-badge.test.ts",
+      "find": "expect(drawn).toContain(\"1,0\");",
+      "replace": "expect(drawn).toContain(\"2,0\");",
+      "count": 1
+    },
+    {
+      "why": "agent radius: round, without the cut corner (both tokens.css, kept equal by a test)",
+      "files": [
+        "docs/design/design-system/tokens.css",
+        "packages/ui/src/styles/tokens.css"
+      ],
+      "find": "  --radius-agent: 30% 30% 30% 9%;",
+      "replace": "  --radius-agent: 50% 50% 50% 50%;",
+      "count": 1
+    },
+    {
+      "why": "agent radius on the phone's tokens (the same corners as --radius-agent)",
+      "file": "packages/tokens/src/index.ts",
+      "find": "export const agentRadius = [0.3, 0.3, 0.3, 0.09] as const;",
+      "replace": "export const agentRadius = [0.5, 0.5, 0.5, 0.5] as const;",
+      "count": 1
     }
-  ]
+  ],
+  "texts": {
+    "look.accessories.hat": {
+      "en": "Captain's cap",
+      "pt-BR": "Quepe de capitão",
+      "de": "Kapitänsmütze",
+      "es": "Gorra de capitán",
+      "fr": "Casquette de capitaine",
+      "id": "Topi kapten",
+      "it": "Berretto da capitano",
+      "ja": "船長帽",
+      "ko": "선장 모자",
+      "nl": "Kapiteinspet",
+      "pl": "Czapka kapitańska",
+      "ru": "Капитанская фуражка",
+      "tr": "Kaptan şapkası",
+      "zh-Hans": "船长帽"
+    },
+    "look.accessories.antenna": {
+      "en": "Round glasses",
+      "pt-BR": "Óculos redondos",
+      "de": "Runde Brille",
+      "es": "Gafas redondas",
+      "fr": "Lunettes rondes",
+      "id": "Kacamata bulat",
+      "it": "Occhiali tondi",
+      "ja": "丸メガネ",
+      "ko": "동그란 안경",
+      "nl": "Ronde bril",
+      "pl": "Okrągłe okulary",
+      "ru": "Круглые очки",
+      "tr": "Yuvarlak gözlük",
+      "zh-Hans": "圆框眼镜"
+    }
+  }
 }

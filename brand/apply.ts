@@ -49,6 +49,8 @@ type Profile = {
   patches?: Patch[];
   // CSS appended to repo files: repo path -> profile file (a font face, a wordmark weight).
   css?: Record<string, string>;
+  // Shared i18n values by key and language ("look.accessories.hat" -> { en, pt-BR, de, … }), every language required.
+  texts?: Record<string, Record<string, string>>;
   // Path (in the profile) of the color tokens: { "light": { "--bg": "#…" }, "dark": { … } }.
   theme?: string;
   // Whole-file replacements: repo path -> the profile's file and the SHA-256 of the upstream file it replaces.
@@ -1111,7 +1113,8 @@ if (brand.theme) {
 
 // Patches: small edits where a whole-file override would be too much to review on every sync. `find` is exact text
 // (`pattern` a regular expression, `replace` may use $1); `file` is one path or `files` a list of globs. Every patch
-// must change each of its files, so an upstream rewrite of those lines fails the apply and names the patch.
+// must change each of its files, so an upstream rewrite of those lines fails the apply and names the patch. `count`
+// pins how many times it matches in each file (a renamed declaration: exactly once).
 type Patch = {
   why: string;
   file?: string;
@@ -1119,6 +1122,7 @@ type Patch = {
   find?: string;
   pattern?: string;
   replace: string;
+  count?: number;
 };
 for (const p of brand.patches ?? []) {
   const targets = p.file
@@ -1142,12 +1146,85 @@ for (const p of brand.patches ?? []) {
         })
       : s.split(p.find as string).join(p.replace);
     if (!p.pattern) n = s.split(p.find as string).length - 1;
-    if (!n) {
-      fail(`patch "${p.why}": upstream changed ${target}; review the patch`);
+    if (!n || (p.count !== undefined && n !== p.count)) {
+      fail(
+        `patch "${p.why}": upstream changed ${target}${n ? ` (${n} matches, ${p.count} expected)` : ""}; review the patch`,
+      );
       continue;
     }
     write(target, out);
     count(`patch: ${p.why}`, target, n);
+  }
+}
+
+// Texts: shared i18n values the profile sets by key, in every language (a label that names what the profile's own
+// drawing shows). `{ "look.accessories.hat": { "en": "…", "pt-BR": "…", "de": "…", … } }`. A language file without
+// a value, or a key upstream moved, fails the apply: a new upstream language must not keep the upstream's label. The
+// English text is also written to each language's `.source.json` (what its translation was made from).
+const I18N_DIR = "packages/i18n/src";
+// A nested key's string value in a pretty-printed i18n file (a TS object literal or JSON, two spaces a level).
+const textAt = (src: string, path: string[], json: boolean): { start: number; end: number } | null => {
+  let from = 0;
+  let to = src.length;
+  for (let i = 0; i < path.length; i++) {
+    const pad = " ".repeat(2 * (i + 1));
+    const key = json ? `"${esc(path[i] as string)}"` : `(?:${esc(path[i] as string)}|"${esc(path[i] as string)}")`;
+    const leaf = i === path.length - 1;
+    const re = new RegExp(`\\n${pad}${key}: ${leaf ? '("(?:[^"\\\\\\n]|\\\\.)*")' : "\\{"}`, "g");
+    re.lastIndex = from;
+    const m = re.exec(src);
+    if (!m || m.index >= to) return null;
+    if (leaf) {
+      const start = m.index + m[0].length - (m[1] as string).length;
+      return { start, end: start + (m[1] as string).length };
+    }
+    from = m.index + m[0].length;
+    const close = src.indexOf(`\n${pad}}`, from);
+    to = close < 0 ? src.length : close;
+  }
+  return null;
+};
+if (brand.texts) {
+  const langs: [string, string, boolean][] = [
+    ["en", `${I18N_DIR}/en.ts`, false],
+    ["pt-BR", `${I18N_DIR}/pt-BR.ts`, false],
+    ...readdirSync(join(SRC, I18N_DIR, "locales"))
+      .filter((f) => f.endsWith(".json") && !f.endsWith(".source.json"))
+      .sort()
+      .map((f): [string, string, boolean] => [f.replace(/\.json$/, ""), `${I18N_DIR}/locales/${f}`, true]),
+  ];
+  for (const [lang, file, json] of langs) {
+    let s = read(file);
+    let n = 0;
+    for (const [key, values] of Object.entries(brand.texts)) {
+      const value = values[lang];
+      if (value === undefined) {
+        fail(`text "${key}": no ${lang} value in the profile (${file})`);
+        continue;
+      }
+      const at = textAt(s, key.split("."), json);
+      if (!at) {
+        fail(`text "${key}": not found in ${file}; review the profile's texts`);
+        continue;
+      }
+      s = s.slice(0, at.start) + JSON.stringify(value) + s.slice(at.end);
+      n++;
+    }
+    write(file, s);
+    count("text", file, n);
+    const source = `${I18N_DIR}/locales/${lang}.source.json`;
+    if (json && existsSync(join(SRC, source))) {
+      let src = read(source);
+      let m = 0;
+      for (const [key, values] of Object.entries(brand.texts)) {
+        const re = new RegExp(`(\\n  "${esc(key)}": \\{\\n    "value": )"(?:[^"\\\\\\n]|\\\\.)*"`);
+        if (!re.test(src)) continue;
+        src = src.replace(re, (_m, head: string) => `${head}${JSON.stringify(values.en)}`);
+        m++;
+      }
+      write(source, src);
+      count("text source", source, m);
+    }
   }
 }
 

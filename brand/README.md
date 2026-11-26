@@ -36,6 +36,8 @@ brand/build.sh --profile brand/profiles/<name> --out ../<name>-build --target no
 | `mobile.slug` | EAS slug |
 | `assets` | Repo path → file in the profile, copied as is (favicon, icons, email logos, splash) |
 | `theme` | Color tokens, `{ "light": { "--bg": "#…" }, "dark": { … } }`. Written to both copies of `tokens.css` and to `packages/tokens` (the phone), which upstream tests keep equal. Optional `replaceHex`/`replaceHexIn` recolor upstream palette literals in listed files |
+| `patches` | Small edits, `[{ "why", "file" \| "files", "find" \| "pattern", "replace", "count"? }]`. Each must match in each file (`count`: exactly that many times), so an upstream rewrite of those lines fails the apply and names the patch |
+| `texts` | Shared i18n values by key, `{ "look.accessories.hat": { "en": "…", "pt-BR": "…", "de": "…", … } }`. Every language file needs a value (a new upstream language fails the apply); the English one also goes to each `.source.json` |
 | `overrides` | Whole-file replacements, `{ "<repo path>": { "file": "<profile path>", "upstreamSha256": "<sha>" } }`. The apply fails when upstream changes that file, so the override gets reviewed instead of silently dropping upstream's change. A test file's override is named `*.override-test.*` (the apply refuses `*.test.*`): `bun test <path>` filters by path and would run it from the profile |
 
 `brand/profiles/example` is a minimal profile to start from.
