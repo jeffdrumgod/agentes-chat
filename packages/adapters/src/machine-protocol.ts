@@ -7,7 +7,7 @@ import type { MergeDone } from "./command-policy";
  */
 
 /** Bumped on breaking changes; the server refuses runners older than `MIN_RUNNER_PROTOCOL`. */
-export const MACHINE_PROTOCOL_VERSION = 87;
+export const MACHINE_PROTOCOL_VERSION = 90;
 export const MIN_RUNNER_PROTOCOL = 1;
 /** From this protocol on, requests carry `agent` and each agent works in its own folder. */
 export const AGENT_FOLDERS_PROTOCOL = 2;
@@ -336,12 +336,28 @@ export interface MachineLoad {
   diskFreeGb?: number;
   diskUse?: number;
   sharedGb?: number;
+  /** The workspace disk's size (GB, one decimal). Absent from an older runner, as `oomKills`. */
+  diskGb?: number;
+  /**
+   * What takes the workspace disk, by kind (GB, one decimal), measured every `DISK_PARTS_MS` by the runner in system
+   * mode on Linux; the rest of what is in use is everything else. Absent elsewhere and from an older runner, as
+   * `oomKills`.
+   */
+  diskParts?: DiskParts;
   /**
    * What the agents' temporary folders hold in memory now (GB), ADR 0243: system mode on Linux. Absent from an older
    * runner: no protocol number, as `oomKills`.
    */
   agentTmpRamGb?: number;
 }
+
+/** The kinds of things `MachineLoad.diskParts` splits a disk into, in the order a bar shows them. */
+export const DISK_PARTS = ["projects", "apps", "agents", "caches", "system"] as const;
+export type DiskPart = (typeof DISK_PARTS)[number];
+export type DiskParts = Record<DiskPart, number>;
+
+/** How often the runner measures `diskParts`: `du` walks the whole disk. */
+export const DISK_PARTS_MS = 6 * 3600_000;
 
 /** How often a computer's load is sampled (protocol 22). */
 export const LOAD_SAMPLE_MS = 5 * 60_000;
@@ -750,6 +766,20 @@ export const TERMINAL_CWD_PROTOCOL = 76;
  * person closed it). The server sends `keep` to no older runner, where each open is a new shell.
  */
 export const TERMINAL_KEEP_PROTOCOL = 77;
+/**
+ * From this protocol on (ADR 0253): the Devin brain. `brain.turn` takes `kind: "devin"` (Cognition's Devin CLI,
+ * `devin acp` over the Agent Client Protocol, one process per turn, the model family's variant picked by the turn's
+ * effort and speed), `account` takes `kind: "devin"` (a Devin sign-in by a pasted code, `devin auth login
+ * --force-manual-token-flow`, in the account's own home), `hello.executors.devin` reports the CLI with the models its
+ * accounts list, and `access.tools.devin` turns it on or off. The server never sends any of these to an older runner.
+ */
+export const DEVIN_PROTOCOL = 89;
+/**
+ * `phone.power`: an iOS simulator or an Android emulator this computer runs started (`on`) or shut down, from the
+ * apps or by an agent. A Mac boots a simulator with `simctl` and shows it in Simulator; an emulator starts detached
+ * from the Android SDK's `emulator`, its AVD found by the model it showed (`model`). The server asks no older runner.
+ */
+export const SIMULATOR_POWER_PROTOCOL = 90;
 /** A kept terminal's name: the server puts the person's id in front of the app's, so each person reaches only theirs. */
 export const isTerminalKeep = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9_.-]{8,128}$/.test(v);
 /**
@@ -1158,7 +1188,7 @@ export interface ExecVault {
 }
 
 /** Which CLI an account signs in. */
-export type AccountKind = "claude_code" | "codex" | "cursor" | "opencode" | "grok" | "antigravity";
+export type AccountKind = "claude_code" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "devin";
 export const ACCOUNT_KINDS: readonly AccountKind[] = [
   "claude_code",
   "codex",
@@ -1166,6 +1196,7 @@ export const ACCOUNT_KINDS: readonly AccountKind[] = [
   "opencode",
   "grok",
   "antigravity",
+  "devin",
 ];
 export const isAccountKind = (v: unknown): v is AccountKind => ACCOUNT_KINDS.some((k) => k === v);
 /** Account and sign-in ids: UUIDs (the server makes them; the desktop app's runner too). */
@@ -1343,6 +1374,7 @@ export const OWN_USAGE_ID: Record<AccountKind, string> = {
   opencode: "own:opencode",
   grok: "own:grok",
   antigravity: "own:antigravity",
+  devin: "own:devin",
 };
 
 export const PLAN_USAGE_LIMITS = { windows: 8, label: 40 } as const;
@@ -2192,7 +2224,7 @@ export interface TaskStart {
 }
 
 /** The coding CLIs `hello.executors` reports. */
-export const CLI_NAMES = ["claude", "codex", "cursor", "opencode", "grok", "antigravity"] as const;
+export const CLI_NAMES = ["claude", "codex", "cursor", "opencode", "grok", "antigravity", "devin"] as const;
 export type CliName = (typeof CLI_NAMES)[number];
 
 /**
@@ -2226,6 +2258,7 @@ export interface RunnerExecutorInfo {
    * Protocol 36, `cursor`: the models its sign-in lists (`agent models`), and which its plan includes when the CLI
    * says. Protocol 39, `opencode`: the models `opencode models` lists (`provider/model`), `free` on OpenCode's free tier.
    * Protocol 43, `grok`: the models `grok models` lists. Protocol 44, `antigravity`: the models `agy models` lists.
+   * Protocol 89, `devin`: the model families `devin models list` lists to the accounts signed in here.
    */
   models?: CursorModelInfo[];
 }
@@ -2236,12 +2269,23 @@ export interface CursorModelInfo {
   label?: string;
   /** Cursor: the CLI said the plan includes it (absent: it didn't say; other models are billed at API prices). */
   inPlan?: boolean;
-  /** OpenCode (protocol 39): a model of OpenCode's free tier (no key, no cost). */
+  /**
+   * OpenCode (protocol 39): a model of OpenCode's free tier (no key, no cost). Devin (protocol 89): one the plan serves
+   * at no cost (`cost_tier` "Free").
+   */
   free?: boolean;
+  /** Devin (protocol 89): the levels its variants name (`DEVIN_LEVELS`), least thinking first. */
+  efforts?: string[];
+  /** Devin: it has a faster variant (Fast mode, priority, Lightning) for Velocidade. */
+  fast?: boolean;
+  /** Devin: its context window in tokens. */
+  contextWindow?: number;
+  /** Devin, on the runner only (never sent): its variants' ids, the CLI's default first (`devinVariant`). */
+  variants?: string[];
 }
 
-/** Most models kept from `agent models`, and their longest id and label. */
-export const CURSOR_MODEL_LIMITS = { models: 60, id: 80, label: 80 } as const;
+/** Most models kept from `agent models` (and a Devin account's families, ADR 0253), and their longest id and label. */
+export const CURSOR_MODEL_LIMITS = { models: 80, id: 80, label: 80 } as const;
 
 /**
  * How a brain turn started on the runner (Claude Code; an older runner leaves it out): on a process already open
@@ -2269,7 +2313,9 @@ export interface BrainTurnTimings {
  * fresh session the server started for an old one), or the end of the session's last process: idle past its limit,
  * closed for another conversation of the agent (its cap) or for memory, another launch asked (folder, permissions,
  * account, sign-in), a warm start with another system text, exited by itself, closed after its turn (canceled,
- * died, a background turn), or a session that ran before with no process left in this runner (it restarted).
+ * died, a background turn), or a session that ran before with no process left in this runner (it restarted). A warm
+ * start that came to nothing says why: started with another launch than its turn's (`warm_settings`), or asked before
+ * this runner ran a turn of the agent's, so with no system text to start it with (`no_launch`); `cap` too.
  */
 export const BRAIN_COLD_CAUSES = [
   "new_session",
@@ -2281,6 +2327,8 @@ export const BRAIN_COLD_CAUSES = [
   "exited",
   "closed",
   "restart",
+  "warm_settings",
+  "no_launch",
 ] as const;
 export type BrainColdCause = (typeof BRAIN_COLD_CAUSES)[number];
 
@@ -2478,9 +2526,9 @@ export interface BrainTurnRequest {
   runId: string;
   /**
    * `cursor`: protocol 36 (`CURSOR_PROTOCOL`); `opencode`: protocol 39 (`OPENCODE_PROTOCOL`); `grok`: 43
-   * (`GROK_PROTOCOL`); `antigravity`: 44 (`ANTIGRAVITY_PROTOCOL`).
+   * (`GROK_PROTOCOL`); `antigravity`: 44 (`ANTIGRAVITY_PROTOCOL`); `devin`: 89 (`DEVIN_PROTOCOL`).
    */
-  kind: "claude_code" | "codex" | "cursor" | "opencode" | "grok" | "antigravity";
+  kind: "claude_code" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "devin";
   /** The executor's session (a UUID, stable per thread); `resume`: the server knows it ran before (a hint). */
   session: { id: string; resume: boolean };
   /** Relative to the agent's folder ("" = the folder). */
@@ -2630,8 +2678,6 @@ export const EGRESS_SHARE_PROTOCOL = 81;
 export const EGRESS_SHARE = {
   /** The web only: anything else leaves the workspace's computer its usual way. */
   ports: [80, 443] as readonly number[],
-  /** Bytes both ways a day (UTC) the lending computer carries before it refuses new connections until the next. */
-  dailyBytes: 5 * 1024 ** 3,
   /** Connections open at once through one lending computer. */
   open: 256,
   /** How long the lending computer waits to reach the destination. */
@@ -2692,6 +2738,14 @@ export function parseTaskRoom(v: unknown): TaskRoomReport | null {
  * (the apps' "Try again"). An older runner brings only its Antigravity copy (`AGY_COPY_PROTOCOL`).
  */
 export const CLI_COPIES_PROTOCOL = 86;
+
+/**
+ * Protocol 88: in system mode the CLIs are what every agent's user can start (`executors`, a CLI only root can start
+ * is `CLI_HOME_ONLY`), and the runner fetches the pinned build of one no agent reaches at all, root's and linked from
+ * `/usr/local/bin` (`hello.clis`, `cli.fetch`), which `cli.install` starts too (Claude Code, Codex). An older
+ * system-mode runner fetches nothing and installs nothing.
+ */
+export const AGENTS_CLI_PROTOCOL = 88;
 
 /** Why a fetch failed: no network, a download that isn't the vendor's build, no build for this system, a full disk. */
 export type CliFetchFailure = "offline" | "hash_mismatch" | "no_build" | "disk_full" | "failed";
@@ -2893,6 +2947,8 @@ export interface RunnerTools {
   grok?: boolean;
   /** Protocol 44: Google's Antigravity CLI (ADR 0143). Absent = off (older runners). */
   antigravity?: boolean;
+  /** Protocol 89: Cognition's Devin CLI (ADR 0253). Absent = off (older runners). */
+  devin?: boolean;
   /** Shell commands (`exec`, `shell` tasks). The same as `exec` in `hello` once protocol 10 is in use. */
   commands: boolean;
   /** Protocol 12: the agent browser (ADR 0040). Absent = off (older runners). */
@@ -2961,6 +3017,7 @@ export interface RunnerInfo {
     opencode?: RunnerExecutorInfo;
     grok?: RunnerExecutorInfo;
     antigravity?: RunnerExecutorInfo;
+    devin?: RunnerExecutorInfo;
     /**
      * `CLI_INSTALL_PROTOCOL`: a CLI that is there and whose `--version` keeps failing, with its own last line of
      * error. It is not listed above: it can't run turns, and it isn't missing either.
@@ -3276,6 +3333,8 @@ export type MachineRequest = (
   | { op: "xcode.open" }
   /** `PHONE_REPAIR_PROTOCOL`: repair the test helper of the iPhone `serial`; answers once its rebuild started. */
   | { op: "phone.repair"; serial: string }
+  /** `SIMULATOR_POWER_PROTOCOL`: start or shut down a simulator or emulator; answers once it is starting or off. */
+  | { op: "phone.power"; platform: PhonePlatform; serial: string; model: string; on: boolean }
   /** `PROBLEM_REPORT_PROTOCOL`: facts and the scrubbed log tail for a problem report. */
   | { op: "report.collect" }
   /** `EGRESS_SHARE_PROTOCOL`: one connection to `host`:`port`, its bytes on the data socket `streamId`. */
@@ -3364,6 +3423,7 @@ export const MACHINE_OPS: readonly MachineOp[] = [
   "cli.fetch",
   "xcode.open",
   "phone.repair",
+  "phone.power",
   "report.collect",
   "egress.dial",
 ];
@@ -3542,6 +3602,7 @@ export interface MachineReplies {
   "cli.fetch": { fetch: CliFetchState | null };
   "xcode.open": { opened: boolean };
   "phone.repair": { repairing: boolean };
+  "phone.power": { on: boolean };
   "report.collect": RunnerReportParts;
   "egress.dial": { connected: true };
 }
@@ -3972,6 +4033,19 @@ const denialList = (v: unknown): TaskDenial[] => {
   return out;
 };
 
+/** A Devin model's levels, its fast variant and its window (protocol 89), checked; its variants never travel. */
+function devinModelFields(m: Record<string, unknown>): Pick<CursorModelInfo, "efforts" | "fast" | "contextWindow"> {
+  const efforts = Array.isArray(m.efforts)
+    ? [...new Set(m.efforts.filter((e): e is string => isString(e) && /^[a-z]{1,12}$/.test(e)))].slice(0, 10)
+    : [];
+  const window = typeof m.contextWindow === "number" && Number.isInteger(m.contextWindow) ? m.contextWindow : 0;
+  return {
+    ...(efforts.length ? { efforts } : {}),
+    ...(m.fast === true ? { fast: true } : {}),
+    ...(window > 0 && window <= 100_000_000 ? { contextWindow: window } : {}),
+  };
+}
+
 /** `cursor`'s `models` (protocol 36), cut to `CURSOR_MODEL_LIMITS`; ids are short words only. */
 export function parseCursorModels(v: unknown): CursorModelInfo[] {
   if (!Array.isArray(v)) return [];
@@ -3985,6 +4059,7 @@ export function parseCursorModels(v: unknown): CursorModelInfo[] {
       ...(label ? { label } : {}),
       ...(m.inPlan === true ? { inPlan: true } : {}),
       ...(m.free === true ? { free: true } : {}),
+      ...devinModelFields(m),
     });
     if (out.length >= CURSOR_MODEL_LIMITS.models) break;
   }
@@ -3992,9 +4067,9 @@ export function parseCursorModels(v: unknown): CursorModelInfo[] {
 }
 
 /**
- * `hello.executors`: only `claude`, `codex`, `cursor`, `opencode`, `grok` and `antigravity`, each with a short version
- * line (and Claude Code's login, Codex's sandbox on Windows), and `broken`: the error line of each of them that is there
- * and can't start.
+ * `hello.executors`: only `claude`, `codex`, `cursor`, `opencode`, `grok`, `antigravity` and `devin`, each with a short
+ * version line (and Claude Code's login, Codex's sandbox on Windows), and `broken`: the error line of each of them that
+ * is there and can't start.
  */
 export function parseExecutors(v: Record<string, unknown>): NonNullable<RunnerInfo["executors"]> {
   const out: NonNullable<RunnerInfo["executors"]> = {};
@@ -4060,8 +4135,8 @@ export const CLI_ERROR_MAX = 300;
 /** `executors.broken.claude` on Windows when Git for Windows, which Claude Code needs there, isn't on the computer. */
 export const CLI_GIT_MISSING = "git_missing";
 /**
- * `executors.broken.<cli>` in system mode for Cursor's, Grok Build or the Antigravity CLI found only in root's own
- * `~/.local/bin`, where its installer puts it and no agent's user can run it.
+ * `executors.broken.<cli>` in system mode for a CLI only root can start (one in root's own `~/.local/bin`, where its
+ * installer puts it, or anywhere else no agent's user can run it).
  */
 export const CLI_HOME_ONLY = "home_only";
 
@@ -5078,6 +5153,8 @@ export function parseAccess(v: unknown): RunnerAccess | undefined {
       ...(typeof t.grok === "boolean" ? { grok: t.grok } : {}),
       // Absent: a runner before the Antigravity CLI's switch (protocol 44), where it is off.
       ...(typeof t.antigravity === "boolean" ? { antigravity: t.antigravity } : {}),
+      // Absent: a runner before the Devin CLI's switch (protocol 89), where it is off.
+      ...(typeof t.devin === "boolean" ? { devin: t.devin } : {}),
       commands: t.commands === true,
       ...(t.browser === true ? { browser: true } : {}),
       ...(t.desktop === true ? { desktop: true } : {}),
@@ -5170,8 +5247,13 @@ export function parseMachineLoad(v: unknown): MachineLoad | null {
     ...(between(v.diskUse, 0, 1) ? { diskUse: v.diskUse } : {}),
     ...(between(v.sharedGb, 0, 1e6) ? { sharedGb: v.sharedGb } : {}),
     ...(between(v.agentTmpRamGb, 0, 1e6) ? { agentTmpRamGb: v.agentTmpRamGb } : {}),
+    ...(between(v.diskGb, 0, 1e6) ? { diskGb: v.diskGb } : {}),
+    ...(isDiskParts(v.diskParts) ? { diskParts: pickDiskParts(v.diskParts) } : {}),
   };
 }
+
+const isDiskParts = (v: unknown): v is DiskParts => isObject(v) && DISK_PARTS.every((k) => between(v[k], 0, 1e6));
+const pickDiskParts = (v: DiskParts) => Object.fromEntries(DISK_PARTS.map((k) => [k, v[k]])) as DiskParts;
 
 /** `pong.browserTraffic` (protocol 23): whole bytes up to 1e15 and at most 24 hours, else none. */
 export function parseBrowserTraffic(v: unknown): BrowserTraffic | null {

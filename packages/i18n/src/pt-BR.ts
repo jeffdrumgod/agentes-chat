@@ -3625,6 +3625,8 @@ export const ptBR = {
       antigravity: "O Gemini está sem login neste computador. Conecte uma conta do Gemini na página do\u00a0{{name}}.",
       antigravity_female:
         "O Gemini está sem login neste computador. Conecte uma conta do Gemini na página da\u00a0{{name}}.",
+      devin: "O Devin está sem login neste computador. Conecte uma conta do Devin na página do\u00a0{{name}}.",
+      devin_female: "O Devin está sem login neste computador. Conecte uma conta do Devin na página da\u00a0{{name}}.",
       opencode:
         "O OpenCode não consegue pensar neste computador. Conecte uma chave do OpenCode na página do\u00a0{{name}}.",
       opencode_female:
@@ -3645,6 +3647,8 @@ export const ptBR = {
       antigravity: "O Gemini está sem login no {{computer}}. Conecte uma conta do Gemini na página do\u00a0{{name}}.",
       antigravity_female:
         "O Gemini está sem login no {{computer}}. Conecte uma conta do Gemini na página da\u00a0{{name}}.",
+      devin: "O Devin está sem login no {{computer}}. Conecte uma conta do Devin na página do\u00a0{{name}}.",
+      devin_female: "O Devin está sem login no {{computer}}. Conecte uma conta do Devin na página da\u00a0{{name}}.",
       opencode:
         "O OpenCode não consegue pensar no {{computer}}. Conecte uma chave do OpenCode na página do\u00a0{{name}}.",
       opencode_female:
@@ -3722,6 +3726,7 @@ export const ptBR = {
       cursor: "Conectar o seu plano do Cursor",
       grok: "Conectar o seu plano do Grok",
       gemini: "Conectar o seu plano do Gemini",
+      devin: "Conectar o seu plano do Devin",
       zen: "Conectar o OpenCode",
       api_key: "Adicionar uma chave de API",
     },
@@ -3908,6 +3913,7 @@ export const ptBR = {
           "O Google diz que usar um plano pessoal do Gemini dentro de outros apps pode suspender a conta. Para não correr esse risco, use uma chave de API do Gemini ou o Gemini Enterprise.",
         windowsOne: "No Windows, um computador usa uma conta do Gemini por vez.",
       },
+      devin: { title: "Seu plano do Devin", tiers: "Free, Pro, Max ou Teams" },
       zen: { title: "OpenCode", tiers: "Modelos grátis, ou a sua chave do OpenCode" },
       zai: { tiers: "Lite, Pro ou Max" },
       kimi: { tiers: "Plus, Pro, Max ou Ultra" },
@@ -4010,6 +4016,7 @@ export const ptBR = {
       cursor: "O Cursor entrou como {{email}}, não como {{account}}. Saia na página do Cursor e tente de novo.",
       grok: "O Grok entrou como {{email}}, não como {{account}}. Saia na página do Grok e tente de novo.",
       antigravity: "O Gemini entrou como {{email}}, não como {{account}}. Saia na página do Google e tente de novo.",
+      devin: "O Devin entrou como {{email}}, não como {{account}}. Saia na página do Devin e tente de novo.",
       opencode: "O OpenCode entrou como {{email}}, não como {{account}}. Tente de novo com a chave certa.",
     },
     useAnyway: "Usar {{email}}",
@@ -6449,6 +6456,7 @@ export const ptBR = {
             cursor: "Adicionar conta do Cursor",
             grok: "Adicionar conta do Grok",
             antigravity: "Adicionar conta do Gemini",
+            devin: "Adicionar conta do Devin",
             opencode: "Adicionar chave do OpenCode",
           },
           stepOne: {
@@ -6456,6 +6464,7 @@ export const ptBR = {
             codex: "A conta com o seu plano",
             cursor: "A conta com o seu plano",
             grok: "A conta com o seu plano",
+            devin: "A conta com o seu plano",
             antigravity: "A conta do Google com o seu plano",
             antigravityEnterprise: "A sua conta do Gemini Enterprise",
           },
@@ -6468,6 +6477,7 @@ export const ptBR = {
             cursor: "Entrar com Cursor",
             grok: "Entrar com Grok",
             antigravity: "Entrar com Google",
+            devin: "Entrar com Devin",
           },
           opencodeFree:
             "Os modelos grátis do OpenCode não pedem chave. Uma chave do console do OpenCode libera os pagos.",
@@ -6487,6 +6497,9 @@ export const ptBR = {
           /** The Gemini sign-in's second step: Google's page shows a code and takes it out of its own address. */
           stepTwoGoogle: "Cole o código que o Google mostrar",
           codeLabelGoogle: "Código do Google",
+          stepTwoDevin: "Cole o código que o Devin mostrar",
+          codeHintDevin: "Cole o código que a página do Devin mostra, não o endereço da página.",
+          codeLabelDevin: "Código do Devin",
           /** That step's ⓘ. */
           codeHintGoogle: "Cole o código que a página do Google mostra, não o endereço da página.",
           /** Under the field while it holds an address with no code in it (never sent). */
@@ -6534,6 +6547,8 @@ export const ptBR = {
             grok: "O Grok entrou como {{account}}, uma conta que você já conectou. Para usar outra, saia na página do Grok e tente de novo.",
             antigravity:
               "O Gemini entrou como {{account}}, uma conta que você já conectou. Para usar outra, saia na página do Google e tente de novo.",
+            devin:
+              "O Devin entrou como {{account}}, uma conta que você já conectou. Para usar outra, saia na página do Devin e tente de novo.",
             opencode: "Essa chave do OpenCode já está conectada como {{account}}.",
           },
           startFailed: "O {{computer}} não respondeu. Tente de novo em instantes.",
@@ -11696,6 +11711,7 @@ export const ptBR = {
       cursor: "Cursor",
       grok: "Grok",
       antigravity: "Gemini",
+      devin: "Devin",
       opencode: "OpenCode",
       needs: {
         keys: "Atualize o agentes no computador para usar a chave de um plano",
@@ -13245,6 +13261,7 @@ export const ptBR = {
       cursor: "{{model}} pelo plano do Cursor",
       grok: "{{model}} pelo plano do Grok",
       gemini: "{{model}} pelo plano do Gemini",
+      devin: "{{model}} pelo plano do Devin",
       zen: "{{model}} pelo OpenCode",
       coding: "{{model}} pelo {{plan}}",
       claudeOf: "{{model}} pelo plano do Claude de {{owner}}",
@@ -13252,6 +13269,7 @@ export const ptBR = {
       cursorOf: "{{model}} pelo plano do Cursor de {{owner}}",
       grokOf: "{{model}} pelo plano do Grok de {{owner}}",
       geminiOf: "{{model}} pelo plano do Gemini de {{owner}}",
+      devinOf: "{{model}} pelo plano do Devin de {{owner}}",
       zenOf: "{{model}} pelo OpenCode de {{owner}}",
       codingOf: "{{model}} pelo {{plan}} de {{owner}}",
       claudeAuto: "Plano do Claude",
@@ -13259,6 +13277,7 @@ export const ptBR = {
       cursorAuto: "Plano do Cursor",
       grokAuto: "Plano do Grok",
       geminiAuto: "Plano do Gemini",
+      devinAuto: "Plano do Devin",
       zenAuto: "OpenCode",
       codingAuto: "{{plan}}",
       claudeAutoOf: "Plano do Claude de {{owner}}",
@@ -13266,6 +13285,7 @@ export const ptBR = {
       cursorAutoOf: "Plano do Cursor de {{owner}}",
       grokAutoOf: "Plano do Grok de {{owner}}",
       geminiAutoOf: "Plano do Gemini de {{owner}}",
+      devinAutoOf: "Plano do Devin de {{owner}}",
       zenAutoOf: "OpenCode de {{owner}}",
       codingAutoOf: "{{plan}} de {{owner}}",
       on: "{{line}} no {{computer}}",
@@ -13281,6 +13301,7 @@ export const ptBR = {
       opencode: "OpenCode",
       grok: "Grok Build",
       antigravity: "Antigravity CLI",
+      devin: "Devin CLI",
     },
     foot: {
       api: "Pela API",
@@ -13293,6 +13314,7 @@ export const ptBR = {
     cursorText: "Usa o plano do Cursor de quem conectou o computador.",
     grokText: "Usa o plano do Grok de quem conectou o computador.",
     antigravityText: "Usa o plano do Gemini de quem conectou o computador.",
+    devinText: "Usa o plano do Devin de quem conectou o computador.",
     opencodeText: "Os modelos grátis do OpenCode, ou a chave do OpenCode de quem conectou o computador.",
     /** Cursor's models (ADR 0114), where its CLI said which the plan includes. */
     cursorModel: { inPlan: "No seu plano do Cursor", apiPrice: "O Cursor cobra pelo preço da API" },
@@ -13313,6 +13335,8 @@ export const ptBR = {
       home_only: "O {{program}} está instalado só para o root no {{computer}}, onde os agentes não chegam.",
       not_reported: "O {{computer}} ainda está vendo quais programas tem. Isto muda sozinho quando terminar.",
       system: "O {{program}} ainda não roda no sistema do {{computer}}.",
+      systemDevin:
+        "O {{computer}} usa Windows, onde o Devin ainda não roda: lá a CLI dele não consegue manter separado o login de cada conta. Use o Devin num computador Mac ou Linux, ou escolha outra IA.",
       /** Codex on a Windows computer where neither MXC nor Codex's own sandbox could start. */
       windows_sandbox:
         "O Windows do {{computer}} não consegue isolar os comandos do {{program}}. Escolha o Claude ou uma chave de API, ou atualize esse computador para o Windows\u00a011\u00a024H2 ou mais novo, com as atualizações em dia.",
@@ -13375,6 +13399,7 @@ export const ptBR = {
       cursor: "Cursor · {{model}}",
       grok: "Grok Build · {{model}}",
       antigravity: "Antigravity CLI · {{model}}",
+      devin: "Devin CLI · {{model}}",
       opencode: "OpenCode · {{model}}",
     },
     mission: {
@@ -13910,6 +13935,23 @@ export const ptBR = {
     s3: "Seu próprio armazenamento",
     s3Text: "Cloudflare R2, Amazon S3, Backblaze B2 ou outro compatível com S3.",
     current: "Em uso",
+    computer: {
+      title: "Computador do workspace",
+      used: "{{used}} de {{size}} em uso",
+      bar: "Disco do computador do workspace",
+      measuring: "Medindo o que ocupa o espaço.",
+      part: {
+        projects: "Projetos e código",
+        apps: "Apps e ferramentas",
+        agents: "Arquivos dos agentes",
+        caches: "Caches e temporários",
+        system: "Sistema",
+        other: "Outros",
+        free: "Livre",
+      },
+      full: "Quase cheio, restam {{free}}. Um agente pode limpar caches e arquivos temporários e apagar o que ninguém usa mais.",
+      ask: "Libere espaço no computador do workspace: limpe caches e arquivos temporários (gerenciadores de pacotes, navegadores, ferramentas de build) e me diga o que mais ocupa espaço.",
+    },
     // What the option in use holds, no-break spaces inside each part: a narrow card breaks the line after its "·".
     usage: {
       files: "{{size}}\u00a0de\u00a0arquivos",
@@ -16917,6 +16959,7 @@ export const ptBR = {
       noSkillMd: "Nenhum SKILL.md em {{path}} nem nas pastas dentro dela.",
       tooManySkills: "Este link tem mais de {{max}} skills. Use o link de uma das pastas dele.",
       zipTooManySkills: "Este .zip tem mais de {{max}} skills. Envie em partes.",
+      zipTooBig: "Este .zip passa de {{maxMb}} MB, o máximo para instalar uma skill.",
       invalidName: "O nome precisa ter só letras minúsculas, números e hífens, até {{max}} caracteres.",
       invalidDescription: "A descrição precisa ter de 1 a {{max}} caracteres.",
       tooLarge: "Esta skill tem {{size}} MB de texto e scripts, e o limite é {{max}} MB.",
@@ -17081,6 +17124,7 @@ export const ptBR = {
         opencode: "o OpenCode",
         grok: "o Grok Build",
         antigravity: "o Antigravity CLI",
+        devin: "o Devin CLI",
         commands: "os comandos",
         browser: "o navegador",
         desktop: "a tela",
@@ -17250,6 +17294,7 @@ export const ptBR = {
         cursor: "Cursor",
         grok: "Grok Build",
         antigravity: "Antigravity CLI",
+        devin: "Devin CLI",
         opencode: "OpenCode",
         commands: "Comandos",
         browser: "Navegador",
@@ -17261,6 +17306,7 @@ export const ptBR = {
         cursor: "Como o Claude Code, com uma conta do Cursor. Só nas pastas liberadas.",
         grok: "Como o Claude Code, com uma conta do Grok. Só nas pastas liberadas.",
         antigravity: "Como o Claude Code, com uma conta do Gemini. Só nas pastas liberadas.",
+        devin: "Como o Claude Code, com uma conta do Devin. Só nas pastas liberadas.",
         opencode: "Como o Claude Code, com os modelos grátis do OpenCode ou uma chave dele. Só nas pastas liberadas.",
         commands: "Roda comandos do Terminal, como testes e builds.",
       },
@@ -17327,6 +17373,22 @@ export const ptBR = {
     forgotten: "{{name}} esquecido.",
     stop: "Parar",
     stopped: "Parado. {{name}} está livre.",
+    /** Ligar / Desligar on an iOS simulator or an Android emulator, which its computer starts or shuts down. */
+    power: {
+      start: "Ligar",
+      stop: "Desligar",
+      starting: "{{name}} está ligando. Fica pronto em instantes.",
+      stopped: "{{name}} foi desligado.",
+      toolMissingIos: "{{computer}} precisa do Xcode para rodar simuladores. Instale o Xcode pela App Store nesse Mac.",
+      toolMissingAndroid:
+        "{{computer}} não tem o Android Emulator. Instale em Android Studio › SDK Manager › SDK Tools nesse computador.",
+      gone: "{{name}} não está mais em {{computer}}: foi apagado lá. Esqueça-o aqui, ou crie de novo lá.",
+      busy: "{{name}} está em uso agora. Pare o que o usa primeiro, ou tente de novo quando estiver livre.",
+      /** `why`: the computer's own words, as its tools said them (in English). */
+      startFailed: "{{name}} não ligou. {{computer}} disse: {{why}}",
+      stopFailed: "{{name}} não desligou. {{computer}} disse: {{why}}",
+      notSimulator: "Só um simulador ou um emulador liga e desliga por aqui.",
+    },
     showMe: "Mostrar como",
     notFound: "Este dispositivo não está mais aqui",
     notFoundText: "Ele foi removido, ou este link está errado.",
@@ -17345,20 +17407,26 @@ export const ptBR = {
     belongsHint: "Ele fica quando quem o conectou sai, e todos podem usá-lo enquanto ninguém for dono dele.",
     spillOwn: "Ajudar quando o computador da equipe estiver cheio ou fora",
     spillOwnHint:
-      "Quando o computador dos seus agentes estiver cheio ou fora, as respostas, os pedidos e as rotinas deles podem pensar aqui com o seu login.",
+      "Quando o computador da equipe estiver cheio ou fora, as respostas, os pedidos e as rotinas dos seus agentes podem pensar aqui, usando as contas de IA conectadas neste computador.",
     spillTeamHint:
-      "Quando o computador de um agente estiver cheio ou fora, as respostas, os pedidos e as rotinas dele podem pensar aqui com o login do dono dele neste computador.",
+      "Quando o computador de um agente estiver cheio ou fora, as respostas, os pedidos e as rotinas dele podem pensar aqui, usando a conta de IA que o dono dele conectou neste computador.",
     spillWorkspaceOff: "Um admin desativou isso para o workspace.",
-    /** `machines.spill_first`: its owner's agents' work starts here first. */
-    spillFirst: "Usar este computador para os trabalhos dos meus agentes",
-    spillFirstHint:
-      "Os pedidos, as rotinas e os trabalhos longos dos seus agentes começam aqui sempre que ele estiver livre, com a IA que você conectou nele. Respostas para pessoas só começam aqui quando o computador da equipe estiver cheio ou fora.",
+    helpUse: "Como ajuda os seus agentes",
+    helpUses: {
+      off: "Não ajuda",
+      help: "Só como reserva",
+      first: "Primeiro para os meus agentes",
+    },
+    helpUseHint:
+      "Só como reserva: seus agentes vêm para cá quando o computador da equipe estiver cheio ou fora. Primeiro para os meus agentes: os pedidos, as rotinas e os trabalhos longos deles começam aqui sempre que este estiver livre, e as respostas para pessoas só quando o da equipe estiver cheio ou fora. Os dois usam as contas de IA conectadas neste computador.",
+    helpUseTeamHint:
+      "Só como reserva: os agentes de qualquer pessoa vêm para cá quando o computador deles estiver cheio ou fora, usando a conta de IA que o dono de cada um conectou neste computador. Primeiro para os meus agentes: os pedidos, as rotinas e os trabalhos longos dos seus agentes começam aqui sempre que este estiver livre.",
     helpWorkspace: "Computadores ajudam quando o da equipe estiver cheio ou fora",
     helpWorkspaceHint:
       "Cada computador só ajuda se o dono permitir. Com isto desativado, nenhum ajuda, seja qual for a escolha do dono.",
     shareInternet: "Agentes usam a internet deste computador",
     shareInternetHint:
-      "Os sites que os agentes abrem passam pela conexão deste computador, então veem a sua localização. Só sites, até 5 GB por dia, e nunca nada da sua própria rede. Enquanto este computador estiver offline, os agentes usam a conexão de sempre.",
+      "Os sites que os agentes abrem passam pela conexão deste computador, então veem a sua localização. Só sites e nunca nada da sua própria rede. Enquanto este computador estiver offline, os agentes usam a conexão de sempre.",
     shareInternetInUse: "Em uso agora",
     shareInternetOther: "Agentes usam {{name}} agora",
     shareInternetPick: "Usar este",
@@ -17936,7 +18004,7 @@ export const ptBR = {
       folderRequest: "<b>{{who}}</b> pede a pasta {{path}} no seu <b>{{deviceName}}</b>",
       internetShared: "Agora os agentes abrem sites pela internet de <b>{{deviceName}}</b>",
       internetSharedLine:
-        "Só os agentes deste workspace, só sites, até 5 GB por dia, nunca nada da rede dele. Enquanto ele estiver offline, os agentes usam a conexão de sempre.",
+        "Só os agentes deste workspace, só sites, nunca nada da rede dele. Enquanto ele estiver offline, os agentes usam a conexão de sempre.",
       internetOff: "Desligar",
       internetOffDone: "Os agentes não usam mais a internet de {{deviceName}}.",
       once: "Permitir uma vez",
@@ -19460,6 +19528,8 @@ export const ptBR = {
     /** The waiting row's step line before its first step (`waitStep`). */
     wait: {
       thinking: "Pensando…",
+      /** Before the model has the turn: the agent's checkouts are being updated from their repositories. */
+      code: "Atualizando o código…",
       held: "Esperando aprovação…",
       /** The agent's own words for its step (what it wrote before the call), quoted. */
       said: "“{{text}}”",
@@ -20416,7 +20486,7 @@ export const ptBR = {
     },
     offer_install_skill: {
       label: "Oferecer instalar uma skill",
-      description: "Posta um cartão cujo botão abre a instalação com o link da skill preenchido.",
+      description: "Posta um cartão cujo botão abre a instalação com a skill já lida do link ou do .zip.",
     },
     update_skill_from_source: {
       label: "Atualizar skills dos links",

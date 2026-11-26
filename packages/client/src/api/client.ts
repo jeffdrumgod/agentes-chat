@@ -1277,6 +1277,8 @@ export interface ApiClient {
     forgetPhone(orgId: string, phoneId: string): Promise<void>;
     /** Takes the phone back from the agent using it. */
     stopPhone(orgId: string, phoneId: string): Promise<void>;
+    /** Starts (`on`) or shuts down a simulator or an emulator on its computer. */
+    powerPhone(orgId: string, phoneId: string, on: boolean): Promise<void>;
     createLink(orgId: string, kind: "server" | "computer"): Promise<ConnectLink>;
     link(orgId: string, linkId: string): Promise<ConnectLinkState>;
     approveRequest(
@@ -1440,13 +1442,28 @@ export interface ApiClient {
      */
     import(
       orgId: string,
-      input: ({ url: string; list?: boolean; forAgentId?: string } | { zipBase64: string }) & { personal?: boolean },
+      input: (
+        | { url: string; list?: boolean; forAgentId?: string }
+        | { zipBase64: string }
+        | { fileId: string; list?: boolean; forAgentId?: string }
+      ) & { personal?: boolean },
       upload?: UploadOptions,
     ): Promise<SkillDetail | SkillPick>;
     /** Installs the skills picked among a link's choices (their `path`), on for `forAgentId` as `import` does. */
     importPicked(
       orgId: string,
       url: string,
+      paths: string[],
+      forAgentId?: string,
+      personal?: boolean,
+    ): Promise<SkillDetail[]>;
+    /**
+     * Installs the skills picked among the choices of a .zip sent in a conversation (`fileId`, a Drive file the card
+     * of `offer_install_skill` names), on for `forAgentId` as `import` does.
+     */
+    importPickedFile(
+      orgId: string,
+      fileId: string,
       paths: string[],
       forAgentId?: string,
       personal?: boolean,

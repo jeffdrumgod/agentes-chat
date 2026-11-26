@@ -518,7 +518,7 @@ export const desktopEn = {
     internetOn: "Websites the agents open see your location",
     internetOff: "Off: agents use their usual connection",
     internetHint:
-      "The workspace's agents open websites through this computer's connection. Only websites, up to 5 GB a day, and never anything on your own network. While this computer is offline, they use their usual connection.",
+      "The workspace's agents open websites through this computer's connection. Only websites and never anything on your own network. While this computer is offline, they use their usual connection.",
     shareOff: "Only you for now",
     shareHint: "Everyone's agents in {{org}} can run tasks on it, as your user.",
     addFolders: "Add folders",
@@ -576,6 +576,11 @@ export const desktopEn = {
     grokDesc: "Writes and changes code in the allowed folders, with your Grok account.",
     antigravityName: "Antigravity CLI",
     antigravityDesc: "Writes and changes code in the allowed folders, with your Gemini account.",
+    devinName: "Devin CLI",
+    devinDesc: "Writes and changes code in the allowed folders, with your Devin account.",
+    /** On Windows, in place of its install line: the Devin CLI isn't pinned there (ADR 0253). */
+    devinWindows:
+      "Devin doesn't run on Windows yet: here its CLI can't keep each account's sign-in apart. Agents think with Devin on a Mac or Linux computer.",
     found: "Found",
     notFound: "Not found",
     loggedOut: "Not signed in",

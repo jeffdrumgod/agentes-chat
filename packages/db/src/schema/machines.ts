@@ -70,8 +70,23 @@ export interface MachineExecutors {
   grok?: { version: string; models?: { id: string; label?: string }[] };
   /** Google's Antigravity CLI (protocol 44, ADR 0143), and the models it lists. */
   antigravity?: { version: string; models?: { id: string; label?: string }[] };
+  /**
+   * Cognition's Devin CLI (protocol 89, ADR 0253), and the model families its accounts list: each one's levels, whether
+   * it has a faster variant, its window, and whether the plan serves it at no cost.
+   */
+  devin?: {
+    version: string;
+    models?: {
+      id: string;
+      label?: string;
+      free?: boolean;
+      efforts?: string[];
+      fast?: boolean;
+      contextWindow?: number;
+    }[];
+  };
   /** A CLI that is there and can't start (`--version` keeps failing), with its own error line; `git_missing`: see `CLI_GIT_MISSING`. */
-  broken?: Partial<Record<"claude" | "codex" | "cursor" | "opencode" | "grok" | "antigravity", string>>;
+  broken?: Partial<Record<"claude" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "devin", string>>;
   /** `hello.browser` (ADR 0040): whether the agent browser can run there; absent = not reported. */
   browser?: {
     available: boolean;
@@ -97,10 +112,10 @@ export interface MachineExecutors {
    * (`fetching` with bytes done and total, `ready`, or `failed` with why), updated by its `cli.fetch` frames.
    */
   copies?: {
-    fetchable?: ("claude" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "git")[];
+    fetchable?: ("claude" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "devin" | "git")[];
     fetch?: Partial<
       Record<
-        "claude" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "git",
+        "claude" | "codex" | "cursor" | "opencode" | "grok" | "antigravity" | "devin" | "git",
         | { state: "fetching"; version: string; done: number; total: number | null }
         | { state: "ready"; version: string }
         | {
@@ -129,6 +144,7 @@ export interface MachineExecutors {
     opencode?: MachinePlanUsage;
     grok?: MachinePlanUsage;
     antigravity?: MachinePlanUsage;
+    devin?: MachinePlanUsage;
   };
   detectedAt?: string;
 }
@@ -158,6 +174,9 @@ export interface MachineLoadRecord {
   diskFreeGb?: number;
   diskUse?: number;
   sharedGb?: number;
+  /** The workspace disk's size in GB, and what takes it by kind (`MachineLoad.diskGb`, `diskParts`). */
+  diskGb?: number;
+  diskParts?: { projects: number; apps: number; agents: number; caches: number; system: number };
   /** What the agents' temporary folders held in memory, GB (`MachineLoad.agentTmpRamGb`). */
   agentTmpRamGb?: number;
   /** The server's own mark: its admins heard of this disk passing the line, and won't again until it drops under 80%. */
@@ -187,6 +206,7 @@ export interface MachineAccess {
     opencode?: boolean;
     grok?: boolean;
     antigravity?: boolean;
+    devin?: boolean;
     commands: boolean;
     browser?: boolean;
     desktop?: boolean;

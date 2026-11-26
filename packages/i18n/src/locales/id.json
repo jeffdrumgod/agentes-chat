@@ -3322,6 +3322,8 @@
       "grok_female": "Grok belum masuk di komputer ini. Hubungkan akun Grok di halaman {{name}}.",
       "antigravity": "Gemini belum masuk di komputer ini. Hubungkan akun Gemini di halaman {{name}}.",
       "antigravity_female": "Gemini belum masuk di komputer ini. Hubungkan akun Gemini di halaman {{name}}.",
+      "devin": "Devin belum masuk di komputer ini. Hubungkan akun Devin di halaman {{name}}.",
+      "devin_female": "Devin belum masuk di komputer ini. Hubungkan akun Devin di halaman {{name}}.",
       "opencode": "OpenCode tidak bisa berpikir di komputer ini. Hubungkan kunci OpenCode di halaman {{name}}.",
       "opencode_female": "OpenCode tidak bisa berpikir di komputer ini. Hubungkan kunci OpenCode di halaman {{name}}."
     },
@@ -3336,6 +3338,8 @@
       "grok_female": "Grok belum masuk di {{computer}}. Hubungkan akun Grok di halaman {{name}}.",
       "antigravity": "Gemini belum masuk di {{computer}}. Hubungkan akun Gemini di halaman {{name}}.",
       "antigravity_female": "Gemini belum masuk di {{computer}}. Hubungkan akun Gemini di halaman {{name}}.",
+      "devin": "Devin belum masuk di {{computer}}. Hubungkan akun Devin di halaman {{name}}.",
+      "devin_female": "Devin belum masuk di {{computer}}. Hubungkan akun Devin di halaman {{name}}.",
       "opencode": "OpenCode tidak bisa berpikir di {{computer}}. Hubungkan kunci OpenCode di halaman {{name}}.",
       "opencode_female": "OpenCode tidak bisa berpikir di {{computer}}. Hubungkan kunci OpenCode di halaman {{name}}."
     },
@@ -3395,6 +3399,7 @@
       "cursor": "Hubungkan paket Cursor-mu",
       "grok": "Hubungkan paket Grok-mu",
       "gemini": "Hubungkan paket Gemini-mu",
+      "devin": "Hubungkan paket Devin-mu",
       "zen": "Hubungkan OpenCode",
       "api_key": "Tambahkan kunci API"
     },
@@ -3536,6 +3541,10 @@
         "warning": "Google menyatakan bahwa memakai paket Gemini pribadi di dalam aplikasi lain bisa membuat akun ditangguhkan. Untuk menghindari risiko itu, pakai kunci API Gemini atau Gemini Enterprise.",
         "windowsOne": "Di Windows, satu komputer memakai satu akun Gemini dalam satu waktu."
       },
+      "devin": {
+        "title": "Paket Devin-mu",
+        "tiers": "Free, Pro, Max, atau Teams"
+      },
       "zen": {
         "title": "OpenCode",
         "tiers": "Model gratis, atau kunci OpenCode-mu"
@@ -3643,6 +3652,7 @@
       "cursor": "Cursor masuk sebagai {{email}}, bukan {{account}}. Keluar di halaman Cursor lalu coba lagi.",
       "grok": "Grok masuk sebagai {{email}}, bukan {{account}}. Keluar di halaman Grok lalu coba lagi.",
       "antigravity": "Gemini masuk sebagai {{email}}, bukan {{account}}. Keluar di halaman Google lalu coba lagi.",
+      "devin": "Devin masuk sebagai {{email}}, bukan {{account}}. Keluar di halaman Devin lalu coba lagi.",
       "opencode": "OpenCode masuk sebagai {{email}}, bukan {{account}}. Coba lagi dengan kunci yang benar."
     },
     "useAnyway": "Pakai {{email}}",
@@ -5848,6 +5858,7 @@
             "cursor": "Tambah akun Cursor",
             "grok": "Tambah akun Grok",
             "antigravity": "Tambah akun Gemini",
+            "devin": "Tambah akun Devin",
             "opencode": "Tambah kunci OpenCode"
           },
           "stepOne": {
@@ -5855,6 +5866,7 @@
             "codex": "Akun dengan paketmu",
             "cursor": "Akun dengan paketmu",
             "grok": "Akun dengan paketmu",
+            "devin": "Akun dengan paketmu",
             "antigravity": "Akun Google dengan paketmu",
             "antigravityEnterprise": "Akun Gemini Enterprise-mu"
           },
@@ -5864,7 +5876,8 @@
             "codex": "Masuk dengan ChatGPT",
             "cursor": "Masuk dengan Cursor",
             "grok": "Masuk dengan Grok",
-            "antigravity": "Masuk dengan Google"
+            "antigravity": "Masuk dengan Google",
+            "devin": "Masuk dengan Devin"
           },
           "opencodeFree": "Model gratis OpenCode tidak perlu kunci. Kunci dari konsol OpenCode menambahkan model berbayarnya.",
           "cursorFinish": "Masuk di halaman Cursor, dan proses masuk selesai sendiri di {{computer}}.",
@@ -5879,6 +5892,9 @@
           "notCode": "Itu sepertinya bukan kode Claude.",
           "stepTwoGoogle": "Tempel kode yang ditampilkan Google",
           "codeLabelGoogle": "Kode Google",
+          "stepTwoDevin": "Tempel kode yang ditampilkan Devin",
+          "codeHintDevin": "Tempel kode yang ditampilkan halaman Devin, bukan alamat halamannya.",
+          "codeLabelDevin": "Kode Devin",
           "codeHintGoogle": "Tempel kode yang ditampilkan halaman Google, bukan alamat halamannya.",
           "notCodeGoogle": "Itu alamat tanpa kode. Tempel kode yang ditampilkan halaman Google.",
           "send": "Kirim ke {{computer}}",
@@ -5912,6 +5928,7 @@
             "cursor": "Cursor masuk sebagai {{account}}, akun yang sudah kamu hubungkan. Untuk memakai akun lain, keluar di halaman Cursor lalu coba lagi.",
             "grok": "Grok masuk sebagai {{account}}, akun yang sudah kamu hubungkan. Untuk memakai akun lain, keluar di halaman Grok lalu coba lagi.",
             "antigravity": "Gemini masuk sebagai {{account}}, akun yang sudah kamu hubungkan. Untuk memakai akun lain, keluar di halaman Google lalu coba lagi.",
+            "devin": "Devin masuk sebagai {{account}}, akun yang sudah kamu hubungkan. Untuk memakai akun lain, keluar di halaman Devin lalu coba lagi.",
             "opencode": "Kunci OpenCode itu sudah terhubung sebagai {{account}}."
           },
           "startFailed": "Tidak ada jawaban dari {{computer}}. Coba lagi sebentar lagi.",
@@ -10793,6 +10810,7 @@
       "cursor": "Cursor",
       "grok": "Grok",
       "antigravity": "Gemini",
+      "devin": "Devin",
       "opencode": "OpenCode",
       "needs": {
         "keys": "Perbarui agentes di komputer untuk memakai kunci paket"
@@ -12221,6 +12239,7 @@
       "cursor": "{{model}} dengan paket Cursor",
       "grok": "{{model}} dengan paket Grok",
       "gemini": "{{model}} dengan paket Gemini",
+      "devin": "{{model}} dengan paket Devin",
       "zen": "{{model}} lewat OpenCode",
       "coding": "{{model}} dengan {{plan}}",
       "claudeOf": "{{model}} dengan paket Claude milik {{owner}}",
@@ -12228,6 +12247,7 @@
       "cursorOf": "{{model}} dengan paket Cursor milik {{owner}}",
       "grokOf": "{{model}} dengan paket Grok milik {{owner}}",
       "geminiOf": "{{model}} dengan paket Gemini milik {{owner}}",
+      "devinOf": "{{model}} dengan paket Devin milik {{owner}}",
       "zenOf": "{{model}} lewat OpenCode milik {{owner}}",
       "codingOf": "{{model}} dengan {{plan}} milik {{owner}}",
       "claudeAuto": "Paket Claude",
@@ -12235,6 +12255,7 @@
       "cursorAuto": "Paket Cursor",
       "grokAuto": "Paket Grok",
       "geminiAuto": "Paket Gemini",
+      "devinAuto": "Paket Devin",
       "zenAuto": "OpenCode",
       "codingAuto": "{{plan}}",
       "claudeAutoOf": "Paket Claude milik {{owner}}",
@@ -12242,6 +12263,7 @@
       "cursorAutoOf": "Paket Cursor milik {{owner}}",
       "grokAutoOf": "Paket Grok milik {{owner}}",
       "geminiAutoOf": "Paket Gemini milik {{owner}}",
+      "devinAutoOf": "Paket Devin milik {{owner}}",
       "zenAutoOf": "OpenCode milik {{owner}}",
       "codingAutoOf": "{{plan}} milik {{owner}}",
       "on": "{{line}} di {{computer}}"
@@ -12255,7 +12277,8 @@
       "cursor": "Cursor",
       "opencode": "OpenCode",
       "grok": "Grok Build",
-      "antigravity": "Antigravity CLI"
+      "antigravity": "Antigravity CLI",
+      "devin": "Devin CLI"
     },
     "foot": {
       "api": "Lewat API",
@@ -12268,6 +12291,7 @@
     "cursorText": "Memakai paket Cursor milik orang yang menghubungkan komputer.",
     "grokText": "Memakai paket Grok milik orang yang menghubungkan komputer.",
     "antigravityText": "Memakai paket Gemini milik orang yang menghubungkan komputer.",
+    "devinText": "Memakai paket Devin milik orang yang menghubungkan komputer.",
     "opencodeText": "Model gratis OpenCode, atau kunci OpenCode milik orang yang menghubungkan komputer.",
     "cursorModel": {
       "inPlan": "Termasuk dalam paket Cursor-mu",
@@ -12285,6 +12309,7 @@
       "home_only": "{{program}} hanya terpasang untuk root di {{computer}}, yang tidak bisa dijangkau para agen.",
       "not_reported": "{{computer}} masih memeriksa program apa saja yang dimilikinya. Ini berubah sendiri setelah selesai.",
       "system": "{{program}} belum berjalan di sistem {{computer}}.",
+      "systemDevin": "{{computer}} memakai Windows, tempat Devin belum berjalan: di sana CLI-nya tidak bisa memisahkan login setiap akun. Gunakan Devin di komputer Mac atau Linux, atau pilih AI lain.",
       "windows_sandbox": "Windows di {{computer}} tidak dapat mengisolasi perintah {{program}}. Pilih Claude atau kunci API sebagai gantinya, atau perbarui komputer itu ke Windows 11 24H2 atau yang lebih baru, dengan pembaruan terbarunya.",
       "no_computerCloud": "Siap begitu {{computer}} siap."
     },
@@ -12330,6 +12355,7 @@
       "cursor": "Cursor · {{model}}",
       "grok": "Grok Build · {{model}}",
       "antigravity": "Antigravity CLI · {{model}}",
+      "devin": "Devin CLI · {{model}}",
       "opencode": "OpenCode · {{model}}"
     },
     "mission": {
@@ -12836,6 +12862,23 @@
     "s3": "Penyimpanan milikmu sendiri",
     "s3Text": "Cloudflare R2, Amazon S3, Backblaze B2, atau lainnya yang kompatibel dengan S3.",
     "current": "Sedang dipakai",
+    "computer": {
+      "title": "Komputer ruang kerja",
+      "used": "{{used}} dari {{size}} terpakai",
+      "bar": "Disk komputer ruang kerja",
+      "measuring": "Mengukur apa yang memakai ruang.",
+      "part": {
+        "projects": "Proyek dan kode",
+        "apps": "Aplikasi dan alat",
+        "agents": "File agen",
+        "caches": "Cache dan file sementara",
+        "system": "Sistem",
+        "other": "Lainnya",
+        "free": "Kosong"
+      },
+      "full": "Hampir penuh, tersisa {{free}}. Agen bisa membersihkan cache dan file sementara serta menghapus yang tidak dipakai lagi.",
+      "ask": "Kosongkan ruang di komputer ruang kerja: bersihkan cache dan file sementara (manajer paket, browser, alat build), lalu beri tahu saya apa lagi yang paling banyak memakai ruang."
+    },
     "usage": {
       "files": "{{size}} file",
       "none": "Tidak ada file",
@@ -15940,6 +15983,7 @@
       "noSkillMd": "Tidak ada SKILL.md di {{path}} atau folder di dalamnya.",
       "tooManySkills": "Tautan ini memuat lebih dari {{max}} skill. Tautkan salah satu foldernya.",
       "zipTooManySkills": "File .zip ini memuat lebih dari {{max}} skill. Kirim dalam beberapa bagian.",
+      "zipTooBig": "File .zip ini lebih dari {{maxMb}} MB, batas untuk memasang satu skill.",
       "invalidName": "Nama harus memakai huruf kecil, angka, dan tanda hubung, maksimal {{max}} karakter.",
       "invalidDescription": "Deskripsi harus terdiri dari 1 sampai {{max}} karakter.",
       "tooLarge": "Skill ini punya {{size}} MB teks dan skrip, dan batasnya {{max}} MB.",
@@ -16090,6 +16134,7 @@
         "opencode": "OpenCode",
         "grok": "Grok Build",
         "antigravity": "Antigravity CLI",
+        "devin": "Devin CLI",
         "commands": "perintah",
         "browser": "browser",
         "desktop": "layar",
@@ -16261,6 +16306,7 @@
         "cursor": "Cursor",
         "grok": "Grok Build",
         "antigravity": "Antigravity CLI",
+        "devin": "Devin CLI",
         "opencode": "OpenCode",
         "commands": "Perintah",
         "browser": "Browser"
@@ -16271,6 +16317,7 @@
         "cursor": "Seperti Claude Code, dengan akun Cursor. Hanya di folder yang diizinkan.",
         "grok": "Seperti Claude Code, dengan akun Grok. Hanya di folder yang diizinkan.",
         "antigravity": "Seperti Claude Code, dengan akun Gemini. Hanya di folder yang diizinkan.",
+        "devin": "Seperti Claude Code, dengan akun Devin. Hanya di folder yang diizinkan.",
         "opencode": "Seperti Claude Code, dengan model gratis OpenCode atau kunci OpenCode. Hanya di folder yang diizinkan.",
         "commands": "Menjalankan perintah Terminal, seperti tes dan build."
       },
@@ -16348,6 +16395,19 @@
     "forgotten": "{{name}} dilupakan.",
     "stop": "Hentikan",
     "stopped": "Dihentikan. {{name}} sudah bebas.",
+    "power": {
+      "start": "Nyalakan",
+      "stop": "Matikan",
+      "starting": "{{name}} sedang dinyalakan. Sebentar lagi siap.",
+      "stopped": "{{name}} sudah dimatikan.",
+      "toolMissingIos": "{{computer}} perlu Xcode untuk menjalankan simulator. Instal Xcode dari App Store di Mac itu.",
+      "toolMissingAndroid": "{{computer}} belum punya Android Emulator. Instal di Android Studio › SDK Manager › SDK Tools di komputer itu.",
+      "gone": "{{name}} sudah tidak ada di {{computer}}: sudah dihapus di sana. Lupakan di sini, atau buat lagi di sana.",
+      "busy": "{{name}} sedang dipakai. Hentikan dulu yang memakainya, atau coba lagi saat sudah bebas.",
+      "startFailed": "{{name}} tidak menyala. {{computer}} menjawab: {{why}}",
+      "stopFailed": "{{name}} tidak mati. {{computer}} menjawab: {{why}}",
+      "notSimulator": "Dari sini, hanya simulator dan emulator yang bisa dinyalakan dan dimatikan."
+    },
     "showMe": "Tunjukkan caranya",
     "notFound": "Perangkat ini sudah tidak ada di sini",
     "notFoundText": "Perangkat ini sudah dihapus, atau tautannya salah.",
@@ -16363,15 +16423,21 @@
     "belongs": "Milik ruang kerja",
     "belongsHint": "Perangkat ini tetap ada saat orang yang menghubungkannya keluar, dan semua orang bisa memakainya selama tidak ada pemiliknya.",
     "spillOwn": "Bantu saat komputer tim penuh atau tidak ada",
-    "spillOwnHint": "Saat komputer agenmu penuh atau tidak ada, balasan, permintaan, dan rutinitas mereka bisa berpikir di sini dengan login-mu.",
-    "spillTeamHint": "Saat komputer sebuah agen penuh atau tidak ada, balasan, permintaan, dan rutinitasnya bisa berpikir di sini dengan login pemiliknya di komputer ini.",
+    "spillOwnHint": "Saat komputer tim penuh atau tidak ada, balasan, permintaan, dan rutinitas agenmu bisa berpikir di sini, memakai akun AI yang login di komputer ini.",
+    "spillTeamHint": "Saat komputer sebuah agen penuh atau tidak ada, balasan, permintaan, dan rutinitasnya bisa berpikir di sini, memakai akun AI yang login oleh pemiliknya di komputer ini.",
     "spillWorkspaceOff": "Admin mematikan ini untuk workspace.",
-    "spillFirst": "Gunakan komputer ini untuk pekerjaan agen saya",
-    "spillFirstHint": "Permintaan, rutinitas, dan pekerjaan panjang agenmu dimulai di sini setiap kali komputer ini kosong, dengan AI yang kamu hubungkan di sini. Balasan untuk orang hanya dimulai di sini saat komputer tim penuh atau tidak ada.",
+    "helpUse": "Cara membantu agenmu",
+    "helpUses": {
+      "off": "Tidak membantu",
+      "help": "Hanya sebagai cadangan",
+      "first": "Utamakan untuk agen saya"
+    },
+    "helpUseHint": "Hanya sebagai cadangan: agenmu datang ke sini saat komputer tim penuh atau tidak ada. Utamakan untuk agen saya: permintaan, rutinitas, dan pekerjaan panjang mereka dimulai di sini setiap kali komputer ini kosong, dan balasan untuk orang hanya saat komputer tim penuh atau tidak ada. Keduanya memakai akun AI yang login di komputer ini.",
+    "helpUseTeamHint": "Hanya sebagai cadangan: agen siapa pun datang ke sini saat komputernya penuh atau tidak ada, memakai akun AI yang login oleh pemiliknya di komputer ini. Utamakan untuk agen saya: permintaan, rutinitas, dan pekerjaan panjang agenmu dimulai di sini setiap kali komputer ini kosong.",
     "helpWorkspace": "Komputer membantu saat komputer tim penuh atau tidak ada",
     "helpWorkspaceHint": "Setiap komputer hanya membantu jika pemiliknya mengizinkan. Mati: tidak ada yang membantu, apa pun pilihan pemiliknya.",
     "shareInternet": "Agen memakai internet komputer ini",
-    "shareInternetHint": "Situs yang dibuka agen lewat koneksi komputer ini, jadi situs melihat lokasimu. Hanya situs web, sampai 5 GB per hari, dan tidak pernah apa pun di jaringanmu sendiri. Selama komputer ini offline, agen memakai koneksi biasa mereka.",
+    "shareInternetHint": "Situs yang dibuka agen lewat koneksi komputer ini, jadi situs melihat lokasimu. Hanya situs web dan tidak pernah apa pun di jaringanmu sendiri. Selama komputer ini offline, agen memakai koneksi biasa mereka.",
     "shareInternetInUse": "Sedang dipakai",
     "shareInternetOther": "Agen sedang memakai {{name}}",
     "shareInternetPick": "Pakai yang ini",
@@ -16905,7 +16971,7 @@
       "cliRequest": "<b>{{who}}</b> meminta kamu memasang {{tool}} di <b>{{deviceName}}</b> kamu",
       "folderRequest": "<b>{{who}}</b> memintamu membuka folder {{path}} di <b>{{deviceName}}</b> milikmu",
       "internetShared": "Agen kini membuka situs web lewat internet <b>{{deviceName}}</b>",
-      "internetSharedLine": "Hanya agen workspace ini, hanya situs web, hingga 5 GB sehari, tidak pernah apa pun di jaringannya sendiri. Selama komputer itu offline, agen memakai koneksi biasa mereka.",
+      "internetSharedLine": "Hanya agen workspace ini, hanya situs web, tidak pernah apa pun di jaringannya sendiri. Selama komputer itu offline, agen memakai koneksi biasa mereka.",
       "internetOff": "Matikan",
       "internetOffDone": "Agen tidak lagi memakai internet {{deviceName}}.",
       "once": "Izinkan sekali",
@@ -18376,6 +18442,7 @@
     "namesMore": "{{first}} dan {{count}} lainnya",
     "wait": {
       "thinking": "Berpikir…",
+      "code": "Memperbarui kode…",
       "held": "Menunggu persetujuan…",
       "said": "“{{text}}”"
     },
@@ -19198,7 +19265,7 @@
     },
     "offer_install_skill": {
       "label": "Tawarkan memasang skill",
-      "description": "Memposting kartu yang tombolnya membuka pemasangan dengan tautan skill sudah terisi."
+      "description": "Memposting kartu yang tombolnya membuka pemasangan dengan skill yang sudah dibaca dari tautan atau .zip-nya."
     },
     "update_skill_from_source": {
       "label": "Perbarui skill dari tautannya",
