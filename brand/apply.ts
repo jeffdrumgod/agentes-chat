@@ -334,6 +334,14 @@ export interface LogoProps {`,
     find: '</svg><span aria-hidden="true">agentes</span></span>',
     replace: `</svg><span aria-hidden="true">${NAME}</span></span>`,
   },
+  // Web: the installable web app's name (ADR 0249), shown on the home screen and in the install prompt. Its icons
+  // come from the generators (app-icons.mjs) and its colors are the upstream's neutral background.
+  {
+    rule: "web app: manifest name",
+    file: "apps/web/public/manifest.webmanifest",
+    find: '"name": "agentes.chat",\n  "short_name": "agentes.chat",',
+    replace: `"name": ${JSON.stringify(NAME)},\n  "short_name": ${JSON.stringify(NAME)},`,
+  },
   // Emails: logo alt text (the image comes from the profile).
   {
     rule: "email: logo alt text",
