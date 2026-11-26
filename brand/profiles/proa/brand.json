@@ -131,7 +131,7 @@
     },
     "apps/web/src/pages/OnboardingPage.tsx": {
       "file": "override/apps/web/src/pages/OnboardingPage.tsx",
-      "upstreamSha256": "768f2640c35adbb19c644d59e50cd4cd825be6396d84f99be3d26dce2bd3d9cd"
+      "upstreamSha256": "26d140bb5ceda89753485c9e058feda9393a328042813ab08df9a81aabbecc5b"
     },
     "packages/ui/src/components/Surfaces.tsx": {
       "file": "override/packages/ui/src/components/Surfaces.tsx",
@@ -360,8 +360,8 @@
     {
       "why": "privacy: this computer lends no internet to a workspace's computer (ADR 0237): every egress.dial is no_slot, which the server passes over, and the workspace's computer goes out its usual way",
       "file": "apps/server/runner/daemon.ts",
-      "find": "    this.egressShare ??= new EgressShare({ file: path.join(home, EGRESS_SHARE_FILE) });\n",
-      "replace": "    // This build lends no internet (ADR 0237): a daily cap of 0 answers every egress.dial with no_slot.\n    this.egressShare ??= new EgressShare({ file: path.join(home, EGRESS_SHARE_FILE), limits: { dailyBytes: 0 } });\n"
+      "find": "    this.egressShare ??= new EgressShare();\n",
+      "replace": "    // This build lends no internet (ADR 0237): room for no connection at once answers every egress.dial with no_slot.\n    this.egressShare ??= new EgressShare({ limits: { open: 0 } });\n"
     },
     {
       "why": "privacy: the desktop app sends no problem report by default (no upstream address): the panel offers Copy only",
@@ -474,8 +474,8 @@
     {
       "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the computer's page imports, the status line",
       "file": "apps/web/src/components/devices/DevicePage.tsx",
-      "find": "  RUNNER_UPDATE_COMMAND,\n  shareInternetText,\n  statusLook,\n",
-      "replace": "  RUNNER_UPDATE_COMMAND,\n  statusLook,\n"
+      "find": "  shareInternetText,\n  spillOfUse,\n",
+      "replace": "  spillOfUse,\n"
     },
     {
       "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the computer's page, nothing to pick",
@@ -516,8 +516,8 @@
     {
       "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page imports",
       "file": "apps/mobile/src/features/devices/ComputerSection.tsx",
-      "find": "import {\n  lendingDevice,\n  mayChangeTasks,\n  shareInternetText,\n  taskChoices,\n  tasksAutoText,\n} from \"@agenteschat/client/lib/devices\";\n",
-      "replace": "import { mayChangeTasks, taskChoices, tasksAutoText } from \"@agenteschat/client/lib/devices\";\n"
+      "find": "import {\n  lendingDevice,\n  mayChangeTasks,\n  SPILL_USES,\n  type SpillUse,\n  shareInternetText,\n  spillOfUse,\n",
+      "replace": "import {\n  mayChangeTasks,\n  SPILL_USES,\n  type SpillUse,\n  spillOfUse,\n"
     },
     {
       "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page, no switch to save",
@@ -529,7 +529,7 @@
       "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the phone's computer page, nothing to pick",
       "file": "apps/mobile/src/features/devices/ComputerSection.tsx",
       "find": "  const sharing = (share.isPending ? share.variables : undefined) ?? d.shareInternet?.on ?? false;\n  const mine = d.ownerUserId === meId;\n  // Someone else's lends now: its owner may pick this one instead (on again moves it first).\n  const mayPick = sharing && !share.isPending && !d.shareInternet?.inUse && lending !== null && mine;\n  const shareFailed = (err: unknown) => toast({ title: errorText(t, err), icon: \"x\" });\n",
-      "replace": ""
+      "replace": "  const mine = d.ownerUserId === meId;\n"
     },
     {
       "why": "privacy: no lent internet (ADR 0237, the runner refuses every egress.dial): the server offers no relay, import",
@@ -583,10 +583,7 @@
     },
     {
       "why": "agent radius: round, without the cut corner (both tokens.css, kept equal by a test)",
-      "files": [
-        "docs/design/design-system/tokens.css",
-        "packages/ui/src/styles/tokens.css"
-      ],
+      "files": ["docs/design/design-system/tokens.css", "packages/ui/src/styles/tokens.css"],
       "find": "  --radius-agent: 30% 30% 30% 9%;",
       "replace": "  --radius-agent: 50% 50% 50% 50%;",
       "count": 1
@@ -1223,11 +1220,7 @@
     }
   },
   "append": {
-    "packages/ui/src/agent/engine.js": [
-      "agent/proa-agent.js"
-    ],
-    "packages/ui/src/styles/components.css": [
-      "agent/porthole.css"
-    ]
+    "packages/ui/src/agent/engine.js": ["agent/proa-agent.js"],
+    "packages/ui/src/styles/components.css": ["agent/porthole.css"]
   }
 }
