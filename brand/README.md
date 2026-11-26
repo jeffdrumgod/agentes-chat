@@ -55,6 +55,14 @@ brand/build.sh --profile brand/profiles/<name> --out ../<name>-build --target no
 fails on any upstream name left outside the allowed places: URLs, the attribution, the upstream's own Cloud and
 technical identifiers.
 
+## Looking at the agents
+
+`bun brand/agent-sheet.ts <branded copy> <out dir>` draws every look (colors × accessories, states and expressions,
+eyes with the presence badge, the sizes in use, and every color × accessory × state) in light and dark, as each app
+draws it: the web's `Avatar` in headless Chrome, the phone's `agentFrame` on Skia (CanvasKit). Look at the sheets
+before committing a change to the drawing; `brand/test/agent-drawing.test.ts` keeps it as a snapshot
+(`bun test brand/test --update-snapshots` after a deliberate change).
+
 ## Syncing with upstream
 
 1. Fast-forward `main` from upstream. Rebase this branch (only `brand/` differs, so there are no conflicts).
