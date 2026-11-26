@@ -334,6 +334,54 @@
       "file": "apps/web/src/lib/phone-apps.ts",
       "find": "const GOOGLE_PLAY = \"https://play.google.com/store/apps/details?id=chat.agentes.app\";",
       "replace": "const GOOGLE_PLAY = \"https://play.google.com/store/apps/details?id=${BRAND_APP_ID}\";"
+    },
+    {
+      "why": "privacy: usage statistics start off on a server set up on this computer (the server's TELEMETRY default is off too, serverDefaults)",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "  const [usage, setUsage] = useState(true);\n",
+      "replace": "  const [usage, setUsage] = useState(false);\n"
+    },
+    {
+      "why": "privacy: the first run's comment says usage statistics start off",
+      "file": "apps/desktop/src/windows/FirstRun.tsx",
+      "find": "usage statistics (on; as they were, for one that ran here before)",
+      "replace": "usage statistics (off; as they were, for one that ran here before)"
+    },
+    {
+      "why": "privacy: before the app answers, the windows show usage statistics off",
+      "file": "apps/desktop/src/control/local-server.ts",
+      "find": "  reach: false,\n  usage: true,\n  installedVersion: null,\n",
+      "replace": "  reach: false,\n  usage: false,\n  installedVersion: null,\n"
+    },
+    {
+      "why": "privacy: the desktop reads usage statistics as on only when .env says so (unset is off, as this build's server reads it)",
+      "file": "apps/desktop/src-tauri/src/local_server.rs",
+      "find": "/// `TELEMETRY` as the server reads it (packages/config: a boolean string, on when unset).\nfn telemetry_on(value: Option<&str>) -> bool {\n    !value.is_some_and(|v| matches!(v.trim().to_ascii_lowercase().as_str(), \"off\" | \"false\" | \"0\" | \"no\" | \"n\" | \"disabled\"))\n}\n",
+      "replace": "/// `TELEMETRY` as the server reads it (packages/config: a boolean string; off when unset in this build, whose\n/// server default is off): on only when `.env` says so.\nfn telemetry_on(value: Option<&str>) -> bool {\n    value.is_some_and(|v| matches!(v.trim().to_ascii_lowercase().as_str(), \"on\" | \"true\" | \"1\" | \"yes\" | \"y\" | \"enabled\"))\n}\n"
+    },
+    {
+      "why": "privacy: the desktop's test of how it reads TELEMETRY (unset is off)",
+      "file": "apps/desktop/src-tauri/src/local_server.rs",
+      "find": "        assert!(telemetry_on(None));\n        assert!(telemetry_on(Some(\"on\")));\n",
+      "replace": "        assert!(!telemetry_on(None));\n        assert!(!telemetry_on(Some(\"maybe\")));\n        assert!(telemetry_on(Some(\"on\")));\n        assert!(telemetry_on(Some(\" ON \")));\n"
+    },
+    {
+      "why": "privacy: this computer lends no internet to a workspace's computer (ADR 0237): every egress.dial is no_slot, which the server passes over, and the workspace's computer goes out its usual way",
+      "file": "apps/server/runner/daemon.ts",
+      "find": "    this.egressShare ??= new EgressShare({ file: path.join(home, EGRESS_SHARE_FILE) });\n",
+      "replace": "    // This build lends no internet (ADR 0237): a daily cap of 0 answers every egress.dial with no_slot.\n    this.egressShare ??= new EgressShare({ file: path.join(home, EGRESS_SHARE_FILE), limits: { dailyBytes: 0 } });\n"
+    },
+    {
+      "why": "privacy: the desktop app sends no problem report by default (no upstream address): the panel offers Copy only",
+      "file": "apps/desktop/src-tauri/src/problem_report.rs",
+      "find": "const DEFAULT_URL: &str = \"https://telemetry.agentes.chat/v1/problem-report\";\n",
+      "replace": ""
+    },
+    {
+      "why": "privacy: where the desktop app sends a problem report: only an address set in PROBLEM_REPORT_URL",
+      "file": "apps/desktop/src-tauri/src/problem_report.rs",
+      "find": "/// Where reports go: the app process's `PROBLEM_REPORT_URL` when set (`off` turns sending off), else agentes.chat's.\nfn target() -> Option<String> {\n    match std::env::var(\"PROBLEM_REPORT_URL\") {\n        Ok(url) if url.trim() == \"off\" => None,\n        Ok(url) if url.trim().is_empty() => Some(DEFAULT_URL.into()),\n        Ok(url) => Some(url),\n        Err(_) => Some(DEFAULT_URL.into()),\n    }\n}\n",
+      "replace": "/// Where reports go: the app process's `PROBLEM_REPORT_URL` when it is an address; unset, empty or `off`, nowhere\n/// (this build sends no report by default, so the panel offers Copy only).\nfn target() -> Option<String> {\n    match std::env::var(\"PROBLEM_REPORT_URL\") {\n        Ok(url) if url.trim() == \"off\" || url.trim().is_empty() => None,\n        Ok(url) => Some(url),\n        Err(_) => None,\n    }\n}\n"
     }
   ]
 }
