@@ -1,4 +1,3 @@
-
 /* Proa: an agent's tile is a porthole. Round, and its ring is drawn on the canvas (engine drawPorthole), so the
    kit's square tile edge (the inset hairline and top highlight) steps aside for agents. */
 .ac-avatar.ac-avatar--framed.ac-avatar--agent {
